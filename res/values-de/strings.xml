@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="cancel">Abbrechen</string>
+	<string name="error">Fehler</string>
+	<string name="go_to_position">Gehe zu Position</string>
+	<string name="gps_disabled">Der GPS-Empfänger ist deaktiviert</string>
+	<string name="latitude">Breitengrad</string>
+	<string name="longitude">Längengrad</string>
+	<string name="map_file_invalid">Die gewählte Datei ist keine gültige Kartendatei.
+		Bitte wählen Sie eine andere Datei aus.</string>
+	<string name="map_file_select">Bitte wählen Sie eine Kartendatei aus.</string>
+	<string name="menu_exit">Beenden</string>
+	<string name="menu_info">Info</string>
+	<string name="menu_mapfile">Kartendatei</string>
+	<string name="menu_position">Position</string>
+	<string name="menu_position_enter_coordinates">Neue Koordinaten eingeben</string>
+	<string name="menu_position_gps_follow">GPS-Signal folgen</string>
+	<string name="menu_position_map_file_center">Zentrum der Kartendatei</string>
+	<string name="menu_preferences">Einstellungen</string>
+	<string name="ok">OK</string>
+	<string name="preferences_general">Allgemeine Einstellungen</string>
+	<string name="preferences_cache_size">Cache-Größe</string>
+	<string name="preferences_cache_size_desc"></string>
+	<string name="preferences_map">Karteneinstellungen</string>
+	<string name="preferences_show_map_scale">Kartenmaßstab anzeigen</string>
+	<string name="preferences_show_map_scale_desc"></string>
+</resources>

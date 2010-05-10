@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="cancel">Cancel</string>
+	<string name="error">Error</string>
+	<string name="go_to_position">Go to position</string>
+	<string name="gps_disabled">The GPS receiver is disabled</string>
+	<string name="latitude">Latitude</string>
+	<string name="longitude">Longitude</string>
+	<string name="map_file_invalid">The selected file is not a valid map file. Please
+		select another file.</string>
+	<string name="map_file_select">Please select a map file.</string>
+	<string name="menu_exit">Exit</string>
+	<string name="menu_info">Info</string>
+	<string name="menu_mapfile">Mapfile</string>
+	<string name="menu_position">Position</string>
+	<string name="menu_position_enter_coordinates">Enter new coordinates</string>
+	<string name="menu_position_gps_follow">Follow GPS signal</string>
+	<string name="menu_position_map_file_center">Map file center</string>
+	<string name="menu_preferences">Preferences</string>
+	<string name="ok">OK</string>
+	<string name="preferences_general">General settings</string>
+	<string name="preferences_cache_size">Cache size</string>
+	<string name="preferences_cache_size_desc">Set the size of the image cache</string>
+	<string name="preferences_map">Map settings</string>
+	<string name="preferences_show_map_scale">Show map scale</string>
+	<string name="preferences_show_map_scale_desc"></string>
+</resources>

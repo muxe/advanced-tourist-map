@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+	<RelativeLayout android:id="@+id/mainView"
+		android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<org.mapsforge.android.map.MapView
+			android:id="@+id/mapView" android:layout_width="fill_parent"
+			android:layout_height="fill_parent" />
+		<ImageView android:id="@+id/gpsView" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/gps_animation"
+			android:background="@drawable/btn_square_overlay_normal"
+			android:layout_alignParentTop="true" android:layout_alignParentRight="true"
+			android:layout_marginTop="5px" android:layout_marginRight="5px"
+			android:scaleType="center" android:visibility="gone" />
+		<RelativeLayout android:id="@+id/coordinatesView"
+			android:layout_width="fill_parent" android:layout_height="fill_parent"
+			android:background="#F000" android:orientation="vertical"
+			android:padding="15px" android:layout_centerHorizontal="true"
+			android:visibility="gone">
+			<TextView android:id="@+id/latitudeLabel"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:text="@string/latitude" android:textStyle="bold" />
+			<EditText android:id="@+id/latitude" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:layout_below="@id/latitudeLabel"
+				android:maxLength="9" android:inputType="numberSigned|numberDecimal" />
+			<TextView android:id="@+id/longitudeLabel"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_below="@id/latitude" android:text="@string/longitude"
+				android:textStyle="bold" />
+			<EditText android:id="@+id/longitude" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:layout_below="@id/longitudeLabel"
+				android:maxLength="9" android:inputType="numberSigned|numberDecimal" />
+			<Button android:id="@+id/goButton" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_below="@id/longitude"
+				android:text="@string/go_to_position" android:layout_marginTop="15px" />
+			<Button android:id="@+id/cancelButton" android:layout_width="wrap_content"
+				android:layout_height="wrap_content" android:layout_below="@id/longitude"
+				android:layout_toRightOf="@id/goButton" android:text="@string/cancel"
+				android:layout_marginTop="15px" android:layout_marginLeft="15px" />
+		</RelativeLayout>
+	</RelativeLayout>
+	<GridView android:id="@+id/fileBrowserView"
+		android:layout_width="fill_parent" android:layout_height="fill_parent"
+		android:fadingEdge="vertical" android:fadingEdgeLength="40px"
+		android:columnWidth="90px" android:numColumns="auto_fit"
+		android:visibility="gone" />
+</merge>
