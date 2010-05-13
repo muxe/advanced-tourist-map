@@ -31,6 +31,7 @@ import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -61,9 +62,11 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final String THREAD_NAME = "AdvancedMapViewer";
 	static final byte IMAGE_CACHE_SIZE_DEFAULT = 25;
 	static final byte IMAGE_CACHE_SIZE_MAX = 50;
+
 	static void d(String str) {
 		Log.d("osm", Thread.currentThread().getName() + ": " + str);
 	}
+
 	private Button cancelButton;
 	private FileBrowser fileBrowser;
 	private GridView fileBrowserView;
@@ -72,7 +75,6 @@ public class AdvancedMapViewer extends MapActivity {
 	private MapView mapView;
 	private Toast toast;
 	RelativeLayout coordinatesView;
-	AnimationDrawable gpsAnimation;
 	ImageView gpsView;
 	InputMethodManager inputMethodManager;
 	EditText latitudeView;
@@ -105,9 +107,6 @@ public class AdvancedMapViewer extends MapActivity {
 
 		// create the file browser
 		this.fileBrowser = new FileBrowser(this, "/", this.fileBrowserView);
-
-		// get the animation drawable for the gps symbol
-		this.gpsAnimation = (AnimationDrawable) this.gpsView.getDrawable();
 
 		// set an empty touch listener to handle all touch events
 		this.coordinatesView.setOnTouchListener(new OnTouchListener() {
@@ -174,40 +173,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 			case R.id.menu_position_gps_follow:
 				if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-					this.locationListener = new LocationListener() {
-						@Override
-						public void onLocationChanged(Location location) {
-							AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(
-									location.getLatitude(), location.getLongitude()));
-						}
-
-						@Override
-						public void onProviderDisabled(String provider) {
-							disableFollowGPS(this);
-							showDialog(DIALOG_GPS_DISABLED);
-						}
-
-						@Override
-						public void onProviderEnabled(String provider) {
-							// do nothing
-						}
-
-						@Override
-						public void onStatusChanged(String provider, int status, Bundle extras) {
-							// do nothing
-						}
-					};
-
-					this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-							2000, 0, this.locationListener);
-					this.gpsAnimation.start();
-					this.gpsView.setVisibility(View.VISIBLE);
-					this.gpsView.setOnClickListener(new OnClickListener() {
-						@Override
-						public void onClick(View v) {
-							disableFollowGPS(AdvancedMapViewer.this.locationListener);
-						}
-					});
+					enableFollowGPS();
 				} else {
 					showDialog(DIALOG_GPS_DISABLED);
 				}
@@ -224,7 +190,7 @@ public class AdvancedMapViewer extends MapActivity {
 					@Override
 					public void onClick(View v) {
 						// disable gps follow mode if it is enabled
-						disableFollowGPS(AdvancedMapViewer.this.locationListener);
+						disableFollowGPS();
 						// set the new map center coordinates
 						AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(Double
 								.parseDouble(AdvancedMapViewer.this.latitudeView.getText()
@@ -253,7 +219,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 			case R.id.menu_position_map_center:
 				// disable gps follow mode if it is enabled
-				disableFollowGPS(AdvancedMapViewer.this.locationListener);
+				disableFollowGPS();
 				this.mapController.setCenter(this.mapView.getMapFileCenter());
 				return true;
 
@@ -296,6 +262,61 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 		}
 		return true;
+	}
+
+	@Override
+	public Object onRetainNonConfigurationInstance() {
+		if (this.locationListener != null) {
+			return new Boolean(true);
+		}
+		return null;
+	}
+
+	private void enableFollowGPS() {
+		this.locationListener = new LocationListener() {
+			@Override
+			public void onLocationChanged(Location location) {
+				AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(location
+						.getLatitude(), location.getLongitude()));
+				AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
+			}
+
+			@Override
+			public void onProviderDisabled(String provider) {
+				disableFollowGPS();
+				showDialog(DIALOG_GPS_DISABLED);
+			}
+
+			@Override
+			public void onProviderEnabled(String provider) {
+				// do nothing
+			}
+
+			@Override
+			public void onStatusChanged(String provider, int status, Bundle extras) {
+				if (status == LocationProvider.AVAILABLE) {
+					AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
+				} else if (status == LocationProvider.OUT_OF_SERVICE) {
+					AdvancedMapViewer.this.gpsView
+							.setImageResource(R.drawable.stat_sys_gps_acquiring);
+				} else {
+					// must be TEMPORARILY_UNAVAILABLE
+					AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.gps_animation);
+					((AnimationDrawable) AdvancedMapViewer.this.gpsView.getDrawable()).start();
+				}
+			}
+		};
+
+		this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0,
+				this.locationListener);
+		this.gpsView.setImageResource(R.drawable.stat_sys_gps_acquiring);
+		this.gpsView.setVisibility(View.VISIBLE);
+		this.gpsView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				disableFollowGPS();
+			}
+		});
 	}
 
 	@Override
@@ -348,9 +369,16 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setMapScale(this.preferencesDefault.getBoolean("showMapScale", false));
 		this.mapView.setCacheSize(this.preferencesDefault.getInt("cacheSize",
 				IMAGE_CACHE_SIZE_DEFAULT));
+	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
 		if (this.mapView.hasValidMapFile()) {
 			setMapFileTitle();
+			if (getLastNonConfigurationInstance() != null) {
+				enableFollowGPS();
+			}
 		} else {
 			this.mainView.setVisibility(View.GONE);
 			this.fileBrowserView.setVisibility(View.VISIBLE);
@@ -359,12 +387,12 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 	}
 
-	void disableFollowGPS(LocationListener listener) {
-		if (listener != null) {
-			this.locationManager.removeUpdates(listener);
+	void disableFollowGPS() {
+		if (this.locationListener != null) {
+			this.locationManager.removeUpdates(this.locationListener);
+			this.locationListener = null;
 		}
 		this.gpsView.setVisibility(View.GONE);
-		this.gpsAnimation.stop();
 	}
 
 	/**
