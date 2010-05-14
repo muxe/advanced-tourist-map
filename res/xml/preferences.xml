@@ -5,6 +5,9 @@
 		<CheckBoxPreference android:title="@string/preferences_show_map_scale"
 			android:summary="@string/preferences_show_map_scale_desc"
 			android:key="showMapScale" />
+		<CheckBoxPreference android:title="@string/preferences_show_fps_counter"
+			android:summary="@string/preferences_show_fps_counter_desc"
+			android:key="showFpsCounter" />
 	</PreferenceCategory>
 	<PreferenceCategory android:title="@string/preferences_general">
 		<org.mapsforge.applications.android.advancedmapviewer.CacheSizePreference

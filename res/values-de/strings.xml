@@ -20,8 +20,10 @@
 	<string name="ok">OK</string>
 	<string name="preferences_general">Allgemeine Einstellungen</string>
 	<string name="preferences_cache_size">Cache-Größe</string>
-	<string name="preferences_cache_size_desc"></string>
+	<string name="preferences_cache_size_desc">Kapazität des Bilder-Caches einstellen</string>
 	<string name="preferences_map">Karteneinstellungen</string>
+	<string name="preferences_show_fps_counter">Bildfrequenz anzeigen</string>
+	<string name="preferences_show_fps_counter_desc"></string>
 	<string name="preferences_show_map_scale">Kartenmaßstab anzeigen</string>
 	<string name="preferences_show_map_scale_desc"></string>
 </resources>

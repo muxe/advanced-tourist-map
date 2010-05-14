@@ -40,8 +40,8 @@ public class CacheSizePreference extends SeekBarPreference {
 
 		// define the current and maximum value of the seek bar
 		this.progress = this.preferencesDefault.getInt(this.getKey(),
-				AdvancedMapViewer.IMAGE_CACHE_SIZE_DEFAULT);
-		this.max = AdvancedMapViewer.IMAGE_CACHE_SIZE_MAX;
+				AdvancedMapViewer.FILE_CACHE_SIZE_DEFAULT);
+		this.max = AdvancedMapViewer.FILE_CACHE_SIZE_MAX;
 
 		// define the progress increment via the arrow keys
 		this.increment = 1;

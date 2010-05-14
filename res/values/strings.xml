@@ -20,8 +20,10 @@
 	<string name="ok">OK</string>
 	<string name="preferences_general">General settings</string>
 	<string name="preferences_cache_size">Cache size</string>
-	<string name="preferences_cache_size_desc">Set the size of the image cache</string>
+	<string name="preferences_cache_size_desc">Set the size of the image file cache</string>
 	<string name="preferences_map">Map settings</string>
+	<string name="preferences_show_fps_counter">Show frame rate</string>
+	<string name="preferences_show_fps_counter_desc"></string>
 	<string name="preferences_show_map_scale">Show map scale</string>
 	<string name="preferences_show_map_scale_desc"></string>
 </resources>

@@ -113,7 +113,7 @@ abstract class SeekBarPreference extends DialogPreference {
 		// create the seek bar and set the maximum and current value
 		this.seekBar = new SeekBar(getContext());
 		this.seekBar.setMax(this.max);
-		this.seekBar.setProgress(this.progress);
+		this.seekBar.setProgress(Math.min(this.progress, this.max));
 		this.seekBar.setKeyProgressIncrement(this.increment);
 
 		// add the seek bar to the layout

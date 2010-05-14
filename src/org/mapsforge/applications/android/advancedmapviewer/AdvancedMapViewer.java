@@ -34,7 +34,6 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,14 +58,8 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
 	private static final int DIALOG_MAP_FILE_INVALID = 1;
 	private static final int DIALOG_MAP_FILE_SELECT = 2;
-	private static final String THREAD_NAME = "AdvancedMapViewer";
-	static final byte IMAGE_CACHE_SIZE_DEFAULT = 25;
-	static final byte IMAGE_CACHE_SIZE_MAX = 50;
-
-	static void d(String str) {
-		Log.d("osm", Thread.currentThread().getName() + ": " + str);
-	}
-
+	static final short FILE_CACHE_SIZE_DEFAULT = 10;
+	static final short FILE_CACHE_SIZE_MAX = 250;
 	private Button cancelButton;
 	private FileBrowser fileBrowser;
 	private GridView fileBrowserView;
@@ -88,7 +81,6 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		Thread.currentThread().setName(THREAD_NAME);
 
 		// set up the layout views
 		setContentView(R.layout.main);
@@ -367,8 +359,9 @@ public class AdvancedMapViewer extends MapActivity {
 		// Read the default shared preferences
 		this.preferencesDefault = PreferenceManager.getDefaultSharedPreferences(this);
 		this.mapView.setMapScale(this.preferencesDefault.getBoolean("showMapScale", false));
-		this.mapView.setCacheSize(this.preferencesDefault.getInt("cacheSize",
-				IMAGE_CACHE_SIZE_DEFAULT));
+		this.mapView.setFpsCounter(this.preferencesDefault.getBoolean("showFpsCounter", false));
+		this.mapView.setFileCacheSize(Math.min(this.preferencesDefault.getInt("cacheSize",
+				FILE_CACHE_SIZE_DEFAULT), FILE_CACHE_SIZE_MAX));
 	}
 
 	@Override
