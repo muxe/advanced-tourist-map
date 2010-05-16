@@ -16,7 +16,7 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
+import org.mapsforge.android.map.MapView;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -25,6 +25,8 @@ import android.util.AttributeSet;
  * Preferences class for adjusting the cache size.
  */
 public class CacheSizePreference extends SeekBarPreference {
+	private final StringBuilder stringBuilder;
+
 	/**
 	 * Construct a new cache size preference seek bar.
 	 * 
@@ -36,14 +38,34 @@ public class CacheSizePreference extends SeekBarPreference {
 	public CacheSizePreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		// define the text message
-		this.message = getContext().getString(R.string.preferences_cache_size_desc);
+		this.messageText = getContext().getString(R.string.preferences_cache_size_desc);
 
 		// define the current and maximum value of the seek bar
-		this.progress = this.preferencesDefault.getInt(this.getKey(),
+		this.seekBarCurrentValue = this.preferencesDefault.getInt(this.getKey(),
 				AdvancedMapViewer.FILE_CACHE_SIZE_DEFAULT);
 		this.max = AdvancedMapViewer.FILE_CACHE_SIZE_MAX;
+		this.stringBuilder = new StringBuilder(32);
+	}
 
-		// define the progress increment via the arrow keys
-		this.increment = 1;
+	private void appendHumanReadableSize(int fileSize) {
+		if (fileSize < 1000000) {
+			this.stringBuilder.append(fileSize / 1000);
+			this.stringBuilder.append(getContext().getString(R.string.unit_symbol_kilobyte));
+		} else {
+			// round to first decimal place
+			this.stringBuilder.append((fileSize / 100000) / 10d);
+			this.stringBuilder.append(getContext().getString(R.string.unit_symbol_megabyte));
+		}
+	}
+
+	@Override
+	String getCurrentValueText(int progress) {
+		this.stringBuilder.delete(0, Integer.MAX_VALUE);
+		this.stringBuilder.append(getContext().getString(R.string.seek_bar_current_value));
+		appendHumanReadableSize(MapView.getTileSizeInBytes() * progress);
+		this.stringBuilder.append(getContext().getString(R.string.out_of));
+		appendHumanReadableSize(MapView.getTileSizeInBytes()
+				* AdvancedMapViewer.FILE_CACHE_SIZE_MAX);
+		return this.stringBuilder.toString();
 	}
 }

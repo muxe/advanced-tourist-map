@@ -19,7 +19,6 @@ package org.mapsforge.applications.android.advancedmapviewer;
 import java.io.File;
 import java.util.ArrayList;
 
-
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.AdapterView;

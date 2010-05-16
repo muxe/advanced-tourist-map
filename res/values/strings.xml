@@ -18,6 +18,7 @@
 	<string name="menu_position_map_file_center">Map file center</string>
 	<string name="menu_preferences">Preferences</string>
 	<string name="ok">OK</string>
+	<string name="out_of">&#160;of&#160;</string>
 	<string name="preferences_general">General settings</string>
 	<string name="preferences_cache_size">Cache size</string>
 	<string name="preferences_cache_size_desc">Set the size of the image file cache</string>
@@ -26,4 +27,9 @@
 	<string name="preferences_show_fps_counter_desc"></string>
 	<string name="preferences_show_map_scale">Show map scale</string>
 	<string name="preferences_show_map_scale_desc"></string>
+	<string name="seek_bar_current_value">Current value:&#160;</string>
+	<string name="unit_symbol_kilobyte">&#160;kB</string>
+	<string name="unit_symbol_kilometer">&#160;km</string>
+	<string name="unit_symbol_megabyte">&#160;MB</string>
+	<string name="unit_symbol_meter">&#160;m</string>
 </resources>

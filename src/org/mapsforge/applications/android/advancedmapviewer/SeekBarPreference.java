@@ -23,26 +23,29 @@ import android.content.SharedPreferences.Editor;
 import android.preference.DialogPreference;
 import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
 /**
  * This abstract class provides all code for a seek bar preference. Deriving classes only need
- * to set the current and maximum value of the seek bar. An optional text message is also
- * supported.
+ * to set the current and maximum value of the seek bar. An optional text message above the seek
+ * bar is also supported as well as an optional current value message below the seek bar.
  */
-abstract class SeekBarPreference extends DialogPreference {
+abstract class SeekBarPreference extends DialogPreference implements OnSeekBarChangeListener {
+	private TextView currentValueTextView;
 	private Editor editor;
 	private LinearLayout linearLayout;
-	private SeekBar seekBar;
-	private TextView textView;
+	private TextView messageTextView;
+	private SeekBar preferenceSeekBar;
 
 	/**
 	 * How much the value should increase when the seek bar is moved.
 	 */
-	int increment;
+	int increment = 1;
 
 	/**
 	 * The maximum value of the seek bar.
@@ -52,7 +55,7 @@ abstract class SeekBarPreference extends DialogPreference {
 	/**
 	 * Optional text message to display on top of the seek bar.
 	 */
-	String message;
+	String messageText;
 
 	/**
 	 * The SharedPreferences instance that is used.
@@ -62,7 +65,7 @@ abstract class SeekBarPreference extends DialogPreference {
 	/**
 	 * The current value of the seek bar.
 	 */
-	int progress;
+	int seekBarCurrentValue;
 
 	/**
 	 * Create a new seek bar preference.
@@ -82,42 +85,77 @@ abstract class SeekBarPreference extends DialogPreference {
 		// check if the "OK" button was pressed
 		if (which == DialogInterface.BUTTON_POSITIVE) {
 			// check if the value of the seek bar differs from the initial value
-			if (this.progress != this.seekBar.getProgress()) {
+			if (this.seekBarCurrentValue != this.preferenceSeekBar.getProgress()) {
 				// get the value of the seek bar and save it in the preferences
-				this.progress = this.seekBar.getProgress();
+				this.seekBarCurrentValue = this.preferenceSeekBar.getProgress();
 				this.editor = this.preferencesDefault.edit();
-				this.editor.putInt(this.getKey(), this.progress);
+				this.editor.putInt(this.getKey(), this.seekBarCurrentValue);
 				this.editor.commit();
 			}
 		}
 	}
 
 	@Override
+	public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+		if (this.currentValueTextView != null) {
+			this.currentValueTextView.setText(getCurrentValueText(progress));
+		}
+	}
+
+	@Override
+	public void onStartTrackingTouch(SeekBar seekBar) {
+		// do nothing
+	}
+
+	@Override
+	public void onStopTrackingTouch(SeekBar seekBar) {
+		// do nothing
+	}
+
+	@Override
 	protected View onCreateDialogView() {
-		// create a layout for the optional text message and the seek bar
+		// create a layout for the optional text messageText and the seek bar
 		this.linearLayout = new LinearLayout(getContext());
 		this.linearLayout.setOrientation(LinearLayout.VERTICAL);
 		this.linearLayout.setPadding(20, 10, 20, 10);
 
 		// check if a text message should appear above the seek bar
-		if (this.message != null) {
-			// create a text view for the text message
-			this.textView = new TextView(getContext());
-			this.textView.setText(this.message);
-			this.textView.setPadding(0, 0, 0, 10);
-
-			// add the text view to the layout
-			this.linearLayout.addView(this.textView);
+		if (this.messageText != null) {
+			// create a text view for the text messageText
+			this.messageTextView = new TextView(getContext());
+			this.messageTextView.setText(this.messageText);
+			this.messageTextView.setPadding(0, 0, 0, 10);
+			// add the text message view to the layout
+			this.linearLayout.addView(this.messageTextView);
 		}
 
 		// create the seek bar and set the maximum and current value
-		this.seekBar = new SeekBar(getContext());
-		this.seekBar.setMax(this.max);
-		this.seekBar.setProgress(Math.min(this.progress, this.max));
-		this.seekBar.setKeyProgressIncrement(this.increment);
-
+		this.preferenceSeekBar = new SeekBar(getContext());
+		this.preferenceSeekBar.setOnSeekBarChangeListener(this);
+		this.preferenceSeekBar.setMax(this.max);
+		this.preferenceSeekBar.setProgress(Math.min(this.seekBarCurrentValue, this.max));
+		this.preferenceSeekBar.setKeyProgressIncrement(this.increment);
 		// add the seek bar to the layout
-		this.linearLayout.addView(this.seekBar);
+		this.linearLayout.addView(this.preferenceSeekBar);
+
+		// create the text view for the current value below the seek bar
+		this.currentValueTextView = new TextView(getContext());
+		this.currentValueTextView.setText(getCurrentValueText(this.preferenceSeekBar
+				.getProgress()));
+		this.currentValueTextView.setPadding(0, 0, 0, 10);
+		this.currentValueTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+		// add the current value text view to the layout
+		this.linearLayout.addView(this.currentValueTextView);
+
 		return this.linearLayout;
 	}
+
+	/**
+	 * Get the current value text.
+	 * 
+	 * @param progress
+	 *            the current progress level of the seek bar.
+	 * @return the new current value text
+	 */
+	abstract String getCurrentValueText(int progress);
 }

@@ -20,7 +20,6 @@ import org.mapsforge.android.map.GeoPoint;
 import org.mapsforge.android.map.MapActivity;
 import org.mapsforge.android.map.MapController;
 import org.mapsforge.android.map.MapView;
-import org.mapsforge.applications.android.advancedmapviewer.R;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -58,8 +57,8 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
 	private static final int DIALOG_MAP_FILE_INVALID = 1;
 	private static final int DIALOG_MAP_FILE_SELECT = 2;
-	static final short FILE_CACHE_SIZE_DEFAULT = 10;
-	static final short FILE_CACHE_SIZE_MAX = 250;
+	static final short FILE_CACHE_SIZE_DEFAULT = 100;
+	static final short FILE_CACHE_SIZE_MAX = 500;
 	private Button cancelButton;
 	private FileBrowser fileBrowser;
 	private GridView fileBrowserView;
@@ -75,7 +74,6 @@ public class AdvancedMapViewer extends MapActivity {
 	LocationManager locationManager;
 	EditText longitudeView;
 	MapController mapController;
-
 	SharedPreferences preferencesDefault;
 
 	@Override
@@ -112,6 +110,11 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setClickable(true);
 		this.mapView.setBuiltInZoomControls(true);
 
+		// set the localized text fields
+		this.mapView
+				.setText("unit_symbol_kilometer", getString(R.string.unit_symbol_kilometer));
+		this.mapView.setText("unit_symbol_meter", getString(R.string.unit_symbol_meter));
+
 		// get the location manager and the input method manager
 		this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		this.inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
@@ -141,7 +144,7 @@ public class AdvancedMapViewer extends MapActivity {
 					finish();
 				}
 				return true;
-			} else if (this.mainView.getVisibility() == View.VISIBLE) {
+			} else {
 				// quit the application
 				finish();
 				return true;
@@ -264,6 +267,12 @@ public class AdvancedMapViewer extends MapActivity {
 		return null;
 	}
 
+	@Override
+	public boolean onTrackballEvent(MotionEvent event) {
+		// forward the event to the MapView
+		return this.mapView.onTrackballEvent(event);
+	}
+
 	private void enableFollowGPS() {
 		this.locationListener = new LocationListener() {
 			@Override
@@ -337,7 +346,8 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		// remove the toast message if visible
+
+		// remove the toast messageText if visible
 		if (this.toast != null) {
 			this.toast.cancel();
 			this.toast = null;
@@ -356,6 +366,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+
 		// Read the default shared preferences
 		this.preferencesDefault = PreferenceManager.getDefaultSharedPreferences(this);
 		this.mapView.setMapScale(this.preferencesDefault.getBoolean("showMapScale", false));
@@ -367,6 +378,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onStart() {
 		super.onStart();
+
 		if (this.mapView.hasValidMapFile()) {
 			setMapFileTitle();
 			if (getLastNonConfigurationInstance() != null) {
@@ -414,11 +426,11 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	/**
-	 * Displays a text message via the toast notification system. If a previous message is still
-	 * visible, the previous message is first removed to avoid jam.
+	 * Displays a text messageText via the toast notification system. If a previous messageText
+	 * is still visible, the previous messageText is first removed to avoid jam.
 	 * 
 	 * @param text
-	 *            the text message to display
+	 *            the text messageText to display
 	 */
 	void showToast(String text) {
 		if (this.toast == null) {
