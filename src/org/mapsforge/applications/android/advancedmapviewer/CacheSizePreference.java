@@ -61,7 +61,6 @@ public class CacheSizePreference extends SeekBarPreference {
 	@Override
 	String getCurrentValueText(int progress) {
 		this.stringBuilder.delete(0, Integer.MAX_VALUE);
-		this.stringBuilder.append(getContext().getString(R.string.seek_bar_current_value));
 		appendHumanReadableSize(MapView.getTileSizeInBytes() * progress);
 		this.stringBuilder.append(getContext().getString(R.string.out_of));
 		appendHumanReadableSize(MapView.getTileSizeInBytes()

@@ -124,7 +124,7 @@ abstract class SeekBarPreference extends DialogPreference implements OnSeekBarCh
 			// create a text view for the text messageText
 			this.messageTextView = new TextView(getContext());
 			this.messageTextView.setText(this.messageText);
-			this.messageTextView.setPadding(0, 0, 0, 10);
+			this.messageTextView.setPadding(0, 0, 0, 20);
 			// add the text message view to the layout
 			this.linearLayout.addView(this.messageTextView);
 		}
@@ -135,6 +135,7 @@ abstract class SeekBarPreference extends DialogPreference implements OnSeekBarCh
 		this.preferenceSeekBar.setMax(this.max);
 		this.preferenceSeekBar.setProgress(Math.min(this.seekBarCurrentValue, this.max));
 		this.preferenceSeekBar.setKeyProgressIncrement(this.increment);
+		this.preferenceSeekBar.setPadding(0, 0, 0, 10);
 		// add the seek bar to the layout
 		this.linearLayout.addView(this.preferenceSeekBar);
 
@@ -142,7 +143,6 @@ abstract class SeekBarPreference extends DialogPreference implements OnSeekBarCh
 		this.currentValueTextView = new TextView(getContext());
 		this.currentValueTextView.setText(getCurrentValueText(this.preferenceSeekBar
 				.getProgress()));
-		this.currentValueTextView.setPadding(0, 0, 0, 10);
 		this.currentValueTextView.setGravity(Gravity.CENTER_HORIZONTAL);
 		// add the current value text view to the layout
 		this.linearLayout.addView(this.currentValueTextView);

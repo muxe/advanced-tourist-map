@@ -302,7 +302,7 @@ public class AdvancedMapViewer extends MapActivity {
 							.setImageResource(R.drawable.stat_sys_gps_acquiring);
 				} else {
 					// must be TEMPORARILY_UNAVAILABLE
-					AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.gps_animation);
+					AdvancedMapViewer.this.gpsView.setImageResource(R.anim.gps_animation);
 					((AnimationDrawable) AdvancedMapViewer.this.gpsView.getDrawable()).start();
 				}
 			}
