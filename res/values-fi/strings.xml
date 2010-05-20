@@ -3,12 +3,12 @@
 	<string name="cancel">Peruuta</string>
 	<string name="error">Virhe</string>
 	<string name="go_to_position">Määritä sijainti</string>
-	<string name="gps_disabled">GPS-satelliitit ei ole käytössä.</string>
+	<string name="gps_disabled">GPS-satelliitit eivät ole käytössä.</string>
 	<string name="latitude">Leveyspiiri</string>
 	<string name="longitude">Pituuspiiri</string>
 	<string name="map_file_invalid">Valitsemasi karttatiedosto on mitätön. Valitse
-		toisen tiedoston.</string>
-	<string name="map_file_select">Valitse karttatiedoston.</string>
+		toinen tiedosto.</string>
+	<string name="map_file_select">Valitse karttatiedosto.</string>
 	<string name="menu_exit">Lopeta</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_mapfile">Karttatiedosto</string>
@@ -22,11 +22,11 @@
 	<string name="preferences_general">Yleiset asetukset</string>
 	<string name="preferences_cache_size">Ulkopuolinen muisti</string>
 	<string name="preferences_cache_size_desc">Määritä välimuistin koko.</string>
-	<string name="preferences_map">Karttaasetukset</string>
+	<string name="preferences_map">Kartta-asetukset</string>
 	<string name="preferences_show_fps_counter">Kuvataajuus</string>
-	<string name="preferences_show_fps_counter_desc">Näytä FPS-laskinta</string>
+	<string name="preferences_show_fps_counter_desc">Näytä FPS-laskin</string>
 	<string name="preferences_show_map_scale">Kartan mittakaava </string>
-	<string name="preferences_show_map_scale_desc">Näytä kartan mittakaavaa</string>
+	<string name="preferences_show_map_scale_desc">Näytä kartan mittakaava</string>
 	<string name="unit_symbol_kilobyte">&#160;kB</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_megabyte">&#160;MB</string>
