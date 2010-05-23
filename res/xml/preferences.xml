@@ -13,5 +13,8 @@
 		<org.mapsforge.applications.android.advancedmapviewer.CacheSizePreference
 			android:title="@string/preferences_cache_size" android:summary="@string/preferences_cache_size_desc"
 			android:key="cacheSize" />
+		<org.mapsforge.applications.android.advancedmapviewer.MoveSpeedPreference
+			android:title="@string/preferences_move_speed" android:summary="@string/preferences_move_speed_desc"
+			android:key="moveSpeed" />
 	</PreferenceCategory>
 </PreferenceScreen>

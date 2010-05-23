@@ -18,7 +18,6 @@
 	<string name="menu_position_map_file_center">Karttatiedoston keskusta</string>
 	<string name="menu_preferences">Asetukset</string>
 	<string name="ok">OK</string>
-	<string name="out_of">&#160;/&#160;</string>
 	<string name="preferences_general">Yleiset asetukset</string>
 	<string name="preferences_cache_size">Ulkopuolinen muisti</string>
 	<string name="preferences_cache_size_desc">Määritä välimuistin koko.</string>
@@ -27,8 +26,6 @@
 	<string name="preferences_show_fps_counter_desc">Näytä FPS-laskin</string>
 	<string name="preferences_show_map_scale">Kartan mittakaava </string>
 	<string name="preferences_show_map_scale_desc">Näytä kartan mittakaava</string>
-	<string name="unit_symbol_kilobyte">&#160;kB</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
-	<string name="unit_symbol_megabyte">&#160;MB</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 </resources>

@@ -16,37 +16,35 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
-import org.mapsforge.android.map.MapView;
-
 import android.content.Context;
 import android.util.AttributeSet;
 
 /**
- * Preferences class for adjusting the cache size.
+ * Preferences class for adjusting the move speed.
  */
-public class CacheSizePreference extends SeekBarPreference {
+public class MoveSpeedPreference extends SeekBarPreference {
 	/**
-	 * Construct a new cache size preference seek bar.
+	 * Construct a new move speed preference seek bar.
 	 * 
 	 * @param context
 	 *            the context activity.
 	 * @param attrs
 	 *            A set of attributes (currently ignored).
 	 */
-	public CacheSizePreference(Context context, AttributeSet attrs) {
+	public MoveSpeedPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		// define the text message
-		this.messageText = getContext().getString(R.string.preferences_cache_size_desc);
+		this.messageText = getContext().getString(R.string.preferences_move_speed_desc);
 
 		// define the current and maximum value of the seek bar
 		this.seekBarCurrentValue = this.preferencesDefault.getInt(this.getKey(),
-				AdvancedMapViewer.FILE_CACHE_SIZE_DEFAULT);
-		this.max = AdvancedMapViewer.FILE_CACHE_SIZE_MAX;
+				AdvancedMapViewer.MOVE_SPEED_DEFAULT);
+		this.max = AdvancedMapViewer.MOVE_SPEED_MAX;
 	}
 
 	@Override
 	String getCurrentValueText(int progress) {
-		return String.format(getContext().getString(R.string.preferences_cache_size_value),
-				Double.valueOf(MapView.getTileSizeInBytes() * progress / 1000000d));
+		return String.format(getContext().getString(R.string.preferences_move_speed_value),
+				Integer.valueOf(progress * 10));
 	}
 }

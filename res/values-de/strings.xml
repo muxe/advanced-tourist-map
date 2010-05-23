@@ -2,6 +2,7 @@
 <resources>
 	<string name="cancel">Abbrechen</string>
 	<string name="error">Fehler</string>
+	<string name="follow_gps_disabled">GPS-Signal folgen wurde deaktiviert</string>
 	<string name="go_to_position">Gehe zu Position</string>
 	<string name="gps_disabled">Der GPS-Empfänger ist deaktiviert</string>
 	<string name="latitude">Breitengrad</string>
@@ -11,6 +12,8 @@
 	<string name="map_file_select">Bitte wählen Sie eine Kartendatei aus.</string>
 	<string name="menu_exit">Beenden</string>
 	<string name="menu_info">Info</string>
+	<string name="menu_info_about">Über</string>
+	<string name="menu_info_license">Lizenz</string>
 	<string name="menu_mapfile">Kartendatei</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Koordinaten eingeben</string>
@@ -18,17 +21,18 @@
 	<string name="menu_position_map_file_center">Zentrum der Kartendatei</string>
 	<string name="menu_preferences">Einstellungen</string>
 	<string name="ok">OK</string>
-	<string name="out_of">&#160;von&#160;</string>
 	<string name="preferences_general">Allgemeine Einstellungen</string>
 	<string name="preferences_cache_size">Externer Speicher</string>
 	<string name="preferences_cache_size_desc">Größe des Caches anpassen</string>
+	<string name="preferences_cache_size_value">%.1f MB</string>
 	<string name="preferences_map">Karteneinstellungen</string>
+	<string name="preferences_move_speed">Scrollgeschwindigkeit</string>
+	<string name="preferences_move_speed_desc">Scrollgeschwindigkeit der Karte anpassen</string>
+	<string name="preferences_move_speed_value">%d %% Scrollgeschwindigkeit</string>
 	<string name="preferences_show_fps_counter">Bildfrequenz</string>
 	<string name="preferences_show_fps_counter_desc">FPS-Zähler anzeigen</string>
 	<string name="preferences_show_map_scale">Kartenmaßstab</string>
 	<string name="preferences_show_map_scale_desc">Maßstab der Karte anzeigen</string>
-	<string name="unit_symbol_kilobyte">&#160;kB</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
-	<string name="unit_symbol_megabyte">&#160;MB</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 </resources>

@@ -1,7 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/menu_info" android:title="@string/menu_info"
-		android:icon="@drawable/ic_menu_info_details" />
+		android:icon="@drawable/ic_menu_info_details">
+		<menu>
+			<item android:id="@+id/menu_info_about" android:title="@string/menu_info_about" />
+			<item android:id="@+id/menu_info_license" android:title="@string/menu_info_license" />
+		</menu>
+	</item>
 	<item android:id="@+id/menu_position" android:title="@string/menu_position"
 		android:icon="@drawable/ic_menu_mylocation">
 		<menu>

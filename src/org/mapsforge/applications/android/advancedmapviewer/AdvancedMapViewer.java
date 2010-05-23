@@ -50,8 +50,8 @@ import android.widget.Toast;
 
 /**
  * A map application which demonstrates how to use the MapView. The map can be centered to
- * current GPS coordinates. A file viewer for selecting the map file is also included. Some
- * preferences can be adjusted via the standard Android preferences activity.
+ * current GPS coordinates. A simple file browser for selecting the map file is also included.
+ * Some preferences can be adjusted via the EditPreferences activity.
  */
 public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
@@ -59,9 +59,12 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_MAP_FILE_SELECT = 2;
 	static final short FILE_CACHE_SIZE_DEFAULT = 100;
 	static final short FILE_CACHE_SIZE_MAX = 500;
+	static final int MOVE_SPEED_DEFAULT = 10;
+	static final int MOVE_SPEED_MAX = 30;
 	private Button cancelButton;
 	private FileBrowser fileBrowser;
 	private GridView fileBrowserView;
+	private boolean followGpsEnabled;
 	private Button goButton;
 	private RelativeLayout mainView;
 	private MapView mapView;
@@ -163,6 +166,9 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+			case R.id.menu_info:
+				return true;
+
 			case R.id.menu_position:
 				return true;
 
@@ -185,7 +191,7 @@ public class AdvancedMapViewer extends MapActivity {
 					@Override
 					public void onClick(View v) {
 						// disable gps follow mode if it is enabled
-						disableFollowGPS();
+						disableFollowGPS(true);
 						// set the new map center coordinates
 						AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(Double
 								.parseDouble(AdvancedMapViewer.this.latitudeView.getText()
@@ -214,7 +220,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 			case R.id.menu_position_map_center:
 				// disable gps follow mode if it is enabled
-				disableFollowGPS();
+				disableFollowGPS(true);
 				this.mapController.setCenter(this.mapView.getMapFileCenter());
 				return true;
 
@@ -250,7 +256,7 @@ public class AdvancedMapViewer extends MapActivity {
 			menu.findItem(R.id.menu_position).setEnabled(true);
 			menu.findItem(R.id.menu_preferences).setEnabled(true);
 
-			if (this.locationManager == null || this.gpsView.getVisibility() == View.VISIBLE) {
+			if (this.locationManager == null || this.followGpsEnabled) {
 				menu.findItem(R.id.menu_position_gps_follow).setEnabled(false);
 			} else {
 				menu.findItem(R.id.menu_position_gps_follow).setEnabled(true);
@@ -274,6 +280,7 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	private void enableFollowGPS() {
+		this.followGpsEnabled = true;
 		this.locationListener = new LocationListener() {
 			@Override
 			public void onLocationChanged(Location location) {
@@ -284,7 +291,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 			@Override
 			public void onProviderDisabled(String provider) {
-				disableFollowGPS();
+				disableFollowGPS(false);
 				showDialog(DIALOG_GPS_DISABLED);
 			}
 
@@ -315,7 +322,7 @@ public class AdvancedMapViewer extends MapActivity {
 		this.gpsView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				disableFollowGPS();
+				disableFollowGPS(true);
 			}
 		});
 	}
@@ -324,6 +331,10 @@ public class AdvancedMapViewer extends MapActivity {
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		switch (id) {
+			case DIALOG_GPS_DISABLED:
+				builder.setMessage(getString(R.string.gps_disabled)).setPositiveButton(
+						getString(R.string.ok), null);
+				return builder.create();
 			case DIALOG_MAP_FILE_INVALID:
 				builder.setMessage(getString(R.string.map_file_invalid)).setTitle(
 						getString(R.string.error)).setPositiveButton(getString(R.string.ok),
@@ -331,10 +342,6 @@ public class AdvancedMapViewer extends MapActivity {
 				return builder.create();
 			case DIALOG_MAP_FILE_SELECT:
 				builder.setMessage(getString(R.string.map_file_select)).setPositiveButton(
-						getString(R.string.ok), null);
-				return builder.create();
-			case DIALOG_GPS_DISABLED:
-				builder.setMessage(getString(R.string.gps_disabled)).setPositiveButton(
 						getString(R.string.ok), null);
 				return builder.create();
 			default:
@@ -373,6 +380,8 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setFpsCounter(this.preferencesDefault.getBoolean("showFpsCounter", false));
 		this.mapView.setFileCacheSize(Math.min(this.preferencesDefault.getInt("cacheSize",
 				FILE_CACHE_SIZE_DEFAULT), FILE_CACHE_SIZE_MAX));
+		this.mapView.setMoveSpeed(Math.min(this.preferencesDefault.getInt("moveSpeed",
+				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
 	}
 
 	@Override
@@ -392,12 +401,24 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 	}
 
-	void disableFollowGPS() {
-		if (this.locationListener != null) {
-			this.locationManager.removeUpdates(this.locationListener);
-			this.locationListener = null;
+	/**
+	 * Disables the "Follow GPS mode" and removes the GPS icon.
+	 * 
+	 * @param showToastMessage
+	 *            if a toast message should be displayed or not.
+	 */
+	void disableFollowGPS(boolean showToastMessage) {
+		if (this.followGpsEnabled) {
+			if (this.locationListener != null) {
+				this.locationManager.removeUpdates(this.locationListener);
+				this.locationListener = null;
+			}
+			this.gpsView.setVisibility(View.GONE);
+			if (showToastMessage) {
+				showToast(getString(R.string.follow_gps_disabled));
+			}
+			this.followGpsEnabled = false;
 		}
-		this.gpsView.setVisibility(View.GONE);
 	}
 
 	/**
@@ -407,10 +428,11 @@ public class AdvancedMapViewer extends MapActivity {
 	 *            the path to the new map file
 	 */
 	void onMapFileSelected(String newMapFile) {
-		if (!this.mapView.isValidMapFile(newMapFile)) {
+		if (!MapView.isValidMapFile(newMapFile)) {
 			showDialog(DIALOG_MAP_FILE_INVALID);
 			return;
 		}
+		disableFollowGPS(true);
 		this.mapView.setMapFile(newMapFile);
 		this.fileBrowserView.setVisibility(View.GONE);
 		this.mainView.setVisibility(View.VISIBLE);
@@ -426,11 +448,11 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	/**
-	 * Displays a text messageText via the toast notification system. If a previous messageText
-	 * is still visible, the previous messageText is first removed to avoid jam.
+	 * Displays a text message via the toast notification system. If a previous message is still
+	 * visible, the previous message is first removed.
 	 * 
 	 * @param text
-	 *            the text messageText to display
+	 *            the text message to display
 	 */
 	void showToast(String text) {
 		if (this.toast == null) {

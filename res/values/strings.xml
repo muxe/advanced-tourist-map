@@ -2,6 +2,7 @@
 <resources>
 	<string name="cancel">Cancel</string>
 	<string name="error">Error</string>
+	<string name="follow_gps_disabled">Follow GPS signal has been disabled</string>
 	<string name="go_to_position">Go to position</string>
 	<string name="gps_disabled">The GPS receiver is disabled</string>
 	<string name="latitude">Latitude</string>
@@ -11,6 +12,8 @@
 	<string name="map_file_select">Please select a map file.</string>
 	<string name="menu_exit">Exit</string>
 	<string name="menu_info">Info</string>
+	<string name="menu_info_about">About</string>
+	<string name="menu_info_license">License</string>
 	<string name="menu_mapfile">Mapfile</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Enter coordinates</string>
@@ -18,17 +21,18 @@
 	<string name="menu_position_map_file_center">Map file center</string>
 	<string name="menu_preferences">Preferences</string>
 	<string name="ok">OK</string>
-	<string name="out_of">&#160;of&#160;</string>
 	<string name="preferences_general">General settings</string>
 	<string name="preferences_cache_size">External storage</string>
 	<string name="preferences_cache_size_desc">Adjust the size of the cache</string>
+	<string name="preferences_cache_size_value">%.1f MB</string>
 	<string name="preferences_map">Map settings</string>
+	<string name="preferences_move_speed">Move speed</string>
+	<string name="preferences_move_speed_desc">Adjust the move speed of the map</string>
+	<string name="preferences_move_speed_value">%d %% move speed</string>
 	<string name="preferences_show_fps_counter">Frame rate</string>
 	<string name="preferences_show_fps_counter_desc">Enable frames per second counter</string>
 	<string name="preferences_show_map_scale">Map scale</string>
 	<string name="preferences_show_map_scale_desc">Show the scale of the map</string>
-	<string name="unit_symbol_kilobyte">&#160;kB</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
-	<string name="unit_symbol_megabyte">&#160;MB</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 </resources>
