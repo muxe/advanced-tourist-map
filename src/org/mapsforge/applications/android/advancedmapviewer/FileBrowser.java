@@ -46,7 +46,8 @@ public class FileBrowser implements AdapterView.OnItemClickListener,
 	 * @param gridView
 	 *            the grid view for displaying the icons
 	 */
-	public FileBrowser(AdvancedMapViewer advancedMapViewer, String currentDirectory, GridView gridView) {
+	public FileBrowser(AdvancedMapViewer advancedMapViewer, String currentDirectory,
+			GridView gridView) {
 		this.advancedMapViewer = advancedMapViewer;
 		this.currentDirectory = new File(currentDirectory);
 		this.gridView = gridView;

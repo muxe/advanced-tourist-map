@@ -26,6 +26,8 @@
 	<string name="preferences_cache_size_desc">Adjust the size of the cache</string>
 	<string name="preferences_cache_size_value">%.1f MB</string>
 	<string name="preferences_map">Map settings</string>
+	<string name="preferences_map_view_mode">Map mode</string>
+	<string name="preferences_map_view_mode_desc">Select the operating mode</string>
 	<string name="preferences_move_speed">Move speed</string>
 	<string name="preferences_move_speed_desc">Adjust the move speed of the map</string>
 	<string name="preferences_move_speed_value">%d %% move speed</string>
