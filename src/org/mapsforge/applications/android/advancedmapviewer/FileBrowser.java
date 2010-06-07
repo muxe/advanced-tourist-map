@@ -17,7 +17,9 @@
 package org.mapsforge.applications.android.advancedmapviewer;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Comparator;
 
 import android.text.TextUtils;
 import android.view.View;
@@ -32,7 +34,8 @@ public class FileBrowser implements AdapterView.OnItemClickListener,
 		AdapterView.OnItemSelectedListener {
 	private AdvancedMapViewer advancedMapViewer;
 	private File currentDirectory;
-	private ArrayList<File> files;
+	private File[] files;
+	private File[] filesWithParentFolder;
 	private GridView gridView;
 	private TextView lastSelected;
 
@@ -53,7 +56,6 @@ public class FileBrowser implements AdapterView.OnItemClickListener,
 		this.gridView = gridView;
 		this.gridView.setOnItemClickListener(this);
 		this.gridView.setOnItemSelectedListener(this);
-		this.files = new ArrayList<File>();
 		this.gridView.setAdapter(new FileBrowserIconAdapter(this.files, this.currentDirectory,
 				this.advancedMapViewer));
 	}
@@ -62,25 +64,50 @@ public class FileBrowser implements AdapterView.OnItemClickListener,
 	 * Browse to the current directory.
 	 */
 	public synchronized void browseToCurrentDirectory() {
-		this.files.clear();
 		this.advancedMapViewer.setTitle(this.currentDirectory.getAbsolutePath());
-		if (this.currentDirectory.getParentFile() != null) {
-			this.files.add(this.currentDirectory.getParentFile());
-		}
-		for (File file : this.currentDirectory.listFiles()) {
-			if (file.isDirectory() && file.canRead()) {
-				this.files.add(file);
-			} else if (file.isFile() && file.canRead() && file.getName().endsWith(".map")) {
-				this.files.add(file);
+
+		// read files and subfolders in the current folder
+		this.files = this.currentDirectory.listFiles(new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				if (pathname.isDirectory()) {
+					// accept all readable folders
+					return pathname.canRead();
+				}
+				// accept all readable files with the correct extension
+				return pathname.canRead() && pathname.getName().endsWith(".map");
 			}
+		});
+
+		// order all files by type and alphabetically by name
+		Arrays.sort(this.files, new Comparator<File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				if (o1.isDirectory() && !o2.isDirectory()) {
+					return -1;
+				} else if (!o1.isDirectory() && o2.isDirectory()) {
+					return 1;
+				} else {
+					return o1.getName().compareToIgnoreCase(o2.getName());
+				}
+			}
+		});
+
+		// if a parent directory exists, add it at the first position
+		if (this.currentDirectory.getParentFile() != null) {
+			this.filesWithParentFolder = new File[this.files.length + 1];
+			this.filesWithParentFolder[0] = this.currentDirectory.getParentFile();
+			System.arraycopy(this.files, 0, this.filesWithParentFolder, 1, this.files.length);
+			this.files = this.filesWithParentFolder;
 		}
+
 		this.gridView.setAdapter(new FileBrowserIconAdapter(this.files, this.currentDirectory,
 				this.advancedMapViewer));
 	}
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long id) {
-		File file = this.files.get((int) id);
+		File file = this.files[(int) id];
 		if (file.isDirectory()) {
 			browseToDirectory(file);
 		} else {

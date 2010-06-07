@@ -17,7 +17,6 @@
 package org.mapsforge.applications.android.advancedmapviewer;
 
 import java.io.File;
-import java.util.ArrayList;
 
 import android.text.TextUtils;
 import android.view.Gravity;
@@ -31,9 +30,9 @@ import android.widget.TextView;
 class FileBrowserIconAdapter extends BaseAdapter {
 	private AdvancedMapViewer advancedMapViewer;
 	private File currentDirectory;
-	private ArrayList<File> files;
+	private File[] files;
 
-	FileBrowserIconAdapter(ArrayList<File> files, File currentDirectory,
+	FileBrowserIconAdapter(File[] files, File currentDirectory,
 			AdvancedMapViewer advancedMapViewer) {
 		this.files = files;
 		this.currentDirectory = currentDirectory;
@@ -42,12 +41,15 @@ class FileBrowserIconAdapter extends BaseAdapter {
 
 	@Override
 	public int getCount() {
-		return this.files.size();
+		if (this.files == null) {
+			return 0;
+		}
+		return this.files.length;
 	}
 
 	@Override
 	public Object getItem(int index) {
-		return this.files.get(index);
+		return this.files[index];
 	}
 
 	@Override
@@ -57,7 +59,7 @@ class FileBrowserIconAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int index, View convertView, ViewGroup parent) {
-		File currentFile = this.files.get(index);
+		File currentFile = this.files[index];
 		TextView textView;
 		int fileSymbol;
 		String fileName;
@@ -67,7 +69,7 @@ class FileBrowserIconAdapter extends BaseAdapter {
 			// the parent directory
 			fileSymbol = R.drawable.ic_menu_back;
 			fileName = "..";
-		} else if (this.files.get(index).isDirectory()) {
+		} else if (currentFile.isDirectory()) {
 			// another directory
 			fileSymbol = R.drawable.ic_menu_archive;
 			fileName = currentFile.getName();

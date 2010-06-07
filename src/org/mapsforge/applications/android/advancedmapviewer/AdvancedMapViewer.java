@@ -466,8 +466,12 @@ public class AdvancedMapViewer extends MapActivity {
 	 */
 	void setWindowTitle() {
 		if (this.mapView.getMapViewMode() != MapViewMode.TILE_DOWNLOAD) {
-			setTitle(this.mapView.getMapFile().substring(
-					this.mapView.getMapFile().lastIndexOf("/") + 1));
+			if (this.mapView.getMapFile() == null) {
+				setTitle(null);
+			} else {
+				setTitle(this.mapView.getMapFile().substring(
+						this.mapView.getMapFile().lastIndexOf("/") + 1));
+			}
 		} else {
 			setTitle(this.mapView.getMapTileDownloadServer());
 		}
