@@ -21,97 +21,53 @@ import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.mapsforge.android.map.MapView;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
+import android.os.Bundle;
 import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.TextView;
 
 /**
- * Simple file browser to select a .map file from the file system.
+ * Simple file browser activity to select a map file from the file system.
  */
-public class FileBrowser implements AdapterView.OnItemClickListener,
+public class FileBrowser extends Activity implements AdapterView.OnItemClickListener,
 		AdapterView.OnItemSelectedListener {
-	private AdvancedMapViewer advancedMapViewer;
+	private static final String DEFAULT_DIRECTORY = "/";
+	private static final int DIALOG_MAP_FILE_INVALID = 0;
+	private static final int DIALOG_MAP_FILE_SELECT = 1;
+	private static final String PREFERENCES_FILE = "FileBrowser";
 	private File currentDirectory;
+	private FileBrowserIconAdapter fileBrowserIconAdapter;
+	private Comparator<File> fileComparator;
+	private FileFilter fileFilter;
 	private File[] files;
 	private File[] filesWithParentFolder;
 	private GridView gridView;
 	private TextView lastSelected;
-
-	/**
-	 * Constructs a new file browser.
-	 * 
-	 * @param advancedMapViewer
-	 *            the AdvancedMapViewer client
-	 * @param currentDirectory
-	 *            the path of the starting directory
-	 * @param gridView
-	 *            the grid view for displaying the icons
-	 */
-	public FileBrowser(AdvancedMapViewer advancedMapViewer, String currentDirectory,
-			GridView gridView) {
-		this.advancedMapViewer = advancedMapViewer;
-		this.currentDirectory = new File(currentDirectory);
-		this.gridView = gridView;
-		this.gridView.setOnItemClickListener(this);
-		this.gridView.setOnItemSelectedListener(this);
-		this.gridView.setAdapter(new FileBrowserIconAdapter(this.files, this.currentDirectory,
-				this.advancedMapViewer));
-	}
-
-	/**
-	 * Browse to the current directory.
-	 */
-	public synchronized void browseToCurrentDirectory() {
-		this.advancedMapViewer.setTitle(this.currentDirectory.getAbsolutePath());
-
-		// read files and subfolders in the current folder
-		this.files = this.currentDirectory.listFiles(new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				if (pathname.isDirectory()) {
-					// accept all readable folders
-					return pathname.canRead();
-				}
-				// accept all readable files with the correct extension
-				return pathname.canRead() && pathname.getName().endsWith(".map");
-			}
-		});
-
-		// order all files by type and alphabetically by name
-		Arrays.sort(this.files, new Comparator<File>() {
-			@Override
-			public int compare(File o1, File o2) {
-				if (o1.isDirectory() && !o2.isDirectory()) {
-					return -1;
-				} else if (!o1.isDirectory() && o2.isDirectory()) {
-					return 1;
-				} else {
-					return o1.getName().compareToIgnoreCase(o2.getName());
-				}
-			}
-		});
-
-		// if a parent directory exists, add it at the first position
-		if (this.currentDirectory.getParentFile() != null) {
-			this.filesWithParentFolder = new File[this.files.length + 1];
-			this.filesWithParentFolder[0] = this.currentDirectory.getParentFile();
-			System.arraycopy(this.files, 0, this.filesWithParentFolder, 1, this.files.length);
-			this.files = this.filesWithParentFolder;
-		}
-
-		this.gridView.setAdapter(new FileBrowserIconAdapter(this.files, this.currentDirectory,
-				this.advancedMapViewer));
-	}
+	private File selectedFile;
 
 	@Override
 	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long id) {
-		File file = this.files[(int) id];
-		if (file.isDirectory()) {
-			browseToDirectory(file);
+		this.selectedFile = this.files[(int) id];
+		if (this.selectedFile.isDirectory()) {
+			this.currentDirectory = this.selectedFile;
+			browseToCurrentDirectory();
+		} else if (MapView.isValidMapFile(this.selectedFile.getAbsolutePath())) {
+			setResult(RESULT_OK, new Intent().putExtra("mapFile", this.selectedFile
+					.getAbsolutePath()));
+			finish();
 		} else {
-			this.advancedMapViewer.onMapFileSelected(file.getAbsolutePath());
+			showDialog(DIALOG_MAP_FILE_INVALID);
 		}
 	}
 
@@ -131,6 +87,17 @@ public class FileBrowser implements AdapterView.OnItemClickListener,
 	}
 
 	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if (keyCode == KeyEvent.KEYCODE_BACK) {
+			// quit the application
+			setResult(RESULT_CANCELED);
+			finish();
+			return true;
+		}
+		return false;
+	}
+
+	@Override
 	public void onNothingSelected(AdapterView<?> grid) {
 		if (this.lastSelected != null) {
 			this.lastSelected.setEllipsize(TextUtils.TruncateAt.END);
@@ -139,13 +106,109 @@ public class FileBrowser implements AdapterView.OnItemClickListener,
 	}
 
 	/**
-	 * Browse to the specified directory.
-	 * 
-	 * @param directory
-	 *            the new directory
+	 * Browse to the current directory.
 	 */
-	private synchronized void browseToDirectory(File directory) {
-		this.currentDirectory = directory;
+	private void browseToCurrentDirectory() {
+		setTitle(this.currentDirectory.getAbsolutePath());
+
+		// read and filter files and subfolders in the current folder
+		this.files = this.currentDirectory.listFiles(this.fileFilter);
+
+		// order all files by type and alphabetically by name
+		Arrays.sort(this.files, this.fileComparator);
+
+		// if a parent directory exists, add it at the first position
+		if (this.currentDirectory.getParentFile() != null) {
+			this.filesWithParentFolder = new File[this.files.length + 1];
+			this.filesWithParentFolder[0] = this.currentDirectory.getParentFile();
+			System.arraycopy(this.files, 0, this.filesWithParentFolder, 1, this.files.length);
+			this.files = this.filesWithParentFolder;
+			this.fileBrowserIconAdapter.updateFiles(this.files, true);
+		} else {
+			this.fileBrowserIconAdapter.updateFiles(this.files, false);
+		}
+		this.fileBrowserIconAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.filebrowser);
+		this.fileBrowserIconAdapter = new FileBrowserIconAdapter(this);
+		this.gridView = (GridView) findViewById(R.id.fileBrowserView);
+		this.gridView.setOnItemClickListener(this);
+		this.gridView.setOnItemSelectedListener(this);
+		this.gridView.setAdapter(this.fileBrowserIconAdapter);
+
+		this.fileFilter = new FileFilter() {
+			@Override
+			public boolean accept(File pathname) {
+				if (pathname.isDirectory()) {
+					// accept all readable folders
+					return pathname.canRead();
+				}
+				// accept all readable files with the correct extension
+				return pathname.canRead() && pathname.getName().endsWith(".map");
+			}
+		};
+
+		this.fileComparator = new Comparator<File>() {
+			@Override
+			public int compare(File o1, File o2) {
+				if (o1.isDirectory() && !o2.isDirectory()) {
+					return -1;
+				} else if (!o1.isDirectory() && o2.isDirectory()) {
+					return 1;
+				} else {
+					return o1.getName().compareToIgnoreCase(o2.getName());
+				}
+			}
+		};
+	}
+
+	@Override
+	protected Dialog onCreateDialog(int id) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		switch (id) {
+			case DIALOG_MAP_FILE_INVALID:
+				builder.setMessage(getString(R.string.map_file_invalid)).setTitle(
+						getString(R.string.error)).setPositiveButton(getString(R.string.ok),
+						null);
+				return builder.create();
+			case DIALOG_MAP_FILE_SELECT:
+				builder.setMessage(getString(R.string.map_file_select)).setPositiveButton(
+						getString(R.string.ok), null);
+				return builder.create();
+			default:
+				return null;
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+
+		// save the current directory
+		Editor editor = getSharedPreferences(PREFERENCES_FILE, MODE_PRIVATE).edit();
+		editor.clear();
+		if (this.currentDirectory != null) {
+			editor.putString("currentDirectory", this.currentDirectory.getAbsolutePath());
+		}
+		editor.commit();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		// restore the current directory
+		SharedPreferences preferences = getSharedPreferences(PREFERENCES_FILE, MODE_PRIVATE);
+		this.currentDirectory = new File(preferences.getString("currentDirectory",
+				DEFAULT_DIRECTORY));
+		if (!this.currentDirectory.exists()) {
+			this.currentDirectory = new File(DEFAULT_DIRECTORY);
+		}
+		showDialog(DIALOG_MAP_FILE_SELECT);
 		browseToCurrentDirectory();
 	}
 }

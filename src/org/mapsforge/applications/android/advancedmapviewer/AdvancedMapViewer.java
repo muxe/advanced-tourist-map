@@ -39,14 +39,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -58,18 +55,14 @@ import android.widget.Toast;
  */
 public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
-	private static final int DIALOG_MAP_FILE_INVALID = 1;
-	private static final int DIALOG_MAP_FILE_SELECT = 2;
 	static final short FILE_CACHE_SIZE_DEFAULT = 100;
 	static final short FILE_CACHE_SIZE_MAX = 500;
 	static final int MOVE_SPEED_DEFAULT = 10;
 	static final int MOVE_SPEED_MAX = 30;
+	static final int SELECT_MAP_FILE = 0;
 	private Button cancelButton;
-	private FileBrowser fileBrowser;
-	private GridView fileBrowserView;
 	private boolean followGpsEnabled;
 	private Button goButton;
-	private RelativeLayout mainView;
 	private MapView mapView;
 	private MapViewMode mapViewMode;
 	private Toast toast;
@@ -88,9 +81,8 @@ public class AdvancedMapViewer extends MapActivity {
 		super.onCreate(savedInstanceState);
 
 		// set up the layout views
-		setContentView(R.layout.main);
-		this.mainView = (RelativeLayout) findViewById(R.id.mainView);
-		this.fileBrowserView = (GridView) findViewById(R.id.fileBrowserView);
+		setContentView(R.layout.advancedmapviewer);
+		this.mapView = (MapView) findViewById(R.id.mapView);
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
 		this.coordinatesView = (RelativeLayout) findViewById(R.id.coordinatesView);
 		this.latitudeView = (EditText) findViewById(R.id.latitude);
@@ -98,8 +90,7 @@ public class AdvancedMapViewer extends MapActivity {
 		this.goButton = (Button) findViewById(R.id.goButton);
 		this.cancelButton = (Button) findViewById(R.id.cancelButton);
 
-		// create the file browser
-		this.fileBrowser = new FileBrowser(this, "/", this.fileBrowserView);
+		configureMapView();
 
 		// set an empty touch listener to handle all touch events
 		this.coordinatesView.setOnTouchListener(new OnTouchListener() {
@@ -127,23 +118,10 @@ public class AdvancedMapViewer extends MapActivity {
 				this.coordinatesView.setVisibility(View.GONE);
 				setWindowTitle();
 				return true;
-			} else if (this.fileBrowserView.getVisibility() == View.VISIBLE) {
-				if (this.mapView.getMapViewMode() != MapViewMode.TILE_DOWNLOAD
-						&& this.mapView.hasValidMapFile()) {
-					// close the file browser and show the map
-					this.fileBrowserView.setVisibility(View.GONE);
-					this.mainView.setVisibility(View.VISIBLE);
-					setWindowTitle();
-				} else {
-					// quit the application
-					finish();
-				}
-				return true;
-			} else {
-				// quit the application
-				finish();
-				return true;
 			}
+			// quit the application
+			finish();
+			return true;
 		}
 		return false;
 	}
@@ -210,9 +188,7 @@ public class AdvancedMapViewer extends MapActivity {
 				return true;
 
 			case R.id.menu_mapfile:
-				this.fileBrowser.browseToCurrentDirectory();
-				this.mainView.setVisibility(View.GONE);
-				this.fileBrowserView.setVisibility(View.VISIBLE);
+				startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
 				return true;
 
 			case R.id.menu_preferences:
@@ -231,15 +207,13 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.findItem(R.id.menu_info).setEnabled(true);
 
-		if (this.mapView.getMapViewMode() == MapViewMode.TILE_DOWNLOAD
-				|| this.fileBrowserView.getVisibility() == View.VISIBLE) {
+		if (this.mapView.getMapViewMode() == MapViewMode.TILE_DOWNLOAD) {
 			menu.findItem(R.id.menu_mapfile).setEnabled(false);
 		} else {
 			menu.findItem(R.id.menu_mapfile).setEnabled(true);
 		}
 
-		if (this.coordinatesView.getVisibility() == View.VISIBLE
-				|| this.fileBrowserView.getVisibility() == View.VISIBLE) {
+		if (this.coordinatesView.getVisibility() == View.VISIBLE) {
 			menu.findItem(R.id.menu_position).setEnabled(false);
 		} else {
 			menu.findItem(R.id.menu_position).setEnabled(true);
@@ -268,6 +242,21 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onTrackballEvent(MotionEvent event) {
 		// forward the event to the MapView
 		return this.mapView.onTrackballEvent(event);
+	}
+
+	private void configureMapView() {
+		// make the MapView clickable and activate the zoomLevel buttons
+		this.mapView.setClickable(true);
+		this.mapView.setBuiltInZoomControls(true);
+		this.mapView.setFocusable(true);
+
+		// set the localized text fields
+		this.mapView
+				.setText("unit_symbol_kilometer", getString(R.string.unit_symbol_kilometer));
+		this.mapView.setText("unit_symbol_meter", getString(R.string.unit_symbol_meter));
+
+		// get the map controller for this MapView
+		this.mapController = this.mapView.getController();
 	}
 
 	private void enableFollowGPS() {
@@ -318,19 +307,21 @@ public class AdvancedMapViewer extends MapActivity {
 		});
 	}
 
-	private void setupMapView() {
-		// make the MapView clickable and activate the zoomLevel buttons
-		this.mapView.setClickable(true);
-		this.mapView.setBuiltInZoomControls(true);
-		this.mapView.setFocusable(true);
-
-		// set the localized text fields
-		this.mapView
-				.setText("unit_symbol_kilometer", getString(R.string.unit_symbol_kilometer));
-		this.mapView.setText("unit_symbol_meter", getString(R.string.unit_symbol_meter));
-
-		// get the map controller for this MapView
-		this.mapController = this.mapView.getController();
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == SELECT_MAP_FILE) {
+			if (resultCode == RESULT_OK) {
+				disableFollowGPS(true);
+				if (data != null && data.getStringExtra("mapFile") != null) {
+					this.mapView.setMapFile(data.getStringExtra("mapFile"));
+				}
+				setWindowTitle();
+			} else if (resultCode == RESULT_CANCELED
+					&& this.mapView.getMapViewMode() != MapViewMode.TILE_DOWNLOAD
+					&& !this.mapView.hasValidMapFile()) {
+				finish();
+			}
+		}
 	}
 
 	@Override
@@ -339,15 +330,6 @@ public class AdvancedMapViewer extends MapActivity {
 		switch (id) {
 			case DIALOG_GPS_DISABLED:
 				builder.setMessage(getString(R.string.gps_disabled)).setPositiveButton(
-						getString(R.string.ok), null);
-				return builder.create();
-			case DIALOG_MAP_FILE_INVALID:
-				builder.setMessage(getString(R.string.map_file_invalid)).setTitle(
-						getString(R.string.error)).setPositiveButton(getString(R.string.ok),
-						null);
-				return builder.create();
-			case DIALOG_MAP_FILE_SELECT:
-				builder.setMessage(getString(R.string.map_file_select)).setPositiveButton(
 						getString(R.string.ok), null);
 				return builder.create();
 			default:
@@ -383,18 +365,10 @@ public class AdvancedMapViewer extends MapActivity {
 		// Read the default shared preferences
 		this.preferencesDefault = PreferenceManager.getDefaultSharedPreferences(this);
 
-		// get the operation mode for the MapView
-		this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferencesDefault.getString(
-				"mapViewMode", MapView.getDefaultMapViewMode().name()));
-
-		if (this.mapView == null) {
-			// create a new MapView with the correct operation mode
-			this.mapView = new MapView(this, this.mapViewMode);
-			setupMapView();
-			this.mainView.addView(this.mapView, 0, new ViewGroup.LayoutParams(
-					LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
-		} else {
-			// set the correct operation mode
+		// set the operation mode for the MapView
+		if (this.preferencesDefault.contains("mapViewMode")) {
+			this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferencesDefault
+					.getString("mapViewMode", MapView.getDefaultMapViewMode().name()));
 			this.mapView.setMapViewMode(this.mapViewMode);
 		}
 
@@ -409,17 +383,12 @@ public class AdvancedMapViewer extends MapActivity {
 		// check if the file browser needs to be displayed
 		if (this.mapView.getMapViewMode() == MapViewMode.TILE_DOWNLOAD
 				|| this.mapView.hasValidMapFile()) {
-			this.fileBrowserView.setVisibility(View.GONE);
-			this.mainView.setVisibility(View.VISIBLE);
 			setWindowTitle();
 			if (getLastNonConfigurationInstance() != null) {
 				enableFollowGPS();
 			}
 		} else {
-			this.mainView.setVisibility(View.GONE);
-			this.fileBrowserView.setVisibility(View.VISIBLE);
-			this.fileBrowser.browseToCurrentDirectory();
-			showDialog(DIALOG_MAP_FILE_SELECT);
+			startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
 		}
 	}
 
@@ -441,24 +410,6 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 			this.followGpsEnabled = false;
 		}
-	}
-
-	/**
-	 * This method is called when a new map file is selected in the file browser.
-	 * 
-	 * @param newMapFile
-	 *            the path to the new map file
-	 */
-	void onMapFileSelected(String newMapFile) {
-		if (!MapView.isValidMapFile(newMapFile)) {
-			showDialog(DIALOG_MAP_FILE_INVALID);
-			return;
-		}
-		disableFollowGPS(true);
-		this.mapView.setMapFile(newMapFile);
-		this.fileBrowserView.setVisibility(View.GONE);
-		this.mainView.setVisibility(View.VISIBLE);
-		setWindowTitle();
 	}
 
 	/**

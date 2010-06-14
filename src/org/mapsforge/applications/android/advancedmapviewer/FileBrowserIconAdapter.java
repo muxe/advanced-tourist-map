@@ -18,6 +18,7 @@ package org.mapsforge.applications.android.advancedmapviewer;
 
 import java.io.File;
 
+import android.content.Context;
 import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
@@ -28,15 +29,17 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 class FileBrowserIconAdapter extends BaseAdapter {
-	private AdvancedMapViewer advancedMapViewer;
-	private File currentDirectory;
+	private Context context;
+	private File currentFile;
 	private File[] files;
+	private boolean hasParentFolder;
+	private LayoutParams layoutParams;
+	private TextView textView;
 
-	FileBrowserIconAdapter(File[] files, File currentDirectory,
-			AdvancedMapViewer advancedMapViewer) {
-		this.files = files;
-		this.currentDirectory = currentDirectory;
-		this.advancedMapViewer = advancedMapViewer;
+	FileBrowserIconAdapter(Context context) {
+		this.context = context;
+		this.layoutParams = new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,
+				LayoutParams.FILL_PARENT);
 	}
 
 	@Override
@@ -59,43 +62,40 @@ class FileBrowserIconAdapter extends BaseAdapter {
 
 	@Override
 	public View getView(int index, View convertView, ViewGroup parent) {
-		File currentFile = this.files[index];
-		TextView textView;
-		int fileSymbol;
-		String fileName;
-		if (index == 0
-				&& (currentFile.getParentFile() == null || currentFile.getParentFile()
-						.getAbsolutePath().compareTo(this.currentDirectory.getAbsolutePath()) != 0)) {
-			// the parent directory
-			fileSymbol = R.drawable.ic_menu_back;
-			fileName = "..";
-		} else if (currentFile.isDirectory()) {
-			// another directory
-			fileSymbol = R.drawable.ic_menu_archive;
-			fileName = currentFile.getName();
-		} else {
-			// a file
-			fileSymbol = R.drawable.ic_menu_mapmode;
-			fileName = currentFile.getName();
-		}
-
-		if (convertView == null || !(convertView instanceof TextView)) {
-			// create a new view object
-			textView = new TextView(this.advancedMapViewer);
-			textView.setEllipsize(TextUtils.TruncateAt.END);
-			textView.setSingleLine();
-			textView.setLayoutParams(new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,
-					LayoutParams.FILL_PARENT));
-			textView.setGravity(Gravity.CENTER_HORIZONTAL);
-			textView.setPadding(5, 5, 5, 5);
-		} else {
+		if (convertView instanceof TextView) {
 			// recycle the old view
-			textView = (TextView) convertView;
+			this.textView = (TextView) convertView;
+		} else {
+			// create a new view object
+			this.textView = new TextView(this.context);
+			this.textView.setEllipsize(TextUtils.TruncateAt.END);
+			this.textView.setSingleLine();
+			this.textView.setLayoutParams(this.layoutParams);
+			this.textView.setGravity(Gravity.CENTER_HORIZONTAL);
+			this.textView.setPadding(5, 5, 5, 5);
 		}
 
-		// set file icon and name
-		textView.setCompoundDrawablesWithIntrinsicBounds(0, fileSymbol, 0, 0);
-		textView.setText(fileName);
-		return textView;
+		if (index == 0 && this.hasParentFolder) {
+			// the parent directory of the current folder
+			this.textView.setCompoundDrawablesWithIntrinsicBounds(0, R.drawable.ic_menu_back,
+					0, 0);
+			this.textView.setText("..");
+		} else {
+			this.currentFile = this.files[index];
+			if (this.currentFile.isDirectory()) {
+				this.textView.setCompoundDrawablesWithIntrinsicBounds(0,
+						R.drawable.ic_menu_archive, 0, 0);
+			} else {
+				this.textView.setCompoundDrawablesWithIntrinsicBounds(0,
+						R.drawable.ic_menu_mapmode, 0, 0);
+			}
+			this.textView.setText(this.currentFile.getName());
+		}
+		return this.textView;
+	}
+
+	void updateFiles(File[] newFiles, boolean newHasParentFolder) {
+		this.files = newFiles;
+		this.hasParentFolder = newHasParentFolder;
 	}
 }
