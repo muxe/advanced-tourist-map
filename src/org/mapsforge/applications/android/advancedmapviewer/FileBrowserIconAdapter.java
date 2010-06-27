@@ -28,6 +28,9 @@ import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
+/**
+ * An adapter for the FileBrowser GridView.
+ */
 class FileBrowserIconAdapter extends BaseAdapter {
 	private Context context;
 	private File currentFile;
@@ -36,6 +39,12 @@ class FileBrowserIconAdapter extends BaseAdapter {
 	private LayoutParams layoutParams;
 	private TextView textView;
 
+	/**
+	 * Create a new FileBrowserIconAdapter with the given context.
+	 * 
+	 * @param context
+	 *            the context of this adapter, through which new Views can be created.
+	 */
 	FileBrowserIconAdapter(Context context) {
 		this.context = context;
 		this.layoutParams = new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,
@@ -94,6 +103,14 @@ class FileBrowserIconAdapter extends BaseAdapter {
 		return this.textView;
 	}
 
+	/**
+	 * Call this method to change the data of the adapter.
+	 * 
+	 * @param newFiles
+	 *            the new files for this adapter.
+	 * @param newHasParentFolder
+	 *            true, if the files array has a parent folder at index 0, false otherwise.
+	 */
 	void updateFiles(File[] newFiles, boolean newHasParentFolder) {
 		this.files = newFiles;
 		this.hasParentFolder = newHasParentFolder;

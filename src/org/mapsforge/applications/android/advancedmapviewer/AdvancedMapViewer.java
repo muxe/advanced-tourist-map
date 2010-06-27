@@ -55,26 +55,38 @@ import android.widget.Toast;
  */
 public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
+	private static final int SELECT_MAP_FILE = 0;
+	/**
+	 * The default file cache size.
+	 */
 	static final short FILE_CACHE_SIZE_DEFAULT = 100;
+	/**
+	 * The maximum file cache size.
+	 */
 	static final short FILE_CACHE_SIZE_MAX = 500;
+	/**
+	 * The default move speed of the map.
+	 */
 	static final int MOVE_SPEED_DEFAULT = 10;
+	/**
+	 * The maximum move speed of the map.
+	 */
 	static final int MOVE_SPEED_MAX = 30;
-	static final int SELECT_MAP_FILE = 0;
 	private Button cancelButton;
 	private boolean followGpsEnabled;
 	private Button goButton;
+	private LocationListener locationListener;
+	private LocationManager locationManager;
 	private MapView mapView;
 	private MapViewMode mapViewMode;
+	private SharedPreferences preferencesDefault;
 	private Toast toast;
 	RelativeLayout coordinatesView;
 	ImageView gpsView;
 	InputMethodManager inputMethodManager;
 	EditText latitudeView;
-	LocationListener locationListener;
-	LocationManager locationManager;
 	EditText longitudeView;
 	MapController mapController;
-	SharedPreferences preferencesDefault;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -233,7 +245,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	public Object onRetainNonConfigurationInstance() {
 		if (this.locationListener != null) {
-			return new Boolean(true);
+			return Boolean.TRUE;
 		}
 		return null;
 	}
