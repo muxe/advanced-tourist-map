@@ -30,18 +30,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.TextView;
 
 /**
  * Simple file browser activity to select a map file from the file system.
  */
-public class FileBrowser extends Activity implements AdapterView.OnItemClickListener,
-		AdapterView.OnItemSelectedListener {
+public class FileBrowser extends Activity implements AdapterView.OnItemClickListener {
 	private static final String DEFAULT_DIRECTORY = "/";
 	private static final int DIALOG_MAP_FILE_INVALID = 0;
 	private static final int DIALOG_MAP_FILE_SELECT = 1;
@@ -53,7 +50,6 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	private File[] files;
 	private File[] filesWithParentFolder;
 	private GridView gridView;
-	private TextView lastSelected;
 	private File selectedFile;
 
 	@Override
@@ -72,21 +68,6 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	}
 
 	@Override
-	public void onItemSelected(AdapterView<?> grid, View icon, int arg2, long index) {
-		if (this.lastSelected != null) {
-			this.lastSelected.setEllipsize(TextUtils.TruncateAt.END);
-		}
-		if (icon != null) {
-			if (icon instanceof TextView) {
-				this.lastSelected = (TextView) icon;
-				this.lastSelected.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-			} else {
-				this.lastSelected = null;
-			}
-		}
-	}
-
-	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent event) {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			// quit the application
@@ -95,14 +76,6 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 			return true;
 		}
 		return false;
-	}
-
-	@Override
-	public void onNothingSelected(AdapterView<?> grid) {
-		if (this.lastSelected != null) {
-			this.lastSelected.setEllipsize(TextUtils.TruncateAt.END);
-			this.lastSelected = null;
-		}
 	}
 
 	/**
@@ -137,7 +110,6 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		this.fileBrowserIconAdapter = new FileBrowserIconAdapter(this);
 		this.gridView = (GridView) findViewById(R.id.fileBrowserView);
 		this.gridView.setOnItemClickListener(this);
-		this.gridView.setOnItemSelectedListener(this);
 		this.gridView.setAdapter(this.fileBrowserIconAdapter);
 
 		this.fileFilter = new FileFilter() {

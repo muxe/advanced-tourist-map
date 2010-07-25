@@ -19,12 +19,9 @@ package org.mapsforge.applications.android.advancedmapviewer;
 import java.io.File;
 
 import android.content.Context;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
-import android.widget.AbsListView;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
 
@@ -36,7 +33,6 @@ class FileBrowserIconAdapter extends BaseAdapter {
 	private File currentFile;
 	private File[] files;
 	private boolean hasParentFolder;
-	private LayoutParams layoutParams;
 	private TextView textView;
 
 	/**
@@ -47,8 +43,6 @@ class FileBrowserIconAdapter extends BaseAdapter {
 	 */
 	FileBrowserIconAdapter(Context context) {
 		this.context = context;
-		this.layoutParams = new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,
-				LayoutParams.FILL_PARENT);
 	}
 
 	@Override
@@ -77,11 +71,9 @@ class FileBrowserIconAdapter extends BaseAdapter {
 		} else {
 			// create a new view object
 			this.textView = new TextView(this.context);
-			this.textView.setEllipsize(TextUtils.TruncateAt.END);
-			this.textView.setSingleLine();
-			this.textView.setLayoutParams(this.layoutParams);
+			this.textView.setLines(2);
 			this.textView.setGravity(Gravity.CENTER_HORIZONTAL);
-			this.textView.setPadding(5, 5, 5, 5);
+			this.textView.setPadding(5, 10, 5, 10);
 		}
 
 		if (index == 0 && this.hasParentFolder) {
