@@ -39,6 +39,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.inputmethod.InputMethodManager;
@@ -128,7 +129,6 @@ public class AdvancedMapViewer extends MapActivity {
 		if (keyCode == KeyEvent.KEYCODE_BACK) {
 			if (this.coordinatesView.getVisibility() == View.VISIBLE) {
 				this.coordinatesView.setVisibility(View.GONE);
-				setWindowTitle();
 				return true;
 			}
 			// quit the application
@@ -177,7 +177,6 @@ public class AdvancedMapViewer extends MapActivity {
 						AdvancedMapViewer.this.inputMethodManager.hideSoftInputFromWindow(
 								AdvancedMapViewer.this.coordinatesView.getWindowToken(), 0);
 						AdvancedMapViewer.this.coordinatesView.setVisibility(View.GONE);
-						setWindowTitle();
 					}
 				});
 
@@ -188,7 +187,6 @@ public class AdvancedMapViewer extends MapActivity {
 						AdvancedMapViewer.this.inputMethodManager.hideSoftInputFromWindow(
 								AdvancedMapViewer.this.coordinatesView.getWindowToken(), 0);
 						AdvancedMapViewer.this.coordinatesView.setVisibility(View.GONE);
-						setWindowTitle();
 					}
 				});
 				return true;
@@ -327,7 +325,6 @@ public class AdvancedMapViewer extends MapActivity {
 				if (data != null && data.getStringExtra("mapFile") != null) {
 					this.mapView.setMapFile(data.getStringExtra("mapFile"));
 				}
-				setWindowTitle();
 			} else if (resultCode == RESULT_CANCELED
 					&& this.mapView.getMapViewMode() != MapViewMode.TILE_DOWNLOAD
 					&& !this.mapView.hasValidMapFile()) {
@@ -392,10 +389,18 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setMoveSpeed(Math.min(this.preferencesDefault.getInt("moveSpeed",
 				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
 
+		// check if the full screen mode should be activated
+		if (this.preferencesDefault.getBoolean("fullscreen", false)) {
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		} else {
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		}
+
 		// check if the file browser needs to be displayed
 		if (this.mapView.getMapViewMode() == MapViewMode.TILE_DOWNLOAD
 				|| this.mapView.hasValidMapFile()) {
-			setWindowTitle();
 			if (getLastNonConfigurationInstance() != null) {
 				enableFollowGPS();
 			}
@@ -421,22 +426,6 @@ public class AdvancedMapViewer extends MapActivity {
 				showToast(getString(R.string.follow_gps_disabled));
 			}
 			this.followGpsEnabled = false;
-		}
-	}
-
-	/**
-	 * Sets the current window title.
-	 */
-	void setWindowTitle() {
-		if (this.mapView.getMapViewMode() != MapViewMode.TILE_DOWNLOAD) {
-			if (this.mapView.getMapFile() == null) {
-				setTitle(null);
-			} else {
-				setTitle(this.mapView.getMapFile().substring(
-						this.mapView.getMapFile().lastIndexOf("/") + 1));
-			}
-		} else {
-			setTitle(this.mapView.getMapTileDownloadServer());
 		}
 	}
 
