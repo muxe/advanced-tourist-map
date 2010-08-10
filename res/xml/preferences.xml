@@ -8,6 +8,9 @@
 		<CheckBoxPreference android:title="@string/preferences_show_fps_counter"
 			android:summary="@string/preferences_show_fps_counter_desc"
 			android:key="showFpsCounter" />
+		<CheckBoxPreference android:title="@string/preferences_show_tile_frames"
+			android:summary="@string/preferences_show_tile_frames_desc"
+			android:key="showTileFrames" />
 		<ListPreference android:title="@string/preferences_map_view_mode"
 			android:summary="@string/preferences_map_view_mode_desc"
 			android:entries="@array/preferences_map_view_mode_entries"

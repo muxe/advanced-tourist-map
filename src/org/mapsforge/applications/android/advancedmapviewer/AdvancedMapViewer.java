@@ -194,7 +194,7 @@ public class AdvancedMapViewer extends MapActivity {
 			case R.id.menu_position_map_center:
 				// disable gps follow mode if it is enabled
 				disableFollowGPS(true);
-				this.mapController.setCenter(this.mapView.getMapFileCenter());
+				this.mapController.setCenter(this.mapView.getMapDatabase().getMapCenter());
 				return true;
 
 			case R.id.menu_mapfile:
@@ -384,6 +384,7 @@ public class AdvancedMapViewer extends MapActivity {
 		// restore all other preferences
 		this.mapView.setMapScale(this.preferencesDefault.getBoolean("showMapScale", false));
 		this.mapView.setFpsCounter(this.preferencesDefault.getBoolean("showFpsCounter", false));
+		this.mapView.setTileFrames(this.preferencesDefault.getBoolean("showTileFrames", false));
 		this.mapView.setFileCacheSize(Math.min(this.preferencesDefault.getInt("cacheSize",
 				FILE_CACHE_SIZE_DEFAULT), FILE_CACHE_SIZE_MAX));
 		this.mapView.setMoveSpeed(Math.min(this.preferencesDefault.getInt("moveSpeed",
