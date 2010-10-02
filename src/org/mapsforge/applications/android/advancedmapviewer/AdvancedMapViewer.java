@@ -21,6 +21,7 @@ import org.mapsforge.android.map.MapActivity;
 import org.mapsforge.android.map.MapController;
 import org.mapsforge.android.map.MapView;
 import org.mapsforge.android.map.MapViewMode;
+import org.mapsforge.android.map.Projection;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -88,6 +89,15 @@ public class AdvancedMapViewer extends MapActivity {
 	EditText latitudeView;
 	EditText longitudeView;
 	MapController mapController;
+
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+		android.util.Log.d("osm", "dispatchTouchEvent: " + ev.getX() + " - " + ev.getY());
+		Projection projection = this.mapView.getProjection();
+		GeoPoint geoPoint = projection.fromPixels((int) ev.getX(), (int) ev.getY());
+		android.util.Log.d("osm", "GeoPoint: " + geoPoint);
+		return super.dispatchTouchEvent(ev);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -217,7 +227,7 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.findItem(R.id.menu_info).setEnabled(true);
 
-		if (this.mapView.getMapViewMode() == MapViewMode.TILE_DOWNLOAD) {
+		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
 			menu.findItem(R.id.menu_mapfile).setEnabled(false);
 		} else {
 			menu.findItem(R.id.menu_mapfile).setEnabled(true);
@@ -326,7 +336,7 @@ public class AdvancedMapViewer extends MapActivity {
 					this.mapView.setMapFile(data.getStringExtra("mapFile"));
 				}
 			} else if (resultCode == RESULT_CANCELED
-					&& this.mapView.getMapViewMode() != MapViewMode.TILE_DOWNLOAD
+					&& !this.mapView.getMapViewMode().requiresInternetConnection()
 					&& !this.mapView.hasValidMapFile()) {
 				finish();
 			}
@@ -400,7 +410,7 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 
 		// check if the file browser needs to be displayed
-		if (this.mapView.getMapViewMode() == MapViewMode.TILE_DOWNLOAD
+		if (this.mapView.getMapViewMode().requiresInternetConnection()
 				|| this.mapView.hasValidMapFile()) {
 			if (getLastNonConfigurationInstance() != null) {
 				enableFollowGPS();
