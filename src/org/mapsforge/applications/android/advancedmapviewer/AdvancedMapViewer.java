@@ -16,12 +16,12 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
-import org.mapsforge.android.map.GeoPoint;
-import org.mapsforge.android.map.MapActivity;
-import org.mapsforge.android.map.MapController;
-import org.mapsforge.android.map.MapView;
-import org.mapsforge.android.map.MapViewMode;
-import org.mapsforge.android.map.Projection;
+import org.mapsforge.android.maps.GeoPoint;
+import org.mapsforge.android.maps.MapActivity;
+import org.mapsforge.android.maps.MapController;
+import org.mapsforge.android.maps.MapView;
+import org.mapsforge.android.maps.MapViewMode;
+import org.mapsforge.android.maps.Projection;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

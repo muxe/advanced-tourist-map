@@ -16,7 +16,7 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
-import org.mapsforge.android.map.MapView;
+import org.mapsforge.android.maps.MapView;
 
 import android.content.Context;
 import android.util.AttributeSet;

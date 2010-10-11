@@ -21,7 +21,7 @@ import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.mapsforge.android.map.MapView;
+import org.mapsforge.android.maps.MapView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
