@@ -3,13 +3,15 @@
 	<string-array name="preferences_map_view_mode_entries">
 		<item>Canvas renderer</item>
 		<item>Open GL renderer</item>
-		<item>Mapnik (Download)</item>
-		<item>Osmarender (Download)</item>
+		<item>Mapnik (online)</item>
+		<item>Osmarender (online)</item>
+		<item>OpenCycleMap (online)</item>
 	</string-array>
 	<string-array name="preferences_map_view_mode_entry_values">
 		<item>CANVAS_RENDERER</item>
 		<item>OPENGL_RENDERER</item>
 		<item>MAPNIK_TILE_DOWNLOAD</item>
 		<item>OSMARENDER_TILE_DOWNLOAD</item>
+		<item>OPENCYCLEMAP_TILE_DOWNLOAD</item>
 	</string-array>
 </resources>
