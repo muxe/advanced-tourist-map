@@ -59,13 +59,13 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
 	private static final int SELECT_MAP_FILE = 0;
 	/**
-	 * The default file cache size.
+	 * The default size of the memory card cache.
 	 */
-	static final short FILE_CACHE_SIZE_DEFAULT = 100;
+	static final short MEMORY_CARD_CACHE_SIZE_DEFAULT = 100;
 	/**
-	 * The maximum file cache size.
+	 * The maximum size of the memory card cache.
 	 */
-	static final short FILE_CACHE_SIZE_MAX = 500;
+	static final short MEMORY_CARD_CACHE_SIZE_MAX = 500;
 	/**
 	 * The default move speed of the map.
 	 */
@@ -395,8 +395,8 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setMapScale(this.preferencesDefault.getBoolean("showMapScale", false));
 		this.mapView.setFpsCounter(this.preferencesDefault.getBoolean("showFpsCounter", false));
 		this.mapView.setTileFrames(this.preferencesDefault.getBoolean("showTileFrames", false));
-		this.mapView.setFileCacheSize(Math.min(this.preferencesDefault.getInt("cacheSize",
-				FILE_CACHE_SIZE_DEFAULT), FILE_CACHE_SIZE_MAX));
+		this.mapView.setMemoryCardCacheSize(Math.min(this.preferencesDefault.getInt(
+				"cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
 		this.mapView.setMoveSpeed(Math.min(this.preferencesDefault.getInt("moveSpeed",
 				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
 

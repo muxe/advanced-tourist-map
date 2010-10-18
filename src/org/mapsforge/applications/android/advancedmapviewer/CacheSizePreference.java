@@ -40,8 +40,8 @@ public class CacheSizePreference extends SeekBarPreference {
 
 		// define the current and maximum value of the seek bar
 		this.seekBarCurrentValue = this.preferencesDefault.getInt(this.getKey(),
-				AdvancedMapViewer.FILE_CACHE_SIZE_DEFAULT);
-		this.max = AdvancedMapViewer.FILE_CACHE_SIZE_MAX;
+				AdvancedMapViewer.MEMORY_CARD_CACHE_SIZE_DEFAULT);
+		this.max = AdvancedMapViewer.MEMORY_CARD_CACHE_SIZE_MAX;
 	}
 
 	@Override
