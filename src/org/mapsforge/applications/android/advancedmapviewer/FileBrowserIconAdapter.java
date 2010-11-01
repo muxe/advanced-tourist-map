@@ -101,7 +101,7 @@ class FileBrowserIconAdapter extends BaseAdapter {
 	 * @param newFiles
 	 *            the new files for this adapter.
 	 * @param newHasParentFolder
-	 *            true, if the files array has a parent folder at index 0, false otherwise.
+	 *            true if the files array has a parent folder at index 0, false otherwise.
 	 */
 	void updateFiles(File[] newFiles, boolean newHasParentFolder) {
 		this.files = newFiles;

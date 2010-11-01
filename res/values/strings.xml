@@ -35,8 +35,8 @@
 	<string name="preferences_move_speed_value">%d %% move speed</string>
 	<string name="preferences_show_fps_counter">Frame rate</string>
 	<string name="preferences_show_fps_counter_desc">Enable frames per second counter</string>
-	<string name="preferences_show_map_scale">Map scale</string>
-	<string name="preferences_show_map_scale_desc">Show the scale of the map</string>
+	<string name="preferences_show_scale_bar">Map scale</string>
+	<string name="preferences_show_scale_bar_desc">Show the scale of the map</string>
 	<string name="preferences_show_tile_frames">Tile boundaries</string>
 	<string name="preferences_show_tile_frames_desc">Draw tile boundaries (for debugging)</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>

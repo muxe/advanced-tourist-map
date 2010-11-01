@@ -33,8 +33,8 @@
 	<string name="preferences_move_speed_value">%d %% liikkumisnopeus</string>
 	<string name="preferences_show_fps_counter">Kehysnopeus</string>
 	<string name="preferences_show_fps_counter_desc">Salli kehyksen sekunttilaskin</string>
-	<string name="preferences_show_map_scale">Kartan mittakaava</string>
-	<string name="preferences_show_map_scale_desc">Näytä kartan mittakaava</string>
+	<string name="preferences_show_scale_bar">Kartan mittakaava</string>
+	<string name="preferences_show_scale_bar_desc">Näytä kartan mittakaava</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 </resources>

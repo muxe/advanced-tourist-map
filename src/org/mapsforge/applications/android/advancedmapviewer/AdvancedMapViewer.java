@@ -21,7 +21,6 @@ import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
 import org.mapsforge.android.maps.MapView;
 import org.mapsforge.android.maps.MapViewMode;
-import org.mapsforge.android.maps.Projection;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -58,22 +57,27 @@ import android.widget.Toast;
 public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
 	private static final int SELECT_MAP_FILE = 0;
+
 	/**
 	 * The default size of the memory card cache.
 	 */
 	static final short MEMORY_CARD_CACHE_SIZE_DEFAULT = 100;
+
 	/**
 	 * The maximum size of the memory card cache.
 	 */
 	static final short MEMORY_CARD_CACHE_SIZE_MAX = 500;
+
 	/**
 	 * The default move speed of the map.
 	 */
 	static final int MOVE_SPEED_DEFAULT = 10;
+
 	/**
 	 * The maximum move speed of the map.
 	 */
 	static final int MOVE_SPEED_MAX = 30;
+
 	private Button cancelButton;
 	private boolean followGpsEnabled;
 	private Button goButton;
@@ -92,10 +96,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
-		android.util.Log.d("osm", "dispatchTouchEvent: " + ev.getX() + " - " + ev.getY());
-		Projection projection = this.mapView.getProjection();
-		GeoPoint geoPoint = projection.fromPixels((int) ev.getX(), (int) ev.getY());
-		android.util.Log.d("osm", "GeoPoint: " + geoPoint);
+		// insert code here to handle touch events on the screen
 		return super.dispatchTouchEvent(ev);
 	}
 
@@ -392,7 +393,7 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 
 		// restore all other preferences
-		this.mapView.setMapScale(this.preferencesDefault.getBoolean("showMapScale", false));
+		this.mapView.setScaleBar(this.preferencesDefault.getBoolean("showScaleBar", false));
 		this.mapView.setFpsCounter(this.preferencesDefault.getBoolean("showFpsCounter", false));
 		this.mapView.setTileFrames(this.preferencesDefault.getBoolean("showTileFrames", false));
 		this.mapView.setMemoryCardCacheSize(Math.min(this.preferencesDefault.getInt(

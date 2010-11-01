@@ -2,9 +2,9 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
 	android:title="@string/menu_preferences">
 	<PreferenceCategory android:title="@string/preferences_map">
-		<CheckBoxPreference android:title="@string/preferences_show_map_scale"
-			android:summary="@string/preferences_show_map_scale_desc"
-			android:key="showMapScale" />
+		<CheckBoxPreference android:title="@string/preferences_show_scale_bar"
+			android:summary="@string/preferences_show_scale_bar_desc"
+			android:key="showScaleBar" />
 		<CheckBoxPreference android:title="@string/preferences_show_fps_counter"
 			android:summary="@string/preferences_show_fps_counter_desc"
 			android:key="showFpsCounter" />

@@ -35,8 +35,8 @@
 	<string name="preferences_move_speed_value">%d %% Scrollgeschwindigkeit</string>
 	<string name="preferences_show_fps_counter">Bildfrequenz</string>
 	<string name="preferences_show_fps_counter_desc">FPS-Zähler anzeigen</string>
-	<string name="preferences_show_map_scale">Kartenmaßstab</string>
-	<string name="preferences_show_map_scale_desc">Maßstab der Karte anzeigen</string>
+	<string name="preferences_show_scale_bar">Kartenmaßstab</string>
+	<string name="preferences_show_scale_bar_desc">Maßstab der Karte anzeigen</string>
 	<string name="preferences_show_tile_frames">Tile-Umrandungen</string>
 	<string name="preferences_show_tile_frames_desc">Rahmen um Tiles malen (zu Testzwecken)</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
