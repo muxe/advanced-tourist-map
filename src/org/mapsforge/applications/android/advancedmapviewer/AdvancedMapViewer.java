@@ -50,8 +50,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 /**
- * A map application which demonstrates how to use the MapView. The map can be centered to
- * current GPS coordinates. A simple file browser for selecting the map file is also included.
+ * A map application which demonstrates how to use the MapView. The map can be centered to the
+ * current GPS coordinate. A simple file browser for selecting the map file is also included.
  * Some preferences can be adjusted via the EditPreferences activity.
  */
 public class AdvancedMapViewer extends MapActivity {
@@ -203,7 +203,7 @@ public class AdvancedMapViewer extends MapActivity {
 				return true;
 
 			case R.id.menu_position_map_center:
-				// disable gps follow mode if it is enabled
+				// disable GPS follow mode if it is enabled
 				disableFollowGPS(true);
 				this.mapController.setCenter(this.mapView.getMapDatabase().getMapCenter());
 				return true;
@@ -228,24 +228,30 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onPrepareOptionsMenu(Menu menu) {
 		menu.findItem(R.id.menu_info).setEnabled(true);
 
-		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
-			menu.findItem(R.id.menu_mapfile).setEnabled(false);
-		} else {
-			menu.findItem(R.id.menu_mapfile).setEnabled(true);
-		}
-
 		if (this.coordinatesView.getVisibility() == View.VISIBLE) {
 			menu.findItem(R.id.menu_position).setEnabled(false);
 		} else {
 			menu.findItem(R.id.menu_position).setEnabled(true);
 		}
 
-		menu.findItem(R.id.menu_preferences).setEnabled(true);
-
 		if (this.locationManager == null || this.followGpsEnabled) {
 			menu.findItem(R.id.menu_position_gps_follow).setEnabled(false);
 		} else {
 			menu.findItem(R.id.menu_position_gps_follow).setEnabled(true);
+		}
+
+		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
+			menu.findItem(R.id.menu_position_map_center).setEnabled(false);
+		} else {
+			menu.findItem(R.id.menu_position_map_center).setEnabled(true);
+		}
+
+		menu.findItem(R.id.menu_preferences).setEnabled(true);
+
+		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
+			menu.findItem(R.id.menu_mapfile).setEnabled(false);
+		} else {
+			menu.findItem(R.id.menu_mapfile).setEnabled(true);
 		}
 
 		return true;
@@ -266,7 +272,7 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	private void configureMapView() {
-		// make the MapView clickable and activate the zoomLevel buttons
+		// configure the MapView and activate the zoomLevel buttons
 		this.mapView.setClickable(true);
 		this.mapView.setBuiltInZoomControls(true);
 		this.mapView.setFocusable(true);
