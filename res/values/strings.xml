@@ -10,7 +10,6 @@
 	<string name="map_file_invalid">The selected file is not a valid map file. Please
 		select another file.</string>
 	<string name="map_file_select">Please select a map file.</string>
-	<string name="menu_exit">Exit</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_info_about">About</string>
 	<string name="menu_info_license">License</string>

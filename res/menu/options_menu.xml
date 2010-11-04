@@ -20,6 +20,4 @@
 		android:icon="@drawable/ic_menu_preferences" />
 	<item android:id="@+id/menu_mapfile" android:title="@string/menu_mapfile"
 		android:icon="@drawable/ic_menu_archive" />
-	<item android:id="@+id/menu_exit" android:title="@string/menu_exit"
-		android:icon="@drawable/ic_menu_close_clear_cancel" />
 </menu>

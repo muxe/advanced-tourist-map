@@ -10,7 +10,6 @@
 	<string name="map_file_invalid">Die gewählte Datei ist keine gültige Kartendatei.
 		Bitte wählen Sie eine andere Datei aus.</string>
 	<string name="map_file_select">Bitte wählen Sie eine Kartendatei aus.</string>
-	<string name="menu_exit">Beenden</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_info_about">Über</string>
 	<string name="menu_info_license">Lizenz</string>

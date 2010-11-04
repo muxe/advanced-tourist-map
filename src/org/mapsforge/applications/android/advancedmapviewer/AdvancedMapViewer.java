@@ -215,10 +215,6 @@ public class AdvancedMapViewer extends MapActivity {
 			case R.id.menu_preferences:
 				startActivity(new Intent(this, EditPreferences.class));
 				return true;
-
-			case R.id.menu_exit:
-				finish();
-				return true;
 		}
 		showToast("not yet implemented");
 		return false;

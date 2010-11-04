@@ -10,7 +10,6 @@
 	<string name="map_file_invalid">Valittu tiedosto ei ole kelvollinen karttatiedosto.
 		Valitse toinen tiedosto.</string>
 	<string name="map_file_select">Valitse kartta tiedosto.</string>
-	<string name="menu_exit">Poistu</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_info_about">Lisää</string>
 	<string name="menu_info_license">Lisenssi</string>
