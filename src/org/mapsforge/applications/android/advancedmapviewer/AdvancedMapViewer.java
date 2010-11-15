@@ -153,6 +153,7 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_info:
+				startActivity(new Intent(this, InfoView.class));
 				return true;
 
 			case R.id.menu_position:
@@ -171,12 +172,11 @@ public class AdvancedMapViewer extends MapActivity {
 				GeoPoint mapCenter = this.mapView.getMapCenter();
 				this.latitudeView.setText(Double.toString(mapCenter.getLatitude()));
 				this.longitudeView.setText(Double.toString(mapCenter.getLongitude()));
-				setTitle(R.string.menu_position_enter_coordinates);
 
 				this.goButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						// disable gps follow mode if it is enabled
+						// disable GPS follow mode if it is enabled
 						disableFollowGPS(true);
 						// set the new map center coordinates
 						AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(Double
@@ -387,6 +387,15 @@ public class AdvancedMapViewer extends MapActivity {
 		// Read the default shared preferences
 		this.preferencesDefault = PreferenceManager.getDefaultSharedPreferences(this);
 
+		// check if the full screen mode should be activated
+		if (this.preferencesDefault.getBoolean("fullscreen", false)) {
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		} else {
+			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		}
+
 		// set the operation mode for the MapView
 		if (this.preferencesDefault.contains("mapViewMode")) {
 			this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferencesDefault
@@ -402,15 +411,6 @@ public class AdvancedMapViewer extends MapActivity {
 				"cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
 		this.mapView.setMoveSpeed(Math.min(this.preferencesDefault.getInt("moveSpeed",
 				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
-
-		// check if the full screen mode should be activated
-		if (this.preferencesDefault.getBoolean("fullscreen", false)) {
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-		} else {
-			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
-		}
 
 		// check if the file browser needs to be displayed
 		if (this.mapView.getMapViewMode().requiresInternetConnection()

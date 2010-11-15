@@ -11,8 +11,6 @@
 		Bitte wählen Sie eine andere Datei aus.</string>
 	<string name="map_file_select">Bitte wählen Sie eine Kartendatei aus.</string>
 	<string name="menu_info">Info</string>
-	<string name="menu_info_about">Über</string>
-	<string name="menu_info_license">Lizenz</string>
 	<string name="menu_mapfile">Kartendatei</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Koordinaten eingeben</string>

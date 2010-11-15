@@ -14,6 +14,7 @@
 		</activity>
 		<activity android:name=".EditPreferences" />
 		<activity android:name=".FileBrowser" />
+		<activity android:name=".InfoView" android:theme="@android:style/Theme.NoTitleBar" />
 	</application>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

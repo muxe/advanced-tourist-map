@@ -16,19 +16,22 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
+import android.app.Activity;
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
+import android.webkit.WebView;
 
 /**
- * Activity to edit the application preferences.
+ * Simple activity to display the info web page from the assets folder.
  */
-public class EditPreferences extends PreferenceActivity {
+public class InfoView extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		addPreferencesFromResource(R.xml.preferences);
+		WebView webView = new WebView(this);
+		webView.loadUrl("file:///android_asset/info.xml");
+		setContentView(webView);
 	}
 
 	@Override
