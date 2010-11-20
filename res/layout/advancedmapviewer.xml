@@ -8,12 +8,12 @@
 		<ImageView android:id="@+id/gpsView" android:layout_width="wrap_content"
 			android:layout_height="wrap_content" android:background="@drawable/btn_square_overlay_normal"
 			android:layout_alignParentTop="true" android:layout_alignParentRight="true"
-			android:layout_marginTop="5px" android:layout_marginRight="5px"
+			android:layout_marginTop="5dip" android:layout_marginRight="5dip"
 			android:scaleType="center" android:visibility="gone" />
 		<RelativeLayout android:id="@+id/coordinatesView"
 			android:layout_width="fill_parent" android:layout_height="fill_parent"
-			android:background="#F000" android:orientation="vertical"
-			android:padding="15px" android:layout_centerHorizontal="true"
+			android:background="#D000" android:orientation="vertical"
+			android:padding="15dip" android:layout_centerHorizontal="true"
 			android:visibility="gone">
 			<TextView android:id="@+id/latitudeLabel"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
@@ -21,20 +21,33 @@
 			<EditText android:id="@+id/latitude" android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:layout_below="@id/latitudeLabel"
 				android:maxLength="9" android:inputType="numberSigned|numberDecimal" />
+
 			<TextView android:id="@+id/longitudeLabel"
 				android:layout_width="fill_parent" android:layout_height="wrap_content"
 				android:layout_below="@id/latitude" android:text="@string/longitude"
-				android:textStyle="bold" />
+				android:textStyle="bold" android:layout_marginTop="10dip" />
 			<EditText android:id="@+id/longitude" android:layout_width="fill_parent"
 				android:layout_height="wrap_content" android:layout_below="@id/longitudeLabel"
 				android:maxLength="9" android:inputType="numberSigned|numberDecimal" />
+
+			<TextView android:id="@+id/zoomlevelLabel"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_below="@+id/longitude" android:text="@string/zoomlevel"
+				android:textStyle="bold" android:layout_marginTop="10dip" />
+			<SeekBar android:id="@+id/zoomlevel" android:layout_width="fill_parent"
+				android:layout_height="wrap_content" android:layout_below="@+id/zoomlevelLabel" />
+			<TextView android:id="@+id/zoomlevelValue"
+				android:layout_width="fill_parent" android:layout_height="wrap_content"
+				android:layout_below="@+id/zoomlevel" android:textStyle="bold"
+				android:gravity="center_horizontal" />
+
 			<Button android:id="@+id/goButton" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_below="@id/longitude"
-				android:text="@string/go_to_position" android:layout_marginTop="15px" />
+				android:layout_height="wrap_content" android:layout_below="@+id/zoomlevelValue"
+				android:text="@string/go_to_position" android:layout_marginTop="40dip" />
 			<Button android:id="@+id/cancelButton" android:layout_width="wrap_content"
-				android:layout_height="wrap_content" android:layout_below="@id/longitude"
+				android:layout_height="wrap_content" android:layout_below="@+id/zoomlevelValue"
 				android:layout_toRightOf="@id/goButton" android:text="@string/cancel"
-				android:layout_marginTop="15px" android:layout_marginLeft="15px" />
+				android:layout_marginTop="40dip" android:layout_marginLeft="20dip" />
 		</RelativeLayout>
 	</RelativeLayout>
 </merge>

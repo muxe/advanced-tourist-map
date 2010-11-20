@@ -11,7 +11,7 @@
 		select another file.</string>
 	<string name="map_file_select">Please select a map file.</string>
 	<string name="menu_info">Info</string>
-	<string name="menu_mapfile">Mapfile</string>
+	<string name="menu_mapfile">Map file</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Enter coordinates</string>
 	<string name="menu_position_gps_follow">Follow GPS signal</string>
@@ -38,4 +38,5 @@
 	<string name="preferences_show_tile_frames_desc">Draw tile boundaries (for debugging)</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
+	<string name="zoomlevel">Zoom level</string>
 </resources>

@@ -138,6 +138,11 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 				}
 			}
 		};
+
+		if (savedInstanceState == null) {
+			// first start of this instance
+			showDialog(DIALOG_MAP_FILE_SELECT);
+		}
 	}
 
 	@Override
@@ -161,7 +166,6 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	@Override
 	protected void onPause() {
 		super.onPause();
-
 		// save the current directory
 		Editor editor = getSharedPreferences(PREFERENCES_FILE, MODE_PRIVATE).edit();
 		editor.clear();
@@ -190,7 +194,6 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		if (!this.currentDirectory.exists()) {
 			this.currentDirectory = new File(DEFAULT_DIRECTORY);
 		}
-		showDialog(DIALOG_MAP_FILE_SELECT);
 		browseToCurrentDirectory();
 	}
 }

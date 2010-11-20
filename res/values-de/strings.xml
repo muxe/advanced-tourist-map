@@ -38,4 +38,5 @@
 	<string name="preferences_show_tile_frames_desc">Rahmen um Tiles malen (zu Testzwecken)</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
+	<string name="zoomlevel">Zoomstufe</string>
 </resources>

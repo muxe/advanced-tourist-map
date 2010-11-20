@@ -47,6 +47,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -93,6 +95,8 @@ public class AdvancedMapViewer extends MapActivity {
 	EditText latitudeView;
 	EditText longitudeView;
 	MapController mapController;
+	TextView zoomlevelValue;
+	SeekBar zoomlevelView;
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -111,6 +115,8 @@ public class AdvancedMapViewer extends MapActivity {
 		this.coordinatesView = (RelativeLayout) findViewById(R.id.coordinatesView);
 		this.latitudeView = (EditText) findViewById(R.id.latitude);
 		this.longitudeView = (EditText) findViewById(R.id.longitude);
+		this.zoomlevelView = (SeekBar) findViewById(R.id.zoomlevel);
+		this.zoomlevelValue = (TextView) findViewById(R.id.zoomlevelValue);
 		this.goButton = (Button) findViewById(R.id.goButton);
 		this.cancelButton = (Button) findViewById(R.id.cancelButton);
 
@@ -127,6 +133,14 @@ public class AdvancedMapViewer extends MapActivity {
 		// get the location manager and the input method manager
 		this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		this.inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+
+		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
+			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				enableFollowGPS();
+			} else {
+				showDialog(DIALOG_GPS_DISABLED);
+			}
+		}
 	}
 
 	@Override
@@ -172,18 +186,44 @@ public class AdvancedMapViewer extends MapActivity {
 				GeoPoint mapCenter = this.mapView.getMapCenter();
 				this.latitudeView.setText(Double.toString(mapCenter.getLatitude()));
 				this.longitudeView.setText(Double.toString(mapCenter.getLongitude()));
+				this.zoomlevelView.setMax(this.mapView.getMaxZoomLevel());
+				this.zoomlevelView.setProgress(this.mapView.getZoomLevel());
+				this.zoomlevelView
+						.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+							@Override
+							public void onStopTrackingTouch(SeekBar seekBar) {
+								// do nothing
+							}
+
+							@Override
+							public void onStartTrackingTouch(SeekBar seekBar) {
+								// do nothing
+							}
+
+							@Override
+							public void onProgressChanged(SeekBar seekBar, int progress,
+									boolean fromUser) {
+								AdvancedMapViewer.this.zoomlevelValue.setText(String
+										.valueOf(progress));
+							}
+						});
+				this.zoomlevelValue.setText(String.valueOf(this.zoomlevelView.getProgress()));
 
 				this.goButton.setOnClickListener(new View.OnClickListener() {
 					@Override
 					public void onClick(View v) {
 						// disable GPS follow mode if it is enabled
 						disableFollowGPS(true);
-						// set the new map center coordinates
+
+						// set the new map center coordinates and zoom level
 						AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(Double
 								.parseDouble(AdvancedMapViewer.this.latitudeView.getText()
 										.toString()), Double
 								.parseDouble(AdvancedMapViewer.this.longitudeView.getText()
 										.toString())));
+						AdvancedMapViewer.this.mapController
+								.setZoom(AdvancedMapViewer.this.zoomlevelView.getProgress());
+
 						// hide the virtual keyboard
 						AdvancedMapViewer.this.inputMethodManager.hideSoftInputFromWindow(
 								AdvancedMapViewer.this.coordinatesView.getWindowToken(), 0);
@@ -216,7 +256,6 @@ public class AdvancedMapViewer extends MapActivity {
 				startActivity(new Intent(this, EditPreferences.class));
 				return true;
 		}
-		showToast("not yet implemented");
 		return false;
 	}
 
@@ -251,14 +290,6 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 
 		return true;
-	}
-
-	@Override
-	public Object onRetainNonConfigurationInstance() {
-		if (this.locationListener != null) {
-			return Boolean.TRUE;
-		}
-		return null;
 	}
 
 	@Override
@@ -413,14 +444,16 @@ public class AdvancedMapViewer extends MapActivity {
 				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
 
 		// check if the file browser needs to be displayed
-		if (this.mapView.getMapViewMode().requiresInternetConnection()
-				|| this.mapView.hasValidMapFile()) {
-			if (getLastNonConfigurationInstance() != null) {
-				enableFollowGPS();
-			}
-		} else {
+		if (!this.mapView.getMapViewMode().requiresInternetConnection()
+				&& !this.mapView.hasValidMapFile()) {
 			startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
 		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		super.onSaveInstanceState(outState);
+		outState.putBoolean("locationListener", this.locationListener != null);
 	}
 
 	/**
