@@ -52,9 +52,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * A map application which demonstrates how to use the MapView. The map can be centered to the
- * current GPS coordinate. A simple file browser for selecting the map file is also included.
- * Some preferences can be adjusted via the EditPreferences activity.
+ * A map application which uses the features from the mapsforge library. The map can be centered
+ * to the current GPS coordinate. A simple file browser for selecting the map file is also
+ * included. Some preferences can be adjusted via the EditPreferences activity.
  */
 public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
@@ -191,8 +191,10 @@ public class AdvancedMapViewer extends MapActivity {
 				this.zoomlevelView
 						.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
 							@Override
-							public void onStopTrackingTouch(SeekBar seekBar) {
-								// do nothing
+							public void onProgressChanged(SeekBar seekBar, int progress,
+									boolean fromUser) {
+								AdvancedMapViewer.this.zoomlevelValue.setText(String
+										.valueOf(progress));
 							}
 
 							@Override
@@ -201,10 +203,8 @@ public class AdvancedMapViewer extends MapActivity {
 							}
 
 							@Override
-							public void onProgressChanged(SeekBar seekBar, int progress,
-									boolean fromUser) {
-								AdvancedMapViewer.this.zoomlevelValue.setText(String
-										.valueOf(progress));
+							public void onStopTrackingTouch(SeekBar seekBar) {
+								// do nothing
 							}
 						});
 				this.zoomlevelValue.setText(String.valueOf(this.zoomlevelView.getProgress()));

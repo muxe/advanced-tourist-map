@@ -3,18 +3,11 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<head>
 		<title>About this software</title>
+		<meta http-equiv="Content-Style-Type" content="text/css" />
 	</head>
 	<body style="padding: 1em;">
-		<p style="text-align: center;">
-			<img alt="mapsforge logo" src="file:///android_asset/mapsforge_logo.png" style="width: 256px; height: 223px;" />
-			<br />
-			Version 0.1.0
-		</p>
-		<p>
-			This software is a part of the <a href="http://mapsforge.org/">mapsforge</a> project and distributed under the <a href="http://www.gnu.org/licenses/gpl.html">GPL3 license</a>.
-		</p>
-		<p>
-			All map data (c) <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA license</a>.
-		</p>
+		<p style="text-align: center;"><img alt="mapsforge logo" src="file:///android_asset/mapsforge_logo.png" style="width: 256px; height: 223px;" /><br />Version 0.1.0</p>
+		<p>This software is a part of the <a href="http://mapsforge.org/">mapsforge</a> project and distributed under the <a href="http://www.gnu.org/licenses/gpl.html">GPL3 license</a>.</p>
+		<p>All map data (c) <a href="http://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA license</a>.</p>
 	</body>
 </html>
