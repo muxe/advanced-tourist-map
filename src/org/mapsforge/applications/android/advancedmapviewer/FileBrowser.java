@@ -191,7 +191,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		SharedPreferences preferences = getSharedPreferences(PREFERENCES_FILE, MODE_PRIVATE);
 		this.currentDirectory = new File(preferences.getString("currentDirectory",
 				DEFAULT_DIRECTORY));
-		if (!this.currentDirectory.exists()) {
+		if (!this.currentDirectory.exists() || !this.currentDirectory.canRead()) {
 			this.currentDirectory = new File(DEFAULT_DIRECTORY);
 		}
 		browseToCurrentDirectory();
