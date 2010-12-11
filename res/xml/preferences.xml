@@ -20,6 +20,8 @@
 	<PreferenceCategory android:title="@string/preferences_general">
 		<CheckBoxPreference android:title="@string/preferences_fullscreen"
 			android:summary="@string/preferences_fullscreen_desc" android:key="fullscreen" />
+		<CheckBoxPreference android:title="@string/preferences_wake_lock"
+			android:summary="@string/preferences_wake_lock_desc" android:key="wake_lock" />
 		<org.mapsforge.applications.android.advancedmapviewer.CacheSizePreference
 			android:title="@string/preferences_cache_size" android:summary="@string/preferences_cache_size_desc"
 			android:key="cacheSize" />

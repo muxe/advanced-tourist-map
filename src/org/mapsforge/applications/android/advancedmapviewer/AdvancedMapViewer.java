@@ -33,6 +33,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.PowerManager;
+import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -87,8 +89,10 @@ public class AdvancedMapViewer extends MapActivity {
 	private LocationManager locationManager;
 	private MapView mapView;
 	private MapViewMode mapViewMode;
+	private PowerManager powerManager;
 	private SharedPreferences preferencesDefault;
 	private Toast toast;
+	private WakeLock wakeLock;
 	RelativeLayout coordinatesView;
 	ImageView gpsView;
 	InputMethodManager inputMethodManager;
@@ -102,45 +106,6 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 		// insert code here to handle touch events on the screen
 		return super.dispatchTouchEvent(ev);
-	}
-
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-
-		// set up the layout views
-		setContentView(R.layout.advancedmapviewer);
-		this.mapView = (MapView) findViewById(R.id.mapView);
-		this.gpsView = (ImageView) findViewById(R.id.gpsView);
-		this.coordinatesView = (RelativeLayout) findViewById(R.id.coordinatesView);
-		this.latitudeView = (EditText) findViewById(R.id.latitude);
-		this.longitudeView = (EditText) findViewById(R.id.longitude);
-		this.zoomlevelView = (SeekBar) findViewById(R.id.zoomlevel);
-		this.zoomlevelValue = (TextView) findViewById(R.id.zoomlevelValue);
-		this.goButton = (Button) findViewById(R.id.goButton);
-		this.cancelButton = (Button) findViewById(R.id.cancelButton);
-
-		configureMapView();
-
-		// set an empty touch listener to handle all touch events
-		this.coordinatesView.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				return true;
-			}
-		});
-
-		// get the location manager and the input method manager
-		this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		this.inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
-		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
-			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				enableFollowGPS();
-			} else {
-				showDialog(DIALOG_GPS_DISABLED);
-			}
-		}
 	}
 
 	@Override
@@ -378,6 +343,47 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+
+		// set up the layout views
+		setContentView(R.layout.advancedmapviewer);
+		this.mapView = (MapView) findViewById(R.id.mapView);
+		this.gpsView = (ImageView) findViewById(R.id.gpsView);
+		this.coordinatesView = (RelativeLayout) findViewById(R.id.coordinatesView);
+		this.latitudeView = (EditText) findViewById(R.id.latitude);
+		this.longitudeView = (EditText) findViewById(R.id.longitude);
+		this.zoomlevelView = (SeekBar) findViewById(R.id.zoomlevel);
+		this.zoomlevelValue = (TextView) findViewById(R.id.zoomlevelValue);
+		this.goButton = (Button) findViewById(R.id.goButton);
+		this.cancelButton = (Button) findViewById(R.id.cancelButton);
+
+		configureMapView();
+
+		// set an empty touch listener to handle all touch events
+		this.coordinatesView.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true;
+			}
+		});
+
+		// get the pointers to different system services
+		this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+		this.inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		this.powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+		this.wakeLock = this.powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
+
+		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
+			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+				enableFollowGPS();
+			} else {
+				showDialog(DIALOG_GPS_DISABLED);
+			}
+		}
+	}
+
+	@Override
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		switch (id) {
@@ -412,6 +418,15 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	@Override
+	protected void onPause() {
+		super.onPause();
+		// release the wake lock if necessary
+		if (this.wakeLock.isHeld()) {
+			this.wakeLock.release();
+		}
+	}
+
+	@Override
 	protected void onResume() {
 		super.onResume();
 
@@ -425,6 +440,13 @@ public class AdvancedMapViewer extends MapActivity {
 		} else {
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+		}
+
+		// check if the wake lock should be activated
+		if (this.preferencesDefault.getBoolean("wake_lock", false)) {
+			if (!this.wakeLock.isHeld()) {
+				this.wakeLock.acquire();
+			}
 		}
 
 		// set the operation mode for the MapView

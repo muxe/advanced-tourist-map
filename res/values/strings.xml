@@ -36,6 +36,8 @@
 	<string name="preferences_show_scale_bar_desc">Show the scale of the map</string>
 	<string name="preferences_show_tile_frames">Tile boundaries</string>
 	<string name="preferences_show_tile_frames_desc">Draw tile boundaries (for debugging)</string>
+	<string name="preferences_wake_lock">Stay awake</string>
+	<string name="preferences_wake_lock_desc">Stop the screen from dimming</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoom level</string>

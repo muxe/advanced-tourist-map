@@ -36,6 +36,8 @@
 	<string name="preferences_show_scale_bar_desc">Maßstab der Karte anzeigen</string>
 	<string name="preferences_show_tile_frames">Tile-Umrandungen</string>
 	<string name="preferences_show_tile_frames_desc">Rahmen um Tiles malen (zu Testzwecken)</string>
+	<string name="preferences_wake_lock">Aktiv bleiben</string>
+	<string name="preferences_wake_lock_desc">Abschaltung des Bildschirms verhindern</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoomstufe</string>
