@@ -5,18 +5,13 @@
 		<CheckBoxPreference android:title="@string/preferences_show_scale_bar"
 			android:summary="@string/preferences_show_scale_bar_desc"
 			android:key="showScaleBar" />
-		<CheckBoxPreference android:title="@string/preferences_show_fps_counter"
-			android:summary="@string/preferences_show_fps_counter_desc"
-			android:key="showFpsCounter" />
-		<CheckBoxPreference android:title="@string/preferences_show_tile_frames"
-			android:summary="@string/preferences_show_tile_frames_desc"
-			android:key="showTileFrames" />
 		<ListPreference android:title="@string/preferences_map_view_mode"
 			android:summary="@string/preferences_map_view_mode_desc"
 			android:entries="@array/preferences_map_view_mode_entries"
 			android:entryValues="@array/preferences_map_view_mode_entry_values"
 			android:key="mapViewMode" />
 	</PreferenceCategory>
+
 	<PreferenceCategory android:title="@string/preferences_general">
 		<CheckBoxPreference android:title="@string/preferences_fullscreen"
 			android:summary="@string/preferences_fullscreen_desc" android:key="fullscreen" />
@@ -28,5 +23,17 @@
 		<org.mapsforge.applications.android.advancedmapviewer.MoveSpeedPreference
 			android:title="@string/preferences_move_speed" android:summary="@string/preferences_move_speed_desc"
 			android:key="moveSpeed" />
+	</PreferenceCategory>
+
+	<PreferenceCategory android:title="@string/preferences_debug">
+		<CheckBoxPreference android:title="@string/preferences_show_fps_counter"
+			android:summary="@string/preferences_show_fps_counter_desc"
+			android:key="showFpsCounter" />
+		<CheckBoxPreference android:title="@string/preferences_show_tile_frames"
+			android:summary="@string/preferences_show_tile_frames_desc"
+			android:key="showTileFrames" />
+		<CheckBoxPreference android:title="@string/preferences_show_tile_coordinates"
+			android:summary="@string/preferences_show_tile_coordinates_desc"
+			android:key="showTileCoordinates" />
 	</PreferenceCategory>
 </PreferenceScreen>

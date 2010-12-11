@@ -90,7 +90,7 @@ public class AdvancedMapViewer extends MapActivity {
 	private MapView mapView;
 	private MapViewMode mapViewMode;
 	private PowerManager powerManager;
-	private SharedPreferences preferencesDefault;
+	private SharedPreferences preferences;
 	private Toast toast;
 	private WakeLock wakeLock;
 	RelativeLayout coordinatesView;
@@ -431,10 +431,10 @@ public class AdvancedMapViewer extends MapActivity {
 		super.onResume();
 
 		// Read the default shared preferences
-		this.preferencesDefault = PreferenceManager.getDefaultSharedPreferences(this);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		// check if the full screen mode should be activated
-		if (this.preferencesDefault.getBoolean("fullscreen", false)) {
+		if (this.preferences.getBoolean("fullscreen", false)) {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		} else {
@@ -443,26 +443,28 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 
 		// check if the wake lock should be activated
-		if (this.preferencesDefault.getBoolean("wake_lock", false)) {
+		if (this.preferences.getBoolean("wake_lock", false)) {
 			if (!this.wakeLock.isHeld()) {
 				this.wakeLock.acquire();
 			}
 		}
 
 		// set the operation mode for the MapView
-		if (this.preferencesDefault.contains("mapViewMode")) {
-			this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferencesDefault
-					.getString("mapViewMode", MapView.getDefaultMapViewMode().name()));
+		if (this.preferences.contains("mapViewMode")) {
+			this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferences.getString(
+					"mapViewMode", MapView.getDefaultMapViewMode().name()));
 			this.mapView.setMapViewMode(this.mapViewMode);
 		}
 
 		// restore all other preferences
-		this.mapView.setScaleBar(this.preferencesDefault.getBoolean("showScaleBar", false));
-		this.mapView.setFpsCounter(this.preferencesDefault.getBoolean("showFpsCounter", false));
-		this.mapView.setTileFrames(this.preferencesDefault.getBoolean("showTileFrames", false));
-		this.mapView.setMemoryCardCacheSize(Math.min(this.preferencesDefault.getInt(
-				"cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
-		this.mapView.setMoveSpeed(Math.min(this.preferencesDefault.getInt("moveSpeed",
+		this.mapView.setScaleBar(this.preferences.getBoolean("showScaleBar", false));
+		this.mapView.setFpsCounter(this.preferences.getBoolean("showFpsCounter", false));
+		this.mapView.setTileFrames(this.preferences.getBoolean("showTileFrames", false));
+		this.mapView.setTileCoordinates(this.preferences.getBoolean("showTileCoordinates",
+				false));
+		this.mapView.setMemoryCardCacheSize(Math.min(this.preferences.getInt("cacheSize",
+				MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
+		this.mapView.setMoveSpeed(Math.min(this.preferences.getInt("moveSpeed",
 				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
 
 		// check if the file browser needs to be displayed
