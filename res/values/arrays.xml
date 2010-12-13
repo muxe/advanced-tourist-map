@@ -7,6 +7,7 @@
 		<item>Osmarender (online)</item>
 		<item>OpenCycleMap (online)</item>
 	</string-array>
+
 	<string-array name="preferences_map_view_mode_entry_values">
 		<item>CANVAS_RENDERER</item>
 		<item>OPENGL_RENDERER</item>
@@ -14,4 +15,6 @@
 		<item>OSMARENDER_TILE_DOWNLOAD</item>
 		<item>OPENCYCLEMAP_TILE_DOWNLOAD</item>
 	</string-array>
+
+	<string name="preferences_map_view_mode_default">CANVAS_RENDERER</string>
 </resources>

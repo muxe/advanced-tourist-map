@@ -9,7 +9,7 @@
 			android:summary="@string/preferences_map_view_mode_desc"
 			android:entries="@array/preferences_map_view_mode_entries"
 			android:entryValues="@array/preferences_map_view_mode_entry_values"
-			android:key="mapViewMode" />
+			android:key="mapViewMode" android:defaultValue="@string/preferences_map_view_mode_default" />
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/preferences_general">
