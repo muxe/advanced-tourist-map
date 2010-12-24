@@ -16,6 +16,7 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
+import org.mapsforge.android.maps.CircleOverlay;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
@@ -27,6 +28,8 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -65,7 +68,7 @@ public class AdvancedMapViewer extends MapActivity {
 	/**
 	 * The default size of the memory card cache.
 	 */
-	static final short MEMORY_CARD_CACHE_SIZE_DEFAULT = 100;
+	static final short MEMORY_CARD_CACHE_SIZE_DEFAULT = 250;
 
 	/**
 	 * The maximum size of the memory card cache.
@@ -83,6 +86,8 @@ public class AdvancedMapViewer extends MapActivity {
 	static final int MOVE_SPEED_MAX = 30;
 
 	private Button cancelButton;
+	private Paint circleOverlayFill;
+	private Paint circleOverlayOutline;
 	private boolean followGpsEnabled;
 	private Button goButton;
 	private LocationListener locationListener;
@@ -93,6 +98,7 @@ public class AdvancedMapViewer extends MapActivity {
 	private SharedPreferences preferences;
 	private Toast toast;
 	private WakeLock wakeLock;
+	CircleOverlay circleOverlay;
 	RelativeLayout coordinatesView;
 	ImageView gpsView;
 	InputMethodManager inputMethodManager;
@@ -279,13 +285,19 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	private void enableFollowGPS() {
+		this.circleOverlay = new CircleOverlay(this.circleOverlayFill,
+				this.circleOverlayOutline);
+		this.mapView.getOverlays().add(this.circleOverlay);
+
 		this.followGpsEnabled = true;
 		this.locationListener = new LocationListener() {
 			@Override
 			public void onLocationChanged(Location location) {
-				AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(location
-						.getLatitude(), location.getLongitude()));
+				GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
+				AdvancedMapViewer.this.mapController.setCenter(point);
 				AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
+				AdvancedMapViewer.this.circleOverlay.setCircleData(point, location
+						.getAccuracy());
 			}
 
 			@Override
@@ -373,6 +385,18 @@ public class AdvancedMapViewer extends MapActivity {
 		this.inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		this.powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		this.wakeLock = this.powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
+
+		// set up the paint objects for the location overlay
+		this.circleOverlayFill = new Paint(Paint.ANTI_ALIAS_FLAG);
+		this.circleOverlayFill.setStyle(Paint.Style.FILL);
+		this.circleOverlayFill.setColor(Color.BLUE);
+		this.circleOverlayFill.setAlpha(64);
+
+		this.circleOverlayOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
+		this.circleOverlayOutline.setStyle(Paint.Style.STROKE);
+		this.circleOverlayOutline.setColor(Color.BLUE);
+		this.circleOverlayOutline.setAlpha(128);
+		this.circleOverlayOutline.setStrokeWidth(3);
 
 		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
 			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -487,6 +511,10 @@ public class AdvancedMapViewer extends MapActivity {
 	 *            if a toast message should be displayed or not.
 	 */
 	void disableFollowGPS(boolean showToastMessage) {
+		if (this.circleOverlay != null) {
+			this.mapView.getOverlays().remove(this.circleOverlay);
+			this.circleOverlay = null;
+		}
 		if (this.followGpsEnabled) {
 			if (this.locationListener != null) {
 				this.locationManager.removeUpdates(this.locationListener);
