@@ -39,6 +39,9 @@
 	<string name="preferences_show_tile_coordinates_desc">Koordinaten auf Kacheln malen</string>
 	<string name="preferences_show_tile_frames">Tile-Umrandungen</string>
 	<string name="preferences_show_tile_frames_desc">Rahmen um Tiles malen</string>
+	<string name="preferences_show_water_tiles">Wasser-Kacheln</string>
+	<string name="preferences_show_water_tiles_desc">Kacheln mit gesetztem Wasser-Bit hervorheben
+	</string>
 	<string name="preferences_wake_lock">Aktiv bleiben</string>
 	<string name="preferences_wake_lock_desc">Abschaltung des Bildschirms verhindern</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>

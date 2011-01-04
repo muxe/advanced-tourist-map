@@ -486,6 +486,7 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setTileFrames(this.preferences.getBoolean("showTileFrames", false));
 		this.mapView.setTileCoordinates(this.preferences.getBoolean("showTileCoordinates",
 				false));
+		this.mapView.setWaterTiles(this.preferences.getBoolean("showWaterTiles", false));
 		this.mapView.setMemoryCardCacheSize(Math.min(this.preferences.getInt("cacheSize",
 				MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
 		this.mapView.setMoveSpeed(Math.min(this.preferences.getInt("moveSpeed",

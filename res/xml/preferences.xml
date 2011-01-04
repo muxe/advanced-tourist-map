@@ -35,5 +35,8 @@
 		<CheckBoxPreference android:title="@string/preferences_show_tile_coordinates"
 			android:summary="@string/preferences_show_tile_coordinates_desc"
 			android:key="showTileCoordinates" />
+		<CheckBoxPreference android:title="@string/preferences_show_water_tiles"
+			android:summary="@string/preferences_show_water_tiles_desc"
+			android:key="showWaterTiles" />
 	</PreferenceCategory>
 </PreferenceScreen>
