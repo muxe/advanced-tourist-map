@@ -17,10 +17,6 @@
 	<string name="menu_position_gps_follow">Follow GPS signal</string>
 	<string name="menu_position_map_file_center">Map file center</string>
 	<string name="menu_preferences">Preferences</string>
-	<string name="menu_routing">Routing</string>
-	<string name="menu_routing_start">Set start</string>
-	<string name="menu_routing_end">Set end</string>
-	<string name="menu_routing_clear">Clear route</string>
 	<string name="ok">OK</string>
 	<string name="preferences_debug">Debug settings</string>
 	<string name="preferences_general">General settings</string>

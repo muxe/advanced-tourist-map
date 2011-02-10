@@ -12,15 +12,8 @@
 			<item android:id="@+id/menu_position_map_center" android:title="@string/menu_position_map_file_center" />
 		</menu>
 	</item>
-	<item android:id="@+id/menu_routing" android:title="@string/menu_routing">
-		<menu>
-			<item android:id="@+id/menu_routing_start" android:title="@string/menu_routing_start" />
-			<item android:id="@+id/menu_routing_end" android:title="@string/menu_routing_end" />
-			<item android:id="@+id/menu_routing_clear" android:title="@string/menu_routing_clear" />
-		</menu>
-	</item><item android:id="@+id/menu_preferences" android:title="@string/menu_preferences"
-		android:icon="@drawable/ic_menu_preferences" ></item>
+	<item android:id="@+id/menu_preferences" android:title="@string/menu_preferences"
+		android:icon="@drawable/ic_menu_preferences" />
 	<item android:id="@+id/menu_mapfile" android:title="@string/menu_mapfile"
-		android:icon="@drawable/ic_menu_archive" ></item>
-	
+		android:icon="@drawable/ic_menu_archive" />
 </menu>
