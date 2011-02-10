@@ -764,12 +764,16 @@ public class AdvancedMapViewer extends MapActivity {
 		GeoPoint[] arr = null;
 		if (route != null) {
 			ArrayList<GeoPoint> list = new ArrayList<GeoPoint>();
-			for (int i = 0; i < route.length; i++) {
-				GeoCoordinate[] coords = route[i].getAllWaypoints();
-				for (int j = 0; j < coords.length; j++) {
-					GeoPoint gp = new GeoPoint(coords[j].getLatitude(),
-							coords[j].getLongitude());
-					list.add(gp);
+			if (route.length > 0) {
+				GeoCoordinate src = route[0].getSource().getCoordinate();
+				list.add(new GeoPoint(src.getLatitude(), src.getLongitude()));
+				for (int i = 0; i < route.length; i++) {
+					GeoCoordinate[] coords = route[i].getAllWaypoints();
+					for (int j = 1; j < coords.length; j++) {
+						GeoPoint gp = new GeoPoint(coords[j].getLatitude(),
+								coords[j].getLongitude());
+						list.add(gp);
+					}
 				}
 			}
 			arr = new GeoPoint[list.size()];
