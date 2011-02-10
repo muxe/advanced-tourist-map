@@ -226,8 +226,10 @@ public class AdvancedMapViewer extends MapActivity {
 			case R.id.menu_preferences:
 				startActivity(new Intent(this, EditPreferences.class));
 				return true;
+
+			default:
+				return false;
 		}
-		return false;
 	}
 
 	@Override
