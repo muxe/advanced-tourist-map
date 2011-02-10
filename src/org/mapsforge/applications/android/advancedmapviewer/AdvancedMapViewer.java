@@ -16,12 +16,23 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+
+import org.mapsforge.android.maps.ArrayItemizedOverlay;
 import org.mapsforge.android.maps.CircleOverlay;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
 import org.mapsforge.android.maps.MapView;
 import org.mapsforge.android.maps.MapViewMode;
+import org.mapsforge.android.maps.OverlayItem;
+import org.mapsforge.android.maps.RouteOverlay;
+import org.mapsforge.android.routing.blockedHighwayHierarchies.HHRouter;
+import org.mapsforge.core.GeoCoordinate;
+import org.mapsforge.server.routing.IEdge;
+import org.mapsforge.server.routing.IVertex;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -31,6 +42,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -39,14 +51,15 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,6 +98,16 @@ public class AdvancedMapViewer extends MapActivity {
 	 */
 	static final int MOVE_SPEED_MAX = 30;
 
+	/**
+	 * Cache Size for routing in bytes
+	 */
+	static final int ROUTING_MAIN_MEMORY_CACHE_SIZE = 1024 * 2048;
+
+	/**
+	 * Binary file for routing
+	 */
+	static final String ROUTING_BINARY_FILE = "/sdcard/ger_12_k_center_75_true.blockedHH";
+
 	private Button cancelButton;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
@@ -108,9 +131,35 @@ public class AdvancedMapViewer extends MapActivity {
 	TextView zoomlevelValue;
 	SeekBar zoomlevelView;
 
+	/* routing */
+	private Drawable routeStartMarker;
+	private Drawable routeEndMarker;
+
+	HHRouter router;
+	RouteOverlay routeOverlay;
+	IVertex routeStart;
+	IVertex routeEnd;
+	private ArrayItemizedOverlay routeItemsOverlay;
+	private OverlayItem routeStartItem;
+	private OverlayItem routeEndItem;
+
+	private boolean captureRouteStart;
+	private boolean captureRouteEnd;
+
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 		// insert code here to handle touch events on the screen
+		if (this.captureRouteStart) {
+			GeoPoint gp = this.mapView.getProjection().fromPixels((int) ev.getX(),
+					(int) ev.getY());
+			handleMenuEventRouteSetStart(gp);
+			this.captureRouteStart = false;
+		} else if (this.captureRouteEnd) {
+			GeoPoint gp = this.mapView.getProjection().fromPixels((int) ev.getX(),
+					(int) ev.getY());
+			handleMenuEventRouteSetEnd(gp);
+			this.captureRouteEnd = false;
+		}
 		return super.dispatchTouchEvent(ev);
 	}
 
@@ -219,6 +268,25 @@ public class AdvancedMapViewer extends MapActivity {
 				this.mapController.setCenter(this.mapView.getMapDatabase().getMapCenter());
 				return true;
 
+			case R.id.menu_routing:
+				return true;
+
+			case R.id.menu_routing_start:
+				this.captureRouteStart = true;
+				this.captureRouteEnd = false;
+				return true;
+
+			case R.id.menu_routing_end:
+				this.captureRouteStart = false;
+				this.captureRouteEnd = true;
+				return true;
+
+			case R.id.menu_routing_clear:
+				handleMenuEventRouteClear();
+				this.captureRouteEnd = false;
+				this.captureRouteStart = false;
+				return true;
+
 			case R.id.menu_mapfile:
 				startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
 				return true;
@@ -269,6 +337,40 @@ public class AdvancedMapViewer extends MapActivity {
 		return this.mapView.onTrackballEvent(event);
 	}
 
+	@Override
+	protected void onStart() {
+		super.onStart();
+
+		// initialize route markers
+		this.routeStartMarker = getResources().getDrawable(android.R.drawable.btn_star);
+		this.routeEndMarker = getResources().getDrawable(android.R.drawable.btn_star);
+
+		// initialize route overlay
+		Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		fillPaint.setStyle(Paint.Style.STROKE);
+		fillPaint.setColor(Color.BLUE);
+		fillPaint.setAlpha(160);
+		fillPaint.setStrokeWidth(6);
+		fillPaint.setStrokeCap(Paint.Cap.ROUND);
+		fillPaint.setStrokeJoin(Paint.Join.ROUND);
+		this.routeOverlay = new RouteOverlay(fillPaint, null);
+		this.mapView.getOverlays().add(this.routeOverlay);
+
+		// initialize route items overlay
+		this.routeItemsOverlay = new ArrayItemizedOverlay(this.routeStartMarker, this);
+		this.mapView.getOverlays().add(this.routeItemsOverlay);
+
+		// initialize route
+		try {
+			if (this.router == null) {
+				this.router = new HHRouter(new File(ROUTING_BINARY_FILE),
+						ROUTING_MAIN_MEMORY_CACHE_SIZE);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	private void configureMapView() {
 		// configure the MapView and activate the zoomLevel buttons
 		this.mapView.setClickable(true);
@@ -296,8 +398,8 @@ public class AdvancedMapViewer extends MapActivity {
 				GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
 				AdvancedMapViewer.this.mapController.setCenter(point);
 				AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
-				AdvancedMapViewer.this.circleOverlay.setCircleData(point, location
-						.getAccuracy());
+				AdvancedMapViewer.this.circleOverlay.setCircleData(point,
+						location.getAccuracy());
 			}
 
 			@Override
@@ -487,10 +589,13 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setTileCoordinates(this.preferences.getBoolean("showTileCoordinates",
 				false));
 		this.mapView.setWaterTiles(this.preferences.getBoolean("showWaterTiles", false));
-		this.mapView.setMemoryCardCacheSize(Math.min(this.preferences.getInt("cacheSize",
-				MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
-		this.mapView.setMoveSpeed(Math.min(this.preferences.getInt("moveSpeed",
-				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
+		this.mapView.setMemoryCardCacheSize(Math.min(
+				this.preferences.getInt("cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT),
+				MEMORY_CARD_CACHE_SIZE_MAX));
+		this.mapView
+				.setMoveSpeed(Math.min(
+						this.preferences.getInt("moveSpeed", MOVE_SPEED_DEFAULT),
+						MOVE_SPEED_MAX) / 10f);
 
 		// check if the file browser needs to be displayed
 		if (!this.mapView.getMapViewMode().requiresInternetConnection()
@@ -544,5 +649,132 @@ public class AdvancedMapViewer extends MapActivity {
 			this.toast.setText(text);
 		}
 		this.toast.show();
+	}
+
+	private void handleMenuEventRouteClear() {
+		Log.d("osm", "handleMenuEventRouteClear()");
+
+		// clear vertices
+		this.routeStart = null;
+		this.routeEnd = null;
+
+		// remove overlay items
+		this.routeItemsOverlay.removeOverlay(this.routeStartItem);
+		this.routeItemsOverlay.removeOverlay(this.routeEndItem);
+		this.routeStartItem = null;
+		this.routeEnd = null;
+
+		// remove route overlay
+		this.routeOverlay.setRouteData(null);
+	}
+
+	private boolean handleMenuEventRouteSetStart(GeoPoint gp) {
+		// lookup nearest vertex
+		IVertex nearestVertex = null;
+		if (this.router != null) {
+			nearestVertex = this.router.getNearestVertex(new GeoCoordinate(gp.getLatitude(), gp
+					.getLongitude()));
+		}
+		if (nearestVertex == null) {
+			showToast("no vertex found");
+			return false;
+		}
+
+		// clear route if a route is set currently
+		if (this.routeStart != null && this.routeEnd != null) {
+			handleMenuEventRouteClear();
+		}
+
+		// set vertex
+		this.routeStart = nearestVertex;
+
+		// set overlay item
+		this.routeItemsOverlay.removeOverlay(this.routeStartItem);
+		GeoCoordinate c = nearestVertex.getCoordinate();
+		this.routeStartItem = new OverlayItem(new GeoPoint(c.getLatitude(), c.getLongitude()),
+				"Start", null);
+		this.routeStartItem.setMarker(this.routeStartMarker);
+		this.routeItemsOverlay.addOverlay(this.routeStartItem);
+
+		// update route overlay
+		if (this.routeEnd != null) {
+			recomputeRoute();
+		}
+		return true;
+	}
+
+	private boolean handleMenuEventRouteSetEnd(GeoPoint gp) {
+		// lookup nearest vertex
+		IVertex nearestVertex = null;
+		if (this.router != null) {
+			nearestVertex = this.router.getNearestVertex(new GeoCoordinate(gp.getLatitude(), gp
+					.getLongitude()));
+		}
+		if (nearestVertex == null) {
+			showToast("no vertex found");
+			return false;
+		}
+
+		// clear route if a route is set currently
+		if (this.routeStart != null && this.routeEnd != null) {
+			handleMenuEventRouteClear();
+		}
+
+		// set vertex
+		this.routeEnd = nearestVertex;
+
+		// set overlay item
+		this.routeItemsOverlay.removeOverlay(this.routeEndItem);
+		GeoCoordinate c = nearestVertex.getCoordinate();
+		this.routeEndItem = new OverlayItem(new GeoPoint(c.getLatitude(), c.getLongitude()),
+				"End", null);
+		this.routeEndItem.setMarker(this.routeStartMarker);
+		this.routeItemsOverlay.addOverlay(this.routeEndItem);
+
+		// update route overlay
+		if (this.routeStart != null) {
+			recomputeRoute();
+		}
+
+		return true;
+	}
+
+	private void recomputeRoute() {
+		if (this.router == null) {
+			Log.d("osm",
+					"could not compute a route since the routingGraphBinary was not found!");
+			return;
+		}
+		Runnable routeComputation = new Runnable() {
+			@Override
+			public void run() {
+				IEdge[] route = AdvancedMapViewer.this.router.getShortestPath(
+						AdvancedMapViewer.this.routeStart.getId(),
+						AdvancedMapViewer.this.routeEnd.getId());
+				if (route != null) {
+					AdvancedMapViewer.this.routeOverlay.setRouteData(routeToGeoPoints(route));
+				}
+			}
+		};
+		Thread workerThread = new Thread(routeComputation);
+		workerThread.start();
+	}
+
+	static GeoPoint[] routeToGeoPoints(IEdge[] route) {
+		GeoPoint[] arr = null;
+		if (route != null) {
+			ArrayList<GeoPoint> list = new ArrayList<GeoPoint>();
+			for (int i = 0; i < route.length; i++) {
+				GeoCoordinate[] coords = route[i].getAllWaypoints();
+				for (int j = 0; j < coords.length; j++) {
+					GeoPoint gp = new GeoPoint(coords[j].getLatitude(),
+							coords[j].getLongitude());
+					list.add(gp);
+				}
+			}
+			arr = new GeoPoint[list.size()];
+			list.toArray(arr);
+		}
+		return arr;
 	}
 }
