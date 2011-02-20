@@ -16,6 +16,9 @@
  */
 package org.mapsforge.applications.android.advancedmapviewer;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.mapsforge.android.maps.CircleOverlay;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.MapActivity;
@@ -30,12 +33,14 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
@@ -59,10 +64,13 @@ import android.widget.Toast;
 /**
  * A map application which uses the features from the mapsforge library. The map can be centered
  * to the current GPS coordinate. A simple file browser for selecting the map file is also
- * included. Some preferences can be adjusted via the EditPreferences activity.
+ * included. Some preferences can be adjusted via the EditPreferences activity and screenshots
+ * of the map may be taken in different image formats.
  */
 public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
+	private static final String SCREENSHOT_FILE_NAME = "Map screenshot";
+	private static final int SCREENSHOT_QUALITY = 90;
 	private static final int SELECT_MAP_FILE = 0;
 
 	/**
@@ -92,7 +100,6 @@ public class AdvancedMapViewer extends MapActivity {
 	private Button goButton;
 	private LocationListener locationListener;
 	private LocationManager locationManager;
-	private MapView mapView;
 	private MapViewMode mapViewMode;
 	private PowerManager powerManager;
 	private SharedPreferences preferences;
@@ -105,6 +112,7 @@ public class AdvancedMapViewer extends MapActivity {
 	EditText latitudeView;
 	EditText longitudeView;
 	MapController mapController;
+	MapView mapView;
 	TextView zoomlevelValue;
 	SeekBar zoomlevelView;
 
@@ -219,12 +227,23 @@ public class AdvancedMapViewer extends MapActivity {
 				this.mapController.setCenter(this.mapView.getMapDatabase().getMapCenter());
 				return true;
 
-			case R.id.menu_mapfile:
-				startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
+			case R.id.menu_screenshot:
+				return true;
+
+			case R.id.menu_screenshot_jpeg:
+				captureScreenshotAsync(CompressFormat.JPEG);
+				return true;
+
+			case R.id.menu_screenshot_png:
+				captureScreenshotAsync(CompressFormat.PNG);
 				return true;
 
 			case R.id.menu_preferences:
 				startActivity(new Intent(this, EditPreferences.class));
+				return true;
+
+			case R.id.menu_mapfile:
+				startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
 				return true;
 
 			default:
@@ -269,6 +288,47 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onTrackballEvent(MotionEvent event) {
 		// forward the event to the MapView
 		return this.mapView.onTrackballEvent(event);
+	}
+
+	private void captureScreenshotAsync(final CompressFormat format) {
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					File path = Environment
+							.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+					// make sure the Pictures directory exists
+					if (!path.exists() && !path.mkdirs()) {
+						showToast("Could not create target directory");
+						return;
+					}
+
+					// assemble the complete name for the screenshot file
+					String fileName = path.getAbsolutePath() + File.separatorChar
+							+ SCREENSHOT_FILE_NAME + "." + format.name().toLowerCase();
+
+					if (AdvancedMapViewer.this.mapView.makeScreenshot(format,
+							SCREENSHOT_QUALITY, fileName)) {
+						// success
+						showToastOnUiThread(fileName);
+					} else {
+						// failure
+						showToastOnUiThread("Screenshot could not be saved");
+					}
+				} catch (IOException e) {
+					showToastOnUiThread(e.getLocalizedMessage());
+				}
+			}
+
+			private void showToastOnUiThread(final String foo) {
+				AdvancedMapViewer.this.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						showToast(foo);
+					}
+				});
+			}
+		}.start();
 	}
 
 	private void configureMapView() {
@@ -540,7 +600,7 @@ public class AdvancedMapViewer extends MapActivity {
 	 */
 	void showToast(String text) {
 		if (this.toast == null) {
-			this.toast = Toast.makeText(this, text, Toast.LENGTH_SHORT);
+			this.toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
 		} else {
 			this.toast.cancel();
 			this.toast.setText(text);

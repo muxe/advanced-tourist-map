@@ -17,6 +17,9 @@
 	<string name="menu_position_gps_follow">GPS-Signal folgen</string>
 	<string name="menu_position_map_file_center">Zentrum der Kartendatei</string>
 	<string name="menu_preferences">Einstellungen</string>
+	<string name="menu_screenshot">Screenshot</string>
+	<string name="menu_screenshot_jpeg">JPEG (verlustbehaftet)</string>
+	<string name="menu_screenshot_png">PNG (verlustlos)</string>
 	<string name="ok">OK</string>
 	<string name="preferences_debug">Entwicklungs-Einstellungen</string>
 	<string name="preferences_general">Allgemeine Einstellungen</string>

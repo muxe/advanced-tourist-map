@@ -17,6 +17,9 @@
 	<string name="menu_position_gps_follow">Follow GPS signal</string>
 	<string name="menu_position_map_file_center">Map file center</string>
 	<string name="menu_preferences">Preferences</string>
+	<string name="menu_screenshot">Screenshot</string>
+	<string name="menu_screenshot_jpeg">JPEG (lossy)</string>
+	<string name="menu_screenshot_png">PNG (lossless)</string>
 	<string name="ok">OK</string>
 	<string name="preferences_debug">Debug settings</string>
 	<string name="preferences_general">General settings</string>

@@ -12,6 +12,13 @@
 			<item android:id="@+id/menu_position_map_center" android:title="@string/menu_position_map_file_center" />
 		</menu>
 	</item>
+	<item android:id="@+id/menu_screenshot" android:title="@string/menu_screenshot"
+		android:icon="@drawable/ic_menu_save">
+		<menu>
+			<item android:id="@+id/menu_screenshot_jpeg" android:title="@string/menu_screenshot_jpeg" />
+			<item android:id="@+id/menu_screenshot_png" android:title="@string/menu_screenshot_png" />
+		</menu>
+	</item>
 	<item android:id="@+id/menu_preferences" android:title="@string/menu_preferences"
 		android:icon="@drawable/ic_menu_preferences" />
 	<item android:id="@+id/menu_mapfile" android:title="@string/menu_mapfile"
