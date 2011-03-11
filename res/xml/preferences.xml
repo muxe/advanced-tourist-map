@@ -3,20 +3,20 @@
 	android:title="@string/menu_preferences">
 	<PreferenceCategory android:title="@string/preferences_map">
 		<CheckBoxPreference android:title="@string/preferences_show_scale_bar"
-			android:summary="@string/preferences_show_scale_bar_desc"
-			android:key="showScaleBar" />
+			android:summary="@string/preferences_show_scale_bar_desc" android:key="showScaleBar" />
 		<ListPreference android:title="@string/preferences_map_view_mode"
-			android:summary="@string/preferences_map_view_mode_desc"
-			android:entries="@array/preferences_map_view_mode_entries"
-			android:entryValues="@array/preferences_map_view_mode_entry_values"
-			android:key="mapViewMode" android:defaultValue="@string/preferences_map_view_mode_default" />
+			android:summary="@string/preferences_map_view_mode_desc" android:entries="@array/preferences_map_view_mode_entries"
+			android:entryValues="@array/preferences_map_view_mode_entry_values" android:key="mapViewMode"
+			android:defaultValue="@string/preferences_map_view_mode_default" />
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/preferences_general">
 		<CheckBoxPreference android:title="@string/preferences_fullscreen"
 			android:summary="@string/preferences_fullscreen_desc" android:key="fullscreen" />
 		<CheckBoxPreference android:title="@string/preferences_wake_lock"
-			android:summary="@string/preferences_wake_lock_desc" android:key="wake_lock" />
+			android:summary="@string/preferences_wake_lock_desc" android:key="wakeLock" />
+		<CheckBoxPreference android:title="@string/preferences_cache_persistence"
+			android:summary="@string/preferences_cache_persistence_desc" android:key="cachePersistence" />
 		<org.mapsforge.applications.android.advancedmapviewer.CacheSizePreference
 			android:title="@string/preferences_cache_size" android:summary="@string/preferences_cache_size_desc"
 			android:key="cacheSize" />
@@ -27,16 +27,12 @@
 
 	<PreferenceCategory android:title="@string/preferences_debug">
 		<CheckBoxPreference android:title="@string/preferences_show_fps_counter"
-			android:summary="@string/preferences_show_fps_counter_desc"
-			android:key="showFpsCounter" />
+			android:summary="@string/preferences_show_fps_counter_desc" android:key="showFpsCounter" />
 		<CheckBoxPreference android:title="@string/preferences_show_tile_frames"
-			android:summary="@string/preferences_show_tile_frames_desc"
-			android:key="showTileFrames" />
+			android:summary="@string/preferences_show_tile_frames_desc" android:key="showTileFrames" />
 		<CheckBoxPreference android:title="@string/preferences_show_tile_coordinates"
-			android:summary="@string/preferences_show_tile_coordinates_desc"
-			android:key="showTileCoordinates" />
+			android:summary="@string/preferences_show_tile_coordinates_desc" android:key="showTileCoordinates" />
 		<CheckBoxPreference android:title="@string/preferences_show_water_tiles"
-			android:summary="@string/preferences_show_water_tiles_desc"
-			android:key="showWaterTiles" />
+			android:summary="@string/preferences_show_water_tiles_desc" android:key="showWaterTiles" />
 	</PreferenceCategory>
 </PreferenceScreen>

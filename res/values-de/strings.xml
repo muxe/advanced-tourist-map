@@ -7,8 +7,8 @@
 	<string name="gps_disabled">Der GPS-Empfänger ist deaktiviert</string>
 	<string name="latitude">Breitengrad</string>
 	<string name="longitude">Längengrad</string>
-	<string name="map_file_invalid">Die gewählte Datei ist keine gültige Kartendatei.
-		Bitte wählen Sie eine andere Datei aus.</string>
+	<string name="map_file_invalid">Die gewählte Datei ist keine gültige Kartendatei. Bitte wählen Sie
+		eine andere Datei aus.</string>
 	<string name="map_file_select">Bitte wählen Sie eine Kartendatei aus.</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_mapfile">Kartendatei</string>
@@ -23,6 +23,8 @@
 	<string name="ok">OK</string>
 	<string name="preferences_debug">Entwicklungs-Einstellungen</string>
 	<string name="preferences_general">Allgemeine Einstellungen</string>
+	<string name="preferences_cache_persistence">Cache-Persistenz</string>
+	<string name="preferences_cache_persistence_desc">Zwischenspeicher beim Beenden beibehalten</string>
 	<string name="preferences_cache_size">Externer Speicher</string>
 	<string name="preferences_cache_size_desc">Größe des Caches anpassen</string>
 	<string name="preferences_cache_size_value">%.1f MB</string>
@@ -43,8 +45,7 @@
 	<string name="preferences_show_tile_frames">Tile-Umrandungen</string>
 	<string name="preferences_show_tile_frames_desc">Rahmen um Tiles malen</string>
 	<string name="preferences_show_water_tiles">Wasser-Kacheln</string>
-	<string name="preferences_show_water_tiles_desc">Kacheln mit gesetztem Wasser-Bit hervorheben
-	</string>
+	<string name="preferences_show_water_tiles_desc">Kacheln mit gesetztem Wasser-Bit hervorheben</string>
 	<string name="preferences_wake_lock">Aktiv bleiben</string>
 	<string name="preferences_wake_lock_desc">Abschaltung des Bildschirms verhindern</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
