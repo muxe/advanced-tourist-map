@@ -32,6 +32,7 @@ import org.mapsforge.android.maps.MapViewMode;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -48,7 +49,6 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -57,7 +57,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -71,8 +70,9 @@ import android.widget.Toast;
  * of the map may be taken in different image formats.
  */
 public class AdvancedMapViewer extends MapActivity {
-	private static final int DIALOG_GPS_DISABLED = 0;
-	private static final int DIALOG_INFO_MAP_FILE = 1;
+	private static final int DIALOG_ENTER_COORDINATES = 0;
+	private static final int DIALOG_GPS_DISABLED = 1;
+	private static final int DIALOG_INFO_MAP_FILE = 2;
 	private static final String SCREENSHOT_FILE_NAME = "Map screenshot";
 	private static final int SCREENSHOT_QUALITY = 90;
 	private static final int SELECT_MAP_FILE = 0;
@@ -97,11 +97,9 @@ public class AdvancedMapViewer extends MapActivity {
 	 */
 	static final int MOVE_SPEED_MAX = 30;
 
-	private Button cancelButton;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
 	private boolean followGpsEnabled;
-	private Button goButton;
 	private LocationListener locationListener;
 	private LocationManager locationManager;
 	private MapViewMode mapViewMode;
@@ -110,15 +108,10 @@ public class AdvancedMapViewer extends MapActivity {
 	private Toast toast;
 	private WakeLock wakeLock;
 	CircleOverlay circleOverlay;
-	View coordinatesView;
 	ImageView gpsView;
 	InputMethodManager inputMethodManager;
-	EditText latitudeView;
-	EditText longitudeView;
 	MapController mapController;
 	MapView mapView;
-	TextView zoomlevelValue;
-	SeekBar zoomlevelView;
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -130,20 +123,6 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.options_menu, menu);
 		return true;
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			if (this.coordinatesView.getVisibility() == View.VISIBLE) {
-				this.coordinatesView.setVisibility(View.GONE);
-				return true;
-			}
-			// quit the application
-			finish();
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -172,64 +151,7 @@ public class AdvancedMapViewer extends MapActivity {
 				return true;
 
 			case R.id.menu_position_enter_coordinates:
-				this.coordinatesView.setVisibility(View.VISIBLE);
-				GeoPoint mapCenter = this.mapView.getMapCenter();
-				this.latitudeView.setText(Double.toString(mapCenter.getLatitude()));
-				this.longitudeView.setText(Double.toString(mapCenter.getLongitude()));
-				this.zoomlevelView.setMax(this.mapView.getMaxZoomLevel());
-				this.zoomlevelView.setProgress(this.mapView.getZoomLevel());
-				this.zoomlevelView
-						.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-							@Override
-							public void onProgressChanged(SeekBar seekBar, int progress,
-									boolean fromUser) {
-								AdvancedMapViewer.this.zoomlevelValue.setText(String
-										.valueOf(progress));
-							}
-
-							@Override
-							public void onStartTrackingTouch(SeekBar seekBar) {
-								// do nothing
-							}
-
-							@Override
-							public void onStopTrackingTouch(SeekBar seekBar) {
-								// do nothing
-							}
-						});
-				this.zoomlevelValue.setText(String.valueOf(this.zoomlevelView.getProgress()));
-
-				this.goButton.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						// disable GPS follow mode if it is enabled
-						disableFollowGPS(true);
-
-						// set the new map center coordinates and zoom level
-						AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(Double
-								.parseDouble(AdvancedMapViewer.this.latitudeView.getText()
-										.toString()), Double
-								.parseDouble(AdvancedMapViewer.this.longitudeView.getText()
-										.toString())));
-						AdvancedMapViewer.this.mapController
-								.setZoom(AdvancedMapViewer.this.zoomlevelView.getProgress());
-
-						// hide the virtual keyboard
-						AdvancedMapViewer.this.inputMethodManager.hideSoftInputFromWindow(
-								AdvancedMapViewer.this.coordinatesView.getWindowToken(), 0);
-						AdvancedMapViewer.this.coordinatesView.setVisibility(View.GONE);
-					}
-				});
-
-				this.cancelButton.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						// hide the virtual keyboard
-						AdvancedMapViewer.this.inputMethodManager.hideSoftInputFromWindow(
-								AdvancedMapViewer.this.coordinatesView.getWindowToken(), 0);
-						AdvancedMapViewer.this.coordinatesView.setVisibility(View.GONE);
-					}
-				});
+				showDialog(DIALOG_ENTER_COORDINATES);
 				return true;
 
 			case R.id.menu_position_map_center:
@@ -268,12 +190,6 @@ public class AdvancedMapViewer extends MapActivity {
 			menu.findItem(R.id.menu_info_map_file).setEnabled(false);
 		} else {
 			menu.findItem(R.id.menu_info_map_file).setEnabled(true);
-		}
-
-		if (this.coordinatesView.getVisibility() == View.VISIBLE) {
-			menu.findItem(R.id.menu_position).setEnabled(false);
-		} else {
-			menu.findItem(R.id.menu_position).setEnabled(true);
 		}
 
 		if (this.locationManager == null || this.followGpsEnabled) {
@@ -333,11 +249,11 @@ public class AdvancedMapViewer extends MapActivity {
 				}
 			}
 
-			private void showToastOnUiThread(final String foo) {
+			private void showToastOnUiThread(final String message) {
 				AdvancedMapViewer.this.runOnUiThread(new Runnable() {
 					@Override
 					public void run() {
-						showToast(foo);
+						showToast(message);
 					}
 				});
 			}
@@ -437,13 +353,6 @@ public class AdvancedMapViewer extends MapActivity {
 		setContentView(R.layout.advancedmapviewer);
 		this.mapView = (MapView) findViewById(R.id.mapView);
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
-		this.coordinatesView = findViewById(R.id.coordinatesView);
-		this.latitudeView = (EditText) findViewById(R.id.latitude);
-		this.longitudeView = (EditText) findViewById(R.id.longitude);
-		this.zoomlevelView = (SeekBar) findViewById(R.id.zoomlevel);
-		this.zoomlevelValue = (TextView) findViewById(R.id.zoomlevelValue);
-		this.goButton = (Button) findViewById(R.id.goButton);
-		this.cancelButton = (Button) findViewById(R.id.cancelButton);
 
 		configureMapView();
 
@@ -477,23 +386,45 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		switch (id) {
-			case DIALOG_GPS_DISABLED:
-				builder.setMessage(R.string.gps_disabled);
-				builder.setPositiveButton(getString(R.string.ok), null);
-				return builder.create();
+		if (id == DIALOG_ENTER_COORDINATES) {
+			builder.setIcon(android.R.drawable.ic_menu_mylocation);
+			builder.setTitle(R.string.menu_position_enter_coordinates);
+			LayoutInflater factory = LayoutInflater.from(this);
+			final View view = factory.inflate(R.layout.dialog_enter_coordinates, null);
+			builder.setView(view);
+			builder.setPositiveButton(getString(R.string.go_to_position),
+					new DialogInterface.OnClickListener() {
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							// disable GPS follow mode if it is enabled
+							disableFollowGPS(true);
 
-			case DIALOG_INFO_MAP_FILE:
-				builder.setIcon(android.R.drawable.ic_menu_info_details);
-				builder.setTitle(R.string.menu_info_map_file);
-				LayoutInflater factory = LayoutInflater.from(this);
-				builder.setView(factory.inflate(R.layout.dialog_info_map_file, null));
-				builder.setPositiveButton(getString(R.string.ok), null);
-				return builder.create();
-
-			default:
-				showToast("missing dialog implementation: " + id);
-				return null;
+							// set the map center and zoom level
+							AdvancedMapViewer.this.mapController.setCenter(new GeoPoint(Double
+									.parseDouble(((EditText) view.findViewById(R.id.latitude))
+											.getText().toString()), Double
+									.parseDouble(((EditText) view.findViewById(R.id.longitude))
+											.getText().toString())));
+							AdvancedMapViewer.this.mapController.setZoom(((SeekBar) view
+									.findViewById(R.id.zoomlevel)).getProgress());
+						}
+					});
+			builder.setNegativeButton(getString(R.string.cancel), null);
+			return builder.create();
+		} else if (id == DIALOG_GPS_DISABLED) {
+			builder.setMessage(R.string.gps_disabled);
+			builder.setPositiveButton(getString(R.string.ok), null);
+			return builder.create();
+		} else if (id == DIALOG_INFO_MAP_FILE) {
+			builder.setIcon(android.R.drawable.ic_menu_info_details);
+			builder.setTitle(R.string.menu_info_map_file);
+			LayoutInflater factory = LayoutInflater.from(this);
+			builder.setView(factory.inflate(R.layout.dialog_info_map_file, null));
+			builder.setPositiveButton(getString(R.string.ok), null);
+			return builder.create();
+		} else {
+			// do dialog will be created
+			return null;
 		}
 	}
 
@@ -527,58 +458,86 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	@Override
-	protected void onPrepareDialog(int id, Dialog dialog) {
-		switch (id) {
-			case DIALOG_INFO_MAP_FILE:
-				// map file name
-				TextView textView = (TextView) dialog.findViewById(R.id.infoMapFileViewName);
-				textView.setText(this.mapView.getMapFile());
+	protected void onPrepareDialog(int id, final Dialog dialog) {
+		if (id == DIALOG_ENTER_COORDINATES) {
+			// latitude
+			EditText editText = (EditText) dialog.findViewById(R.id.latitude);
+			GeoPoint mapCenter = this.mapView.getMapCenter();
+			editText.setText(Double.toString(mapCenter.getLatitude()));
 
-				// map file name
-				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewDebug);
-				MapDatabase mapDatabase = this.mapView.getMapDatabase();
-				if (mapDatabase.isDebugFile()) {
-					textView.setText(R.string.info_map_file_debug_yes);
-				} else {
-					textView.setText(R.string.info_map_file_debug_no);
+			// longitude
+			editText = (EditText) dialog.findViewById(R.id.longitude);
+			editText.setText(Double.toString(mapCenter.getLongitude()));
+
+			// zoom level
+			SeekBar zoomlevel = (SeekBar) dialog.findViewById(R.id.zoomlevel);
+			zoomlevel.setMax(this.mapView.getMaxZoomLevel());
+			zoomlevel.setProgress(this.mapView.getZoomLevel());
+
+			// zoom level value
+			final TextView textView = (TextView) dialog.findViewById(R.id.zoomlevelValue);
+			textView.setText(String.valueOf(zoomlevel.getProgress()));
+			zoomlevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+				@Override
+				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+					textView.setText(String.valueOf(progress));
 				}
 
-				// map file date
-				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewDate);
-				Date date = new Date(mapDatabase.getMapDate());
-				textView.setText(DateFormat.getDateTimeInstance().format(date));
-
-				// map file area
-				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewArea);
-				Rect mapArea = mapDatabase.getMapBoundary();
-				textView
-						.setText(mapArea.top / 1000000d + ", " + mapArea.left / 1000000d
-								+ " – \n" + mapArea.bottom / 1000000d + ", " + mapArea.right
-								/ 1000000d);
-
-				// map file start position
-				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewStart);
-				GeoPoint startPosition = mapDatabase.getStartPosition();
-				if (startPosition == null) {
-					textView.setText(null);
-				} else {
-					textView.setText(startPosition.getLatitude() + ", "
-							+ startPosition.getLongitude());
+				@Override
+				public void onStartTrackingTouch(SeekBar seekBar) {
+					// do nothing
 				}
 
-				// map file comment text
-				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewComment);
-				String commentText = mapDatabase.getCommentText();
-				if (commentText == null) {
-					textView.setText(null);
-				} else {
-					textView.setText(mapDatabase.getCommentText());
+				@Override
+				public void onStopTrackingTouch(SeekBar seekBar) {
+					// do nothing
 				}
+			});
+		} else if (id == DIALOG_INFO_MAP_FILE) {
+			// map file name
+			TextView textView = (TextView) dialog.findViewById(R.id.infoMapFileViewName);
+			textView.setText(this.mapView.getMapFile());
 
-				break;
-			default:
-				super.onPrepareDialog(id, dialog);
-				break;
+			// map file name
+			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewDebug);
+			MapDatabase mapDatabase = this.mapView.getMapDatabase();
+			if (mapDatabase.isDebugFile()) {
+				textView.setText(R.string.info_map_file_debug_yes);
+			} else {
+				textView.setText(R.string.info_map_file_debug_no);
+			}
+
+			// map file date
+			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewDate);
+			Date date = new Date(mapDatabase.getMapDate());
+			textView.setText(DateFormat.getDateTimeInstance().format(date));
+
+			// map file area
+			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewArea);
+			Rect mapArea = mapDatabase.getMapBoundary();
+			textView.setText(mapArea.top / 1000000d + ", " + mapArea.left / 1000000d + " – \n"
+					+ mapArea.bottom / 1000000d + ", " + mapArea.right / 1000000d);
+
+			// map file start position
+			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewStart);
+			GeoPoint startPosition = mapDatabase.getStartPosition();
+			if (startPosition == null) {
+				textView.setText(null);
+			} else {
+				textView.setText(startPosition.getLatitude() + ", "
+						+ startPosition.getLongitude());
+			}
+
+			// map file comment text
+			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewComment);
+			String commentText = mapDatabase.getCommentText();
+			if (commentText == null) {
+				textView.setText(null);
+			} else {
+				textView.setText(mapDatabase.getCommentText());
+			}
+		} else {
+			super.onPrepareDialog(id, dialog);
 		}
 	}
 
