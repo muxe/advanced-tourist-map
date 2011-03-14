@@ -5,12 +5,22 @@
 	<string name="follow_gps_disabled">Follow GPS signal has been disabled</string>
 	<string name="go_to_position">Go to position</string>
 	<string name="gps_disabled">The GPS receiver is disabled</string>
+	<string name="info_map_file_area">Area</string>
+	<string name="info_map_file_comment">Comment</string>
+	<string name="info_map_file_date">Date</string>
+	<string name="info_map_file_debug">Debug information</string>
+	<string name="info_map_file_debug_no">not included</string>
+	<string name="info_map_file_debug_yes">included</string>
+	<string name="info_map_file_name">File</string>
+	<string name="info_map_file_start">Start position</string>
 	<string name="latitude">Latitude</string>
 	<string name="longitude">Longitude</string>
 	<string name="map_file_invalid">The selected file is not a valid map file. Please select another
 		file.</string>
 	<string name="map_file_select">Please select a map file.</string>
 	<string name="menu_info">Info</string>
+	<string name="menu_info_map_file">Map file properties</string>
+	<string name="menu_info_about">About this software</string>
 	<string name="menu_mapfile">Map file</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Enter coordinates</string>

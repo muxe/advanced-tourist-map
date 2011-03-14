@@ -18,11 +18,14 @@ package org.mapsforge.applications.android.advancedmapviewer;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.util.Date;
 
 import org.mapsforge.android.maps.CircleOverlay;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
+import org.mapsforge.android.maps.MapDatabase;
 import org.mapsforge.android.maps.MapView;
 import org.mapsforge.android.maps.MapViewMode;
 
@@ -33,6 +36,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
@@ -45,18 +49,17 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.view.View.OnTouchListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -69,6 +72,7 @@ import android.widget.Toast;
  */
 public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_GPS_DISABLED = 0;
+	private static final int DIALOG_INFO_MAP_FILE = 1;
 	private static final String SCREENSHOT_FILE_NAME = "Map screenshot";
 	private static final int SCREENSHOT_QUALITY = 90;
 	private static final int SELECT_MAP_FILE = 0;
@@ -106,7 +110,7 @@ public class AdvancedMapViewer extends MapActivity {
 	private Toast toast;
 	private WakeLock wakeLock;
 	CircleOverlay circleOverlay;
-	RelativeLayout coordinatesView;
+	View coordinatesView;
 	ImageView gpsView;
 	InputMethodManager inputMethodManager;
 	EditText latitudeView;
@@ -146,6 +150,13 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 			case R.id.menu_info:
+				return true;
+
+			case R.id.menu_info_map_file:
+				showDialog(DIALOG_INFO_MAP_FILE);
+				return true;
+
+			case R.id.menu_info_about:
 				startActivity(new Intent(this, InfoView.class));
 				return true;
 
@@ -253,7 +264,11 @@ public class AdvancedMapViewer extends MapActivity {
 
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.findItem(R.id.menu_info).setEnabled(true);
+		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
+			menu.findItem(R.id.menu_info_map_file).setEnabled(false);
+		} else {
+			menu.findItem(R.id.menu_info_map_file).setEnabled(true);
+		}
 
 		if (this.coordinatesView.getVisibility() == View.VISIBLE) {
 			menu.findItem(R.id.menu_position).setEnabled(false);
@@ -272,8 +287,6 @@ public class AdvancedMapViewer extends MapActivity {
 		} else {
 			menu.findItem(R.id.menu_position_map_center).setEnabled(true);
 		}
-
-		menu.findItem(R.id.menu_preferences).setEnabled(true);
 
 		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
 			menu.findItem(R.id.menu_mapfile).setEnabled(false);
@@ -424,7 +437,7 @@ public class AdvancedMapViewer extends MapActivity {
 		setContentView(R.layout.advancedmapviewer);
 		this.mapView = (MapView) findViewById(R.id.mapView);
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
-		this.coordinatesView = (RelativeLayout) findViewById(R.id.coordinatesView);
+		this.coordinatesView = findViewById(R.id.coordinatesView);
 		this.latitudeView = (EditText) findViewById(R.id.latitude);
 		this.longitudeView = (EditText) findViewById(R.id.longitude);
 		this.zoomlevelView = (SeekBar) findViewById(R.id.zoomlevel);
@@ -433,14 +446,6 @@ public class AdvancedMapViewer extends MapActivity {
 		this.cancelButton = (Button) findViewById(R.id.cancelButton);
 
 		configureMapView();
-
-		// set an empty touch listener to handle all touch events
-		this.coordinatesView.setOnTouchListener(new OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				return true;
-			}
-		});
 
 		// get the pointers to different system services
 		this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -474,9 +479,18 @@ public class AdvancedMapViewer extends MapActivity {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		switch (id) {
 			case DIALOG_GPS_DISABLED:
-				builder.setMessage(getString(R.string.gps_disabled)).setPositiveButton(
-						getString(R.string.ok), null);
+				builder.setMessage(R.string.gps_disabled);
+				builder.setPositiveButton(getString(R.string.ok), null);
 				return builder.create();
+
+			case DIALOG_INFO_MAP_FILE:
+				builder.setIcon(android.R.drawable.ic_menu_info_details);
+				builder.setTitle(R.string.menu_info_map_file);
+				LayoutInflater factory = LayoutInflater.from(this);
+				builder.setView(factory.inflate(R.layout.dialog_info_map_file, null));
+				builder.setPositiveButton(getString(R.string.ok), null);
+				return builder.create();
+
 			default:
 				showToast("missing dialog implementation: " + id);
 				return null;
@@ -509,6 +523,62 @@ public class AdvancedMapViewer extends MapActivity {
 		// release the wake lock if necessary
 		if (this.wakeLock.isHeld()) {
 			this.wakeLock.release();
+		}
+	}
+
+	@Override
+	protected void onPrepareDialog(int id, Dialog dialog) {
+		switch (id) {
+			case DIALOG_INFO_MAP_FILE:
+				// map file name
+				TextView textView = (TextView) dialog.findViewById(R.id.infoMapFileViewName);
+				textView.setText(this.mapView.getMapFile());
+
+				// map file name
+				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewDebug);
+				MapDatabase mapDatabase = this.mapView.getMapDatabase();
+				if (mapDatabase.isDebugFile()) {
+					textView.setText(R.string.info_map_file_debug_yes);
+				} else {
+					textView.setText(R.string.info_map_file_debug_no);
+				}
+
+				// map file date
+				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewDate);
+				Date date = new Date(mapDatabase.getMapDate());
+				textView.setText(DateFormat.getDateTimeInstance().format(date));
+
+				// map file area
+				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewArea);
+				Rect mapArea = mapDatabase.getMapBoundary();
+				textView
+						.setText(mapArea.top / 1000000d + ", " + mapArea.left / 1000000d
+								+ " – \n" + mapArea.bottom / 1000000d + ", " + mapArea.right
+								/ 1000000d);
+
+				// map file start position
+				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewStart);
+				GeoPoint startPosition = mapDatabase.getStartPosition();
+				if (startPosition == null) {
+					textView.setText(null);
+				} else {
+					textView.setText(startPosition.getLatitude() + ", "
+							+ startPosition.getLongitude());
+				}
+
+				// map file comment text
+				textView = (TextView) dialog.findViewById(R.id.infoMapFileViewComment);
+				String commentText = mapDatabase.getCommentText();
+				if (commentText == null) {
+					textView.setText(null);
+				} else {
+					textView.setText(mapDatabase.getCommentText());
+				}
+
+				break;
+			default:
+				super.onPrepareDialog(id, dialog);
+				break;
 		}
 	}
 

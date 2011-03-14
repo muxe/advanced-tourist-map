@@ -5,12 +5,22 @@
 	<string name="follow_gps_disabled">GPS-Signal folgen wurde deaktiviert</string>
 	<string name="go_to_position">Gehe zu Position</string>
 	<string name="gps_disabled">Der GPS-Empfänger ist deaktiviert</string>
+	<string name="info_map_file_area">Fläche</string>
+	<string name="info_map_file_comment">Kommentar</string>
+	<string name="info_map_file_date">Datum</string>
+	<string name="info_map_file_debug">Debug-Informationen</string>
+	<string name="info_map_file_debug_no">nicht enthalten</string>
+	<string name="info_map_file_debug_yes">enthalten</string>
+	<string name="info_map_file_name">Datei</string>
+	<string name="info_map_file_start">Startposition</string>
 	<string name="latitude">Breitengrad</string>
 	<string name="longitude">Längengrad</string>
 	<string name="map_file_invalid">Die gewählte Datei ist keine gültige Kartendatei. Bitte wählen Sie
 		eine andere Datei aus.</string>
 	<string name="map_file_select">Bitte wählen Sie eine Kartendatei aus.</string>
 	<string name="menu_info">Info</string>
+	<string name="menu_info_map_file">Kartendatei-Info</string>
+	<string name="menu_info_about">Über diese Software</string>
 	<string name="menu_mapfile">Kartendatei</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Koordinaten eingeben</string>

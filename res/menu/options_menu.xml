@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-	<item android:id="@+id/menu_info" android:title="@string/menu_info"
-		android:icon="@drawable/ic_menu_info_details">
+	<item android:id="@+id/menu_info" android:title="@string/menu_info" android:icon="@drawable/ic_menu_info_details">
+		<menu>
+			<item android:id="@+id/menu_info_map_file" android:title="@string/menu_info_map_file" />
+			<item android:id="@+id/menu_info_about" android:title="@string/menu_info_about" />
+		</menu>
 	</item>
 	<item android:id="@+id/menu_position" android:title="@string/menu_position"
 		android:icon="@drawable/ic_menu_mylocation">
 		<menu>
 			<item android:id="@+id/menu_position_gps_follow" android:title="@string/menu_position_gps_follow" />
-			<item android:id="@+id/menu_position_enter_coordinates"
-				android:title="@string/menu_position_enter_coordinates" />
+			<item android:id="@+id/menu_position_enter_coordinates" android:title="@string/menu_position_enter_coordinates" />
 			<item android:id="@+id/menu_position_map_center" android:title="@string/menu_position_map_file_center" />
 		</menu>
 	</item>
