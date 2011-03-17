@@ -21,13 +21,15 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
 
-import org.mapsforge.android.maps.CircleOverlay;
+import org.mapsforge.android.maps.ArrayCircleOverlay;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
 import org.mapsforge.android.maps.MapDatabase;
 import org.mapsforge.android.maps.MapView;
 import org.mapsforge.android.maps.MapViewMode;
+import org.mapsforge.android.maps.OverlayCircle;
+import org.mapsforge.android.maps.MapView.TextField;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -56,7 +58,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.View.OnClickListener;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -97,6 +98,7 @@ public class AdvancedMapViewer extends MapActivity {
 	 */
 	static final int MOVE_SPEED_MAX = 30;
 
+	private ArrayCircleOverlay circleOverlay;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
 	private boolean followGpsEnabled;
@@ -107,11 +109,10 @@ public class AdvancedMapViewer extends MapActivity {
 	private SharedPreferences preferences;
 	private Toast toast;
 	private WakeLock wakeLock;
-	CircleOverlay circleOverlay;
 	ImageView gpsView;
-	InputMethodManager inputMethodManager;
 	MapController mapController;
 	MapView mapView;
+	OverlayCircle overlayCircle;
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
@@ -267,17 +268,18 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setFocusable(true);
 
 		// set the localized text fields
-		this.mapView
-				.setText("unit_symbol_kilometer", getString(R.string.unit_symbol_kilometer));
-		this.mapView.setText("unit_symbol_meter", getString(R.string.unit_symbol_meter));
+		this.mapView.setText(TextField.KILOMETER, getString(R.string.unit_symbol_kilometer));
+		this.mapView.setText(TextField.METER, getString(R.string.unit_symbol_meter));
 
 		// get the map controller for this MapView
 		this.mapController = this.mapView.getController();
 	}
 
 	private void enableFollowGPS() {
-		this.circleOverlay = new CircleOverlay(this.circleOverlayFill,
+		this.circleOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
 				this.circleOverlayOutline);
+		this.overlayCircle = new OverlayCircle();
+		this.circleOverlay.addCircle(this.overlayCircle);
 		this.mapView.getOverlays().add(this.circleOverlay);
 
 		this.followGpsEnabled = true;
@@ -287,7 +289,7 @@ public class AdvancedMapViewer extends MapActivity {
 				GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
 				AdvancedMapViewer.this.mapController.setCenter(point);
 				AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
-				AdvancedMapViewer.this.circleOverlay.setCircleData(point, location
+				AdvancedMapViewer.this.overlayCircle.setCircleData(point, location
 						.getAccuracy());
 			}
 
@@ -358,7 +360,6 @@ public class AdvancedMapViewer extends MapActivity {
 
 		// get the pointers to different system services
 		this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-		this.inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 		this.powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
 		this.wakeLock = this.powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
 
@@ -412,6 +413,8 @@ public class AdvancedMapViewer extends MapActivity {
 			builder.setNegativeButton(getString(R.string.cancel), null);
 			return builder.create();
 		} else if (id == DIALOG_GPS_DISABLED) {
+			builder.setIcon(android.R.drawable.ic_menu_info_details);
+			builder.setTitle(R.string.error);
 			builder.setMessage(R.string.gps_disabled);
 			builder.setPositiveButton(getString(R.string.ok), null);
 			return builder.create();

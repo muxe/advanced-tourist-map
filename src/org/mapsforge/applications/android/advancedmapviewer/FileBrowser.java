@@ -150,13 +150,14 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		switch (id) {
 			case DIALOG_MAP_FILE_INVALID:
-				builder.setMessage(getString(R.string.map_file_invalid)).setTitle(
-						getString(R.string.error)).setPositiveButton(getString(R.string.ok),
-						null);
+				builder.setIcon(android.R.drawable.ic_menu_info_details);
+				builder.setTitle(getString(R.string.error));
+				builder.setMessage(getString(R.string.map_file_invalid));
+				builder.setPositiveButton(getString(R.string.ok), null);
 				return builder.create();
 			case DIALOG_MAP_FILE_SELECT:
-				builder.setMessage(getString(R.string.map_file_select)).setPositiveButton(
-						getString(R.string.ok), null);
+				builder.setMessage(getString(R.string.map_file_select));
+				builder.setPositiveButton(getString(R.string.ok), null);
 				return builder.create();
 			default:
 				return null;
