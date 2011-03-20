@@ -277,7 +277,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 	private void enableFollowGPS() {
 		this.circleOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
-				this.circleOverlayOutline);
+				this.circleOverlayOutline, this);
 		this.overlayCircle = new OverlayCircle();
 		this.circleOverlay.addCircle(this.overlayCircle);
 		this.mapView.getOverlays().add(this.circleOverlay);
