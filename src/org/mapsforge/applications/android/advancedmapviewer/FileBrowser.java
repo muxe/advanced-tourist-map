@@ -21,8 +21,6 @@ import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.mapsforge.android.maps.MapView;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -41,56 +39,41 @@ import android.widget.GridView;
  * Simple file browser activity to select a file.
  */
 public class FileBrowser extends Activity implements AdapterView.OnItemClickListener {
-	/**
-	 * Simple implementation of the FileFilter interface to select valid files and directories
-	 * based on their file permissions and name extensions.
-	 */
-	static class BrowserFileFilter implements FileFilter {
-		private final String[] validExtensions;
-
-		BrowserFileFilter(String[] validExtensions) {
-			this.validExtensions = validExtensions;
-		}
-
-		@Override
-		public boolean accept(File file) {
-			// only accept readable files
-			if (file.canRead()) {
-				if (file.isDirectory()) {
-					// accept all directories
-					return true;
-				} else if (file.isFile()) {
-					if (this.validExtensions == null) {
-						// accept all files
-						return true;
-					}
-
-					// accept all files with a valid extension
-					for (String extension : this.validExtensions) {
-						if (file.getName().endsWith(extension)) {
-							return true;
-						}
-					}
-				}
-			}
-
-			// cannot read the file or file extension is invalid
-			return false;
-		}
-	}
-
 	private static final String DEFAULT_DIRECTORY = "/";
 	private static final int DIALOG_FILE_INVALID = 0;
 	private static final int DIALOG_FILE_SELECT = 1;
+	private static FileFilter fileDisplayFilter;
+	private static FileFilter fileSelectFilter;
 	private static final String PREFERENCES_FILE = "FileBrowser";
+
+	/**
+	 * Sets the file display filter. This filter is used to determine which files and subfolders
+	 * of directories will be displayed. If set to null, all files and subfolders are shown.
+	 * 
+	 * @param fileDisplayFilter
+	 *            the file display filter (may be null).
+	 */
+	static void setFileDisplayFilter(FileFilter fileDisplayFilter) {
+		FileBrowser.fileDisplayFilter = fileDisplayFilter;
+	}
+
+	/**
+	 * Sets the file select filter. This filter is used when the user selects a file to
+	 * determine if it is valid. If set to null, all files are considered as valid.
+	 * 
+	 * @param fileSelectFilter
+	 *            the file selection filter (may be null).
+	 */
+	static void setFileSelectFilter(FileFilter fileSelectFilter) {
+		FileBrowser.fileSelectFilter = fileSelectFilter;
+	}
+
 	private File currentDirectory;
 	private FileBrowserIconAdapter fileBrowserIconAdapter;
 	private Comparator<File> fileComparator;
-	private FileFilter fileFilter;
 	private File[] files;
 	private File[] filesWithParentFolder;
 	private GridView gridView;
-
 	private File selectedFile;
 
 	@Override
@@ -99,7 +82,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		if (this.selectedFile.isDirectory()) {
 			this.currentDirectory = this.selectedFile;
 			browseToCurrentDirectory();
-		} else if (MapView.isValidMapFile(this.selectedFile.getAbsolutePath())) {
+		} else if (fileSelectFilter == null || fileSelectFilter.accept(this.selectedFile)) {
 			setResult(RESULT_OK, new Intent().putExtra("selectedFile", this.selectedFile
 					.getAbsolutePath()));
 			finish();
@@ -125,11 +108,20 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	private void browseToCurrentDirectory() {
 		setTitle(this.currentDirectory.getAbsolutePath());
 
-		// read and filter files and subfolders in the current folder
-		this.files = this.currentDirectory.listFiles(this.fileFilter);
+		// read all files and subfolders from the current directory
+		if (fileDisplayFilter == null) {
+			this.files = this.currentDirectory.listFiles();
+		} else {
+			this.files = this.currentDirectory.listFiles(fileDisplayFilter);
+		}
 
-		// order all files
-		Arrays.sort(this.files, this.fileComparator);
+		if (this.files == null) {
+			// no files could be read
+			this.files = new File[0];
+		} else {
+			// order all files
+			Arrays.sort(this.files, this.fileComparator);
+		}
 
 		// if a parent directory exists, add it at the first position
 		if (this.currentDirectory.getParentFile() != null) {
@@ -152,14 +144,6 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		this.gridView = (GridView) findViewById(R.id.fileBrowserView);
 		this.gridView.setOnItemClickListener(this);
 		this.gridView.setAdapter(this.fileBrowserIconAdapter);
-
-		// create a file filter which includes all valid files and folders
-		Bundle extras = getIntent().getExtras();
-		if (extras == null) {
-			this.fileFilter = new BrowserFileFilter(null);
-		} else {
-			this.fileFilter = new BrowserFileFilter(extras.getStringArray("validExtensions"));
-		}
 
 		// order all files by type and alphabetically by name
 		this.fileComparator = new Comparator<File>() {

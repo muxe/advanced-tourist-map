@@ -17,6 +17,7 @@
 package org.mapsforge.applications.android.advancedmapviewer;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Date;
@@ -178,9 +179,7 @@ public class AdvancedMapViewer extends MapActivity {
 				return true;
 
 			case R.id.menu_mapfile:
-				Intent fileBrowserIntent = new Intent(this, FileBrowser.class);
-				fileBrowserIntent.putExtra("validExtensions", new String[] { ".map" });
-				startActivityForResult(fileBrowserIntent, SELECT_MAP_FILE);
+				startFileBrowser();
 				return true;
 
 			default:
@@ -332,6 +331,41 @@ public class AdvancedMapViewer extends MapActivity {
 				disableFollowGPS(true);
 			}
 		});
+	}
+
+	/**
+	 * Sets all file filters and starts the FileBrowser.
+	 */
+	private void startFileBrowser() {
+		// set the FileDisplayFilter
+		FileBrowser.setFileDisplayFilter(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				// accept only readable files
+				if (file.canRead()) {
+					if (file.isDirectory()) {
+						// accept all directories
+						return true;
+					} else if (file.isFile() && file.getName().endsWith(".map")) {
+						// accept all files with a ".map" extension
+						return true;
+					}
+				}
+				return false;
+			}
+		});
+
+		// set the FileSelectFilter
+		FileBrowser.setFileSelectFilter(new FileFilter() {
+			@Override
+			public boolean accept(File file) {
+				// accept only valid map files
+				return MapView.isValidMapFile(file.getAbsolutePath());
+			}
+		});
+
+		// start the FileBrowser
+		startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
 	}
 
 	@Override
@@ -595,7 +629,7 @@ public class AdvancedMapViewer extends MapActivity {
 		// check if the file browser needs to be displayed
 		if (!this.mapView.getMapViewMode().requiresInternetConnection()
 				&& !this.mapView.hasValidMapFile()) {
-			startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
+			startFileBrowser();
 		}
 	}
 
