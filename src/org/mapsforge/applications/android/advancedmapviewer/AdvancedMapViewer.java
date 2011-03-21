@@ -74,6 +74,7 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_ENTER_COORDINATES = 0;
 	private static final int DIALOG_GPS_DISABLED = 1;
 	private static final int DIALOG_INFO_MAP_FILE = 2;
+	private static final String SCREENSHOT_DIRECTORY = "Pictures";
 	private static final String SCREENSHOT_FILE_NAME = "Map screenshot";
 	private static final int SCREENSHOT_QUALITY = 90;
 	private static final int SELECT_MAP_FILE = 0;
@@ -227,8 +228,8 @@ public class AdvancedMapViewer extends MapActivity {
 			@Override
 			public void run() {
 				try {
-					File path = Environment
-							.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+					File path = new File(Environment.getExternalStorageDirectory(),
+							SCREENSHOT_DIRECTORY);
 					// make sure the Pictures directory exists
 					if (!path.exists() && !path.mkdirs()) {
 						showToast("Could not create target directory");
