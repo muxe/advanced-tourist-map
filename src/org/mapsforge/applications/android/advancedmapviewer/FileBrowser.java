@@ -38,12 +38,50 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 /**
- * Simple file browser activity to select a map file from the file system.
+ * Simple file browser activity to select a file.
  */
 public class FileBrowser extends Activity implements AdapterView.OnItemClickListener {
+	/**
+	 * Simple implementation of the FileFilter interface to select valid files and directories
+	 * based on their file permissions and name extensions.
+	 */
+	static class BrowserFileFilter implements FileFilter {
+		private final String[] validExtensions;
+
+		BrowserFileFilter(String[] validExtensions) {
+			this.validExtensions = validExtensions;
+		}
+
+		@Override
+		public boolean accept(File file) {
+			// only accept readable files
+			if (file.canRead()) {
+				if (file.isDirectory()) {
+					// accept all directories
+					return true;
+				} else if (file.isFile()) {
+					if (this.validExtensions == null) {
+						// accept all files
+						return true;
+					}
+
+					// accept all files with a valid extension
+					for (String extension : this.validExtensions) {
+						if (file.getName().endsWith(extension)) {
+							return true;
+						}
+					}
+				}
+			}
+
+			// cannot read the file or file extension is invalid
+			return false;
+		}
+	}
+
 	private static final String DEFAULT_DIRECTORY = "/";
-	private static final int DIALOG_MAP_FILE_INVALID = 0;
-	private static final int DIALOG_MAP_FILE_SELECT = 1;
+	private static final int DIALOG_FILE_INVALID = 0;
+	private static final int DIALOG_FILE_SELECT = 1;
 	private static final String PREFERENCES_FILE = "FileBrowser";
 	private File currentDirectory;
 	private FileBrowserIconAdapter fileBrowserIconAdapter;
@@ -52,20 +90,21 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	private File[] files;
 	private File[] filesWithParentFolder;
 	private GridView gridView;
+
 	private File selectedFile;
 
 	@Override
-	public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long id) {
+	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 		this.selectedFile = this.files[(int) id];
 		if (this.selectedFile.isDirectory()) {
 			this.currentDirectory = this.selectedFile;
 			browseToCurrentDirectory();
 		} else if (MapView.isValidMapFile(this.selectedFile.getAbsolutePath())) {
-			setResult(RESULT_OK, new Intent().putExtra("mapFile", this.selectedFile
+			setResult(RESULT_OK, new Intent().putExtra("selectedFile", this.selectedFile
 					.getAbsolutePath()));
 			finish();
 		} else {
-			showDialog(DIALOG_MAP_FILE_INVALID);
+			showDialog(DIALOG_FILE_INVALID);
 		}
 	}
 
@@ -89,7 +128,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		// read and filter files and subfolders in the current folder
 		this.files = this.currentDirectory.listFiles(this.fileFilter);
 
-		// order all files by type and alphabetically by name
+		// order all files
 		Arrays.sort(this.files, this.fileComparator);
 
 		// if a parent directory exists, add it at the first position
@@ -98,9 +137,9 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 			this.filesWithParentFolder[0] = this.currentDirectory.getParentFile();
 			System.arraycopy(this.files, 0, this.filesWithParentFolder, 1, this.files.length);
 			this.files = this.filesWithParentFolder;
-			this.fileBrowserIconAdapter.updateFiles(this.files, true);
+			this.fileBrowserIconAdapter.setFiles(this.files, true);
 		} else {
-			this.fileBrowserIconAdapter.updateFiles(this.files, false);
+			this.fileBrowserIconAdapter.setFiles(this.files, false);
 		}
 		this.fileBrowserIconAdapter.notifyDataSetChanged();
 	}
@@ -108,40 +147,37 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.filebrowser);
+		setContentView(R.layout.activity_file_browser);
 		this.fileBrowserIconAdapter = new FileBrowserIconAdapter(this);
 		this.gridView = (GridView) findViewById(R.id.fileBrowserView);
 		this.gridView.setOnItemClickListener(this);
 		this.gridView.setAdapter(this.fileBrowserIconAdapter);
 
-		this.fileFilter = new FileFilter() {
-			@Override
-			public boolean accept(File pathname) {
-				if (pathname.isDirectory()) {
-					// accept all readable folders
-					return pathname.canRead();
-				}
-				// accept all readable files with the correct extension
-				return pathname.canRead() && pathname.getName().endsWith(".map");
-			}
-		};
+		// create a file filter which includes all valid files and folders
+		Bundle extras = getIntent().getExtras();
+		if (extras == null) {
+			this.fileFilter = new BrowserFileFilter(null);
+		} else {
+			this.fileFilter = new BrowserFileFilter(extras.getStringArray("validExtensions"));
+		}
 
+		// order all files by type and alphabetically by name
 		this.fileComparator = new Comparator<File>() {
 			@Override
-			public int compare(File o1, File o2) {
-				if (o1.isDirectory() && !o2.isDirectory()) {
+			public int compare(File file1, File file2) {
+				if (file1.isDirectory() && !file2.isDirectory()) {
 					return -1;
-				} else if (!o1.isDirectory() && o2.isDirectory()) {
+				} else if (!file1.isDirectory() && file2.isDirectory()) {
 					return 1;
 				} else {
-					return o1.getName().compareToIgnoreCase(o2.getName());
+					return file1.getName().compareToIgnoreCase(file2.getName());
 				}
 			}
 		};
 
 		if (savedInstanceState == null) {
 			// first start of this instance
-			showDialog(DIALOG_MAP_FILE_SELECT);
+			showDialog(DIALOG_FILE_SELECT);
 		}
 	}
 
@@ -149,13 +185,13 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	protected Dialog onCreateDialog(int id) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		switch (id) {
-			case DIALOG_MAP_FILE_INVALID:
+			case DIALOG_FILE_INVALID:
 				builder.setIcon(android.R.drawable.ic_menu_info_details);
 				builder.setTitle(getString(R.string.error));
 				builder.setMessage(getString(R.string.map_file_invalid));
 				builder.setPositiveButton(getString(R.string.ok), null);
 				return builder.create();
-			case DIALOG_MAP_FILE_SELECT:
+			case DIALOG_FILE_SELECT:
 				builder.setMessage(getString(R.string.map_file_select));
 				builder.setPositiveButton(getString(R.string.ok), null);
 				return builder.create();

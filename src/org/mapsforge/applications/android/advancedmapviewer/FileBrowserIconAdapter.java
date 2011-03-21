@@ -29,14 +29,14 @@ import android.widget.TextView;
  * An adapter for the FileBrowser GridView.
  */
 class FileBrowserIconAdapter extends BaseAdapter {
-	private Context context;
+	private final Context context;
 	private File currentFile;
 	private File[] files;
 	private boolean hasParentFolder;
 	private TextView textView;
 
 	/**
-	 * Create a new FileBrowserIconAdapter with the given context.
+	 * Creates a new FileBrowserIconAdapter with the given context.
 	 * 
 	 * @param context
 	 *            the context of this adapter, through which new Views can be created.
@@ -96,15 +96,15 @@ class FileBrowserIconAdapter extends BaseAdapter {
 	}
 
 	/**
-	 * Call this method to change the data of the adapter.
+	 * Sets the data of this adapter.
 	 * 
-	 * @param newFiles
+	 * @param files
 	 *            the new files for this adapter.
 	 * @param newHasParentFolder
-	 *            true if the files array has a parent folder at index 0, false otherwise.
+	 *            true if the file array has a parent folder at index 0, false otherwise.
 	 */
-	void updateFiles(File[] newFiles, boolean newHasParentFolder) {
-		this.files = newFiles;
+	void setFiles(File[] files, boolean newHasParentFolder) {
+		this.files = files;
 		this.hasParentFolder = newHasParentFolder;
 	}
 }

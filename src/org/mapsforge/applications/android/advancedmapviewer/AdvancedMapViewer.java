@@ -177,7 +177,9 @@ public class AdvancedMapViewer extends MapActivity {
 				return true;
 
 			case R.id.menu_mapfile:
-				startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
+				Intent fileBrowserIntent = new Intent(this, FileBrowser.class);
+				fileBrowserIntent.putExtra("validExtensions", new String[] { ".map" });
+				startActivityForResult(fileBrowserIntent, SELECT_MAP_FILE);
 				return true;
 
 			default:
@@ -336,8 +338,8 @@ public class AdvancedMapViewer extends MapActivity {
 		if (requestCode == SELECT_MAP_FILE) {
 			if (resultCode == RESULT_OK) {
 				disableFollowGPS(true);
-				if (data != null && data.getStringExtra("mapFile") != null) {
-					this.mapView.setMapFile(data.getStringExtra("mapFile"));
+				if (data != null && data.getStringExtra("selectedFile") != null) {
+					this.mapView.setMapFile(data.getStringExtra("selectedFile"));
 				}
 			} else if (resultCode == RESULT_CANCELED
 					&& !this.mapView.getMapViewMode().requiresInternetConnection()
@@ -352,7 +354,7 @@ public class AdvancedMapViewer extends MapActivity {
 		super.onCreate(savedInstanceState);
 
 		// set up the layout views
-		setContentView(R.layout.advancedmapviewer);
+		setContentView(R.layout.activity_advanced_map_viewer);
 		this.mapView = (MapView) findViewById(R.id.mapView);
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
 
