@@ -2,7 +2,6 @@
 <resources>
 	<string name="cancel">Cancel</string>
 	<string name="error">Error</string>
-	<string name="file_browser">File browser</string>
 	<string name="file_invalid">The selected file is invalid. Please select another one.</string>
 	<string name="file_select">Please select a file.</string>
 	<string name="follow_gps_disabled">Follow GPS signal has been disabled</string>

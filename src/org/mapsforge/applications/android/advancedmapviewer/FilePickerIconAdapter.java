@@ -26,9 +26,9 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 /**
- * An adapter for the FileBrowser GridView.
+ * An adapter for the FilePicker GridView.
  */
-class FileBrowserIconAdapter extends BaseAdapter {
+class FilePickerIconAdapter extends BaseAdapter {
 	private final Context context;
 	private File currentFile;
 	private File[] files;
@@ -36,12 +36,12 @@ class FileBrowserIconAdapter extends BaseAdapter {
 	private TextView textView;
 
 	/**
-	 * Creates a new FileBrowserIconAdapter with the given context.
+	 * Creates a new FilePickerIconAdapter with the given context.
 	 * 
 	 * @param context
-	 *            the context of this adapter, through which new Views can be created.
+	 *            the context of this adapter, through which new Views are created.
 	 */
-	FileBrowserIconAdapter(Context context) {
+	FilePickerIconAdapter(Context context) {
 		this.context = context;
 	}
 

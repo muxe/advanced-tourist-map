@@ -334,11 +334,11 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	/**
-	 * Sets all file filters and starts the FileBrowser.
+	 * Sets all file filters and starts the FilePicker.
 	 */
 	private void startFileBrowser() {
 		// set the FileDisplayFilter
-		FileBrowser.setFileDisplayFilter(new FileFilter() {
+		FilePicker.setFileDisplayFilter(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
 				// accept only readable files
@@ -356,7 +356,7 @@ public class AdvancedMapViewer extends MapActivity {
 		});
 
 		// set the FileSelectFilter
-		FileBrowser.setFileSelectFilter(new FileFilter() {
+		FilePicker.setFileSelectFilter(new FileFilter() {
 			@Override
 			public boolean accept(File file) {
 				// accept only valid map files
@@ -364,8 +364,8 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 		});
 
-		// start the FileBrowser
-		startActivityForResult(new Intent(this, FileBrowser.class), SELECT_MAP_FILE);
+		// start the FilePicker
+		startActivityForResult(new Intent(this, FilePicker.class), SELECT_MAP_FILE);
 	}
 
 	@Override
@@ -430,7 +430,7 @@ public class AdvancedMapViewer extends MapActivity {
 			LayoutInflater factory = LayoutInflater.from(this);
 			final View view = factory.inflate(R.layout.dialog_enter_coordinates, null);
 			builder.setView(view);
-			builder.setPositiveButton(getString(R.string.go_to_position),
+			builder.setPositiveButton(R.string.go_to_position,
 					new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
@@ -447,20 +447,20 @@ public class AdvancedMapViewer extends MapActivity {
 									.findViewById(R.id.zoomlevel)).getProgress());
 						}
 					});
-			builder.setNegativeButton(getString(R.string.cancel), null);
+			builder.setNegativeButton(R.string.cancel, null);
 			return builder.create();
 		} else if (id == DIALOG_GPS_DISABLED) {
 			builder.setIcon(android.R.drawable.ic_menu_info_details);
 			builder.setTitle(R.string.error);
 			builder.setMessage(R.string.gps_disabled);
-			builder.setPositiveButton(getString(R.string.ok), null);
+			builder.setPositiveButton(R.string.ok, null);
 			return builder.create();
 		} else if (id == DIALOG_INFO_MAP_FILE) {
 			builder.setIcon(android.R.drawable.ic_menu_info_details);
 			builder.setTitle(R.string.menu_info_map_file);
 			LayoutInflater factory = LayoutInflater.from(this);
 			builder.setView(factory.inflate(R.layout.dialog_info_map_file, null));
-			builder.setPositiveButton(getString(R.string.ok), null);
+			builder.setPositiveButton(R.string.ok, null);
 			return builder.create();
 		} else {
 			// do dialog will be created

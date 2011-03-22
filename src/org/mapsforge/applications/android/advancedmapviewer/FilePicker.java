@@ -35,7 +35,7 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 
 /**
- * A FileBrowser displays the contents of directories. The user can navigate within the file
+ * A FilePicker displays the contents of directories. The user can navigate within the file
  * system and select a single file whose path is then returned to the calling activity. The
  * ordering of directory contents can be specified via {@link #setFileComparator(Comparator)}.
  * By default subfolders and files are grouped and each group is ordered alphabetically.
@@ -47,14 +47,14 @@ import android.widget.GridView;
  * to check if a selected file is valid before its path is returned. By default all files are
  * considered as valid and can be selected by the user.
  */
-public class FileBrowser extends Activity implements AdapterView.OnItemClickListener {
+public class FilePicker extends Activity implements AdapterView.OnItemClickListener {
 	private static final String DEFAULT_DIRECTORY = "/";
 	private static final int DIALOG_FILE_INVALID = 0;
 	private static final int DIALOG_FILE_SELECT = 1;
 	private static Comparator<File> fileComparator = getDefaultFileComparator();
 	private static FileFilter fileDisplayFilter;
 	private static FileFilter fileSelectFilter;
-	private static final String PREFERENCES_FILE = "FileBrowser";
+	private static final String PREFERENCES_FILE = "FilePicker";
 
 	/**
 	 * Sets the file comparator which is used to order the contents of all directories before
@@ -64,7 +64,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	 *            the file comparator (may be null).
 	 */
 	public static void setFileComparator(Comparator<File> fileComparator) {
-		FileBrowser.fileComparator = fileComparator;
+		FilePicker.fileComparator = fileComparator;
 	}
 
 	/**
@@ -75,7 +75,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	 *            the file display filter (may be null).
 	 */
 	public static void setFileDisplayFilter(FileFilter fileDisplayFilter) {
-		FileBrowser.fileDisplayFilter = fileDisplayFilter;
+		FilePicker.fileDisplayFilter = fileDisplayFilter;
 	}
 
 	/**
@@ -86,7 +86,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	 *            the file selection filter (may be null).
 	 */
 	public static void setFileSelectFilter(FileFilter fileSelectFilter) {
-		FileBrowser.fileSelectFilter = fileSelectFilter;
+		FilePicker.fileSelectFilter = fileSelectFilter;
 	}
 
 	/**
@@ -111,7 +111,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	}
 
 	private File currentDirectory;
-	private FileBrowserIconAdapter fileBrowserIconAdapter;
+	private FilePickerIconAdapter filePickerIconAdapter;
 	private File[] files;
 	private File[] filesWithParentFolder;
 	private GridView gridView;
@@ -158,22 +158,22 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 			this.filesWithParentFolder[0] = this.currentDirectory.getParentFile();
 			System.arraycopy(this.files, 0, this.filesWithParentFolder, 1, this.files.length);
 			this.files = this.filesWithParentFolder;
-			this.fileBrowserIconAdapter.setFiles(this.files, true);
+			this.filePickerIconAdapter.setFiles(this.files, true);
 		} else {
-			this.fileBrowserIconAdapter.setFiles(this.files, false);
+			this.filePickerIconAdapter.setFiles(this.files, false);
 		}
-		this.fileBrowserIconAdapter.notifyDataSetChanged();
+		this.filePickerIconAdapter.notifyDataSetChanged();
 	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_file_browser);
+		setContentView(R.layout.activity_file_picker);
 
-		this.fileBrowserIconAdapter = new FileBrowserIconAdapter(this);
-		this.gridView = (GridView) findViewById(R.id.fileBrowserView);
+		this.filePickerIconAdapter = new FilePickerIconAdapter(this);
+		this.gridView = (GridView) findViewById(R.id.filePickerView);
 		this.gridView.setOnItemClickListener(this);
-		this.gridView.setAdapter(this.fileBrowserIconAdapter);
+		this.gridView.setAdapter(this.filePickerIconAdapter);
 
 		if (savedInstanceState == null) {
 			// first start of this instance
@@ -187,15 +187,13 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		switch (id) {
 			case DIALOG_FILE_INVALID:
 				builder.setIcon(android.R.drawable.ic_menu_info_details);
-				builder.setTitle(getString(R.string.error));
-				builder.setMessage(getString(R.string.file_invalid));
-				builder.setPositiveButton(getString(R.string.ok), null);
+				builder.setTitle(R.string.error);
+				builder.setMessage(R.string.file_invalid);
+				builder.setPositiveButton(R.string.ok, null);
 				return builder.create();
 			case DIALOG_FILE_SELECT:
-				builder.setIcon(android.R.drawable.ic_menu_info_details);
-				builder.setTitle(getString(R.string.file_browser));
-				builder.setMessage(getString(R.string.file_select));
-				builder.setPositiveButton(getString(R.string.ok), null);
+				builder.setMessage(R.string.file_select);
+				builder.setPositiveButton(R.string.ok, null);
 				return builder.create();
 			default:
 				// do dialog will be created
