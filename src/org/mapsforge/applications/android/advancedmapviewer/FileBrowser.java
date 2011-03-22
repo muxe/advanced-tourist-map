@@ -29,22 +29,43 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
 /**
- * Simple file browser activity to select a file.
+ * A FileBrowser displays the contents of directories. The user can navigate within the file
+ * system and select a single file whose path is then returned to the calling activity. The
+ * ordering of directory contents can be specified via {@link #setFileComparator(Comparator)}.
+ * By default subfolders and files are grouped and each group is ordered alphabetically.
+ * <p>
+ * A {@link FileFilter} can be activated via {@link #setFileDisplayFilter(FileFilter)} to
+ * restrict the displayed files and folders. By default all files and folders are visible.
+ * <p>
+ * Another <code>FileFilter</code> can be applied via {@link #setFileSelectFilter(FileFilter)}
+ * to check if a selected file is valid before its path is returned. By default all files are
+ * considered as valid and can be selected by the user.
  */
 public class FileBrowser extends Activity implements AdapterView.OnItemClickListener {
 	private static final String DEFAULT_DIRECTORY = "/";
 	private static final int DIALOG_FILE_INVALID = 0;
 	private static final int DIALOG_FILE_SELECT = 1;
+	private static Comparator<File> fileComparator = getDefaultFileComparator();
 	private static FileFilter fileDisplayFilter;
 	private static FileFilter fileSelectFilter;
 	private static final String PREFERENCES_FILE = "FileBrowser";
+
+	/**
+	 * Sets the file comparator which is used to order the contents of all directories before
+	 * displaying them. If set to null, subfolders and files will not be ordered.
+	 * 
+	 * @param fileComparator
+	 *            the file comparator (may be null).
+	 */
+	public static void setFileComparator(Comparator<File> fileComparator) {
+		FileBrowser.fileComparator = fileComparator;
+	}
 
 	/**
 	 * Sets the file display filter. This filter is used to determine which files and subfolders
@@ -53,7 +74,7 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	 * @param fileDisplayFilter
 	 *            the file display filter (may be null).
 	 */
-	static void setFileDisplayFilter(FileFilter fileDisplayFilter) {
+	public static void setFileDisplayFilter(FileFilter fileDisplayFilter) {
 		FileBrowser.fileDisplayFilter = fileDisplayFilter;
 	}
 
@@ -64,13 +85,33 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	 * @param fileSelectFilter
 	 *            the file selection filter (may be null).
 	 */
-	static void setFileSelectFilter(FileFilter fileSelectFilter) {
+	public static void setFileSelectFilter(FileFilter fileSelectFilter) {
 		FileBrowser.fileSelectFilter = fileSelectFilter;
+	}
+
+	/**
+	 * Creates the default file comparator.
+	 * 
+	 * @return the default file comparator.
+	 */
+	private static Comparator<File> getDefaultFileComparator() {
+		// order all files by type and alphabetically by name
+		return new Comparator<File>() {
+			@Override
+			public int compare(File file1, File file2) {
+				if (file1.isDirectory() && !file2.isDirectory()) {
+					return -1;
+				} else if (!file1.isDirectory() && file2.isDirectory()) {
+					return 1;
+				} else {
+					return file1.getName().compareToIgnoreCase(file2.getName());
+				}
+			}
+		};
 	}
 
 	private File currentDirectory;
 	private FileBrowserIconAdapter fileBrowserIconAdapter;
-	private Comparator<File> fileComparator;
 	private File[] files;
 	private File[] filesWithParentFolder;
 	private GridView gridView;
@@ -91,24 +132,13 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		}
 	}
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			// quit the application
-			setResult(RESULT_CANCELED);
-			finish();
-			return true;
-		}
-		return false;
-	}
-
 	/**
-	 * Browse to the current directory.
+	 * Browses to the current directory.
 	 */
 	private void browseToCurrentDirectory() {
 		setTitle(this.currentDirectory.getAbsolutePath());
 
-		// read all files and subfolders from the current directory
+		// read the subfolders and files from the current directory
 		if (fileDisplayFilter == null) {
 			this.files = this.currentDirectory.listFiles();
 		} else {
@@ -116,11 +146,10 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 		}
 
 		if (this.files == null) {
-			// no files could be read
 			this.files = new File[0];
 		} else {
-			// order all files
-			Arrays.sort(this.files, this.fileComparator);
+			// order the subfolders and files
+			Arrays.sort(this.files, fileComparator);
 		}
 
 		// if a parent directory exists, add it at the first position
@@ -140,24 +169,11 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_file_browser);
+
 		this.fileBrowserIconAdapter = new FileBrowserIconAdapter(this);
 		this.gridView = (GridView) findViewById(R.id.fileBrowserView);
 		this.gridView.setOnItemClickListener(this);
 		this.gridView.setAdapter(this.fileBrowserIconAdapter);
-
-		// order all files by type and alphabetically by name
-		this.fileComparator = new Comparator<File>() {
-			@Override
-			public int compare(File file1, File file2) {
-				if (file1.isDirectory() && !file2.isDirectory()) {
-					return -1;
-				} else if (!file1.isDirectory() && file2.isDirectory()) {
-					return 1;
-				} else {
-					return file1.getName().compareToIgnoreCase(file2.getName());
-				}
-			}
-		};
 
 		if (savedInstanceState == null) {
 			// first start of this instance
@@ -172,14 +188,17 @@ public class FileBrowser extends Activity implements AdapterView.OnItemClickList
 			case DIALOG_FILE_INVALID:
 				builder.setIcon(android.R.drawable.ic_menu_info_details);
 				builder.setTitle(getString(R.string.error));
-				builder.setMessage(getString(R.string.map_file_invalid));
+				builder.setMessage(getString(R.string.file_invalid));
 				builder.setPositiveButton(getString(R.string.ok), null);
 				return builder.create();
 			case DIALOG_FILE_SELECT:
-				builder.setMessage(getString(R.string.map_file_select));
+				builder.setIcon(android.R.drawable.ic_menu_info_details);
+				builder.setTitle(getString(R.string.file_browser));
+				builder.setMessage(getString(R.string.file_select));
 				builder.setPositiveButton(getString(R.string.ok), null);
 				return builder.create();
 			default:
+				// do dialog will be created
 				return null;
 		}
 	}

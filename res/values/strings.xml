@@ -2,6 +2,9 @@
 <resources>
 	<string name="cancel">Cancel</string>
 	<string name="error">Error</string>
+	<string name="file_browser">File browser</string>
+	<string name="file_invalid">The selected file is invalid. Please select another one.</string>
+	<string name="file_select">Please select a file.</string>
 	<string name="follow_gps_disabled">Follow GPS signal has been disabled</string>
 	<string name="go_to_position">Go to position</string>
 	<string name="gps_disabled">The GPS receiver is disabled</string>
@@ -15,9 +18,6 @@
 	<string name="info_map_file_start">Start position</string>
 	<string name="latitude">Latitude</string>
 	<string name="longitude">Longitude</string>
-	<string name="map_file_invalid">The selected file is not a valid map file. Please select another
-		file.</string>
-	<string name="map_file_select">Please select a map file.</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_info_map_file">Map file properties</string>
 	<string name="menu_info_about">About this software</string>

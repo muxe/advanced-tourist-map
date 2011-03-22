@@ -2,6 +2,10 @@
 <resources>
 	<string name="cancel">Abbrechen</string>
 	<string name="error">Fehler</string>
+	<string name="file_browser">Dateimanager</string>
+	<string name="file_invalid">Die gewählte Datei ist ungültig. Bitte wählen Sie eine andere.
+	</string>
+	<string name="file_select">Bitte wählen Sie eine Datei.</string>
 	<string name="follow_gps_disabled">GPS-Signal folgen wurde deaktiviert</string>
 	<string name="go_to_position">Gehe zu Position</string>
 	<string name="gps_disabled">Der GPS-Empfänger ist deaktiviert</string>
@@ -15,9 +19,6 @@
 	<string name="info_map_file_start">Startposition</string>
 	<string name="latitude">Breitengrad</string>
 	<string name="longitude">Längengrad</string>
-	<string name="map_file_invalid">Die gewählte Datei ist keine gültige Kartendatei. Bitte wählen Sie
-		eine andere Datei aus.</string>
-	<string name="map_file_select">Bitte wählen Sie eine Kartendatei aus.</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_info_map_file">Kartendatei-Info</string>
 	<string name="menu_info_about">Über diese Software</string>
