@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="application_name">AdvancedMapViewer</string>
 	<string name="cancel">Cancel</string>
 	<string name="error">Error</string>
 	<string name="file_invalid">The selected file is invalid. Please select another one.</string>

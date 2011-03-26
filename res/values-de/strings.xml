@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string name="application_name">AdvancedMapViewer</string>
 	<string name="cancel">Abbrechen</string>
 	<string name="error">Fehler</string>
 	<string name="file_invalid">Die gewählte Datei ist ungültig. Bitte wählen Sie eine andere.
