@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+        <string-array name="preferences_map_view_mode_values">
+			<item>Canvas renderer</item>
+			<item>Mapnik (online)</item>
+			<item>Osmarender (online)</item>
+			<item>OpenCycleMap (online)</item>
+		</string-array>
+
+		<string-array name="preferences_text_scale_values">
+			<item>hyvin pieni</item>
+			<item>pieni</item>
+			<item>normaali</item>
+			<item>suuri</item>
+			<item>hyvin suuri</item>
+		</string-array>
+                
         <string name="application_name">AdvancedMapViewer</string>
         <string name="cancel">Peruuta</string>
         <string name="error">Virhe</string>
@@ -57,6 +72,8 @@
         <string name="preferences_show_tile_frames_desc">Piirrä laattarajat</string>
         <string name="preferences_show_water_tiles">Vesilaatat</string>
 		<string name="preferences_show_water_tiles_desc">Korostaa vettä sisältävät laatat</string>
+		<string name="preferences_text_scale">Fonttikoko</string>
+		<string name="preferences_text_scale_desc">Valitse karttamerkintöjen tekstikoko</string>
 		<string name="preferences_wake_lock">Pysyy aktiivisena</string>
 		<string name="preferences_wake_lock_desc">Estää kuvaruudun himmenemisen</string>
         <string name="unit_symbol_kilometer">&#160;km</string>
