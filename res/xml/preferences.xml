@@ -5,9 +5,12 @@
 		<CheckBoxPreference android:title="@string/preferences_show_scale_bar"
 			android:summary="@string/preferences_show_scale_bar_desc" android:key="showScaleBar" />
 		<ListPreference android:title="@string/preferences_map_view_mode"
-			android:summary="@string/preferences_map_view_mode_desc" android:entries="@array/preferences_map_view_mode_entries"
-			android:entryValues="@array/preferences_map_view_mode_entry_values" android:key="mapViewMode"
+			android:summary="@string/preferences_map_view_mode_desc" android:entryValues="@array/preferences_map_view_mode_keys"
+			android:entries="@array/preferences_map_view_mode_values" android:key="mapViewMode"
 			android:defaultValue="@string/preferences_map_view_mode_default" />
+		<ListPreference android:title="@string/preferences_text_scale" android:summary="@string/preferences_text_scale_desc"
+			android:entryValues="@array/preferences_text_scale_keys" android:entries="@array/preferences_text_scale_values"
+			android:key="textScale" android:defaultValue="@string/preferences_text_scale_default" />
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/preferences_general">

@@ -588,16 +588,21 @@ public class AdvancedMapViewer extends MapActivity {
 		// Read the default shared preferences
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+		// set the map settings
 		this.mapView.setScaleBar(this.preferences.getBoolean("showScaleBar", false));
-
-		// set the operation mode for the MapView
 		if (this.preferences.contains("mapViewMode")) {
 			this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferences.getString(
 					"mapViewMode", MapView.getDefaultMapViewMode().name()));
 			this.mapView.setMapViewMode(this.mapViewMode);
 		}
+		try {
+			this.mapView.setTextScale(Float.parseFloat(this.preferences.getString("textScale",
+					"1")));
+		} catch (NumberFormatException e) {
+			this.mapView.setTextScale(1);
+		}
 
-		// check if the full screen mode should be activated
+		// set the general settings
 		if (this.preferences.getBoolean("fullscreen", false)) {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
@@ -605,14 +610,11 @@ public class AdvancedMapViewer extends MapActivity {
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		}
-
-		// check if the wake lock should be activated
 		if (this.preferences.getBoolean("wakeLock", false)) {
 			if (!this.wakeLock.isHeld()) {
 				this.wakeLock.acquire();
 			}
 		}
-
 		this.mapView.setMemoryCardCachePersistence(this.preferences.getBoolean(
 				"cachePersistence", false));
 		this.mapView.setMemoryCardCacheSize(Math.min(this.preferences.getInt("cacheSize",
@@ -620,6 +622,7 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setMoveSpeed(Math.min(this.preferences.getInt("moveSpeed",
 				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
 
+		// set the debug settings
 		this.mapView.setFpsCounter(this.preferences.getBoolean("showFpsCounter", false));
 		this.mapView.setTileFrames(this.preferences.getBoolean("showTileFrames", false));
 		this.mapView.setTileCoordinates(this.preferences.getBoolean("showTileCoordinates",

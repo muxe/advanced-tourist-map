@@ -1,10 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string-array name="preferences_map_view_mode_values">
+		<item>Canvas renderer</item>
+		<item>Mapnik (online)</item>
+		<item>Osmarender (online)</item>
+		<item>OpenCycleMap (online)</item>
+	</string-array>
+
+	<string-array name="preferences_text_scale_values">
+		<item>winzig</item>
+		<item>klein</item>
+		<item>normal</item>
+		<item>groß</item>
+		<item>riesig</item>
+	</string-array>
+
 	<string name="application_name">AdvancedMapViewer</string>
 	<string name="cancel">Abbrechen</string>
 	<string name="error">Fehler</string>
-	<string name="file_invalid">Die gewählte Datei ist ungültig. Bitte wählen Sie eine andere.
-	</string>
+	<string name="file_invalid">Die gewählte Datei ist ungültig. Bitte wählen Sie eine andere.</string>
 	<string name="file_select">Bitte wählen Sie eine Datei.</string>
 	<string name="follow_gps_disabled">GPS-Signal folgen wurde deaktiviert</string>
 	<string name="go_to_position">Gehe zu Position</string>
@@ -57,6 +71,8 @@
 	<string name="preferences_show_tile_frames_desc">Rahmen um Tiles malen</string>
 	<string name="preferences_show_water_tiles">Wasser-Kacheln</string>
 	<string name="preferences_show_water_tiles_desc">Kacheln mit gesetztem Wasser-Bit hervorheben</string>
+	<string name="preferences_text_scale">Schriftgröße</string>
+	<string name="preferences_text_scale_desc">Basisgröße für Karten-Beschriftungen auswählen</string>
 	<string name="preferences_wake_lock">Aktiv bleiben</string>
 	<string name="preferences_wake_lock_desc">Abschaltung des Bildschirms verhindern</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+	<string-array name="preferences_map_view_mode_values">
+		<item>Canvas renderer</item>
+		<item>Mapnik (online)</item>
+		<item>Osmarender (online)</item>
+		<item>OpenCycleMap (online)</item>
+	</string-array>
+
+	<string-array name="preferences_text_scale_values">
+		<item>tiny</item>
+		<item>small</item>
+		<item>normal</item>
+		<item>large</item>
+		<item>huge</item>
+	</string-array>
+
 	<string name="application_name">AdvancedMapViewer</string>
 	<string name="cancel">Cancel</string>
 	<string name="error">Error</string>
@@ -56,6 +71,8 @@
 	<string name="preferences_show_tile_frames_desc">Draw tile boundaries</string>
 	<string name="preferences_show_water_tiles">Water tiles</string>
 	<string name="preferences_show_water_tiles_desc">Highlight tiles which have the water flag set</string>
+	<string name="preferences_text_scale">Font size</string>
+	<string name="preferences_text_scale_desc">Select the text size of map labels</string>
 	<string name="preferences_wake_lock">Stay awake</string>
 	<string name="preferences_wake_lock_desc">Stop the screen from dimming</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
