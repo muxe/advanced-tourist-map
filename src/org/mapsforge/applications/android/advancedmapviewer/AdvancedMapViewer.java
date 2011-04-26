@@ -231,7 +231,7 @@ public class AdvancedMapViewer extends MapActivity {
 							SCREENSHOT_DIRECTORY);
 					// make sure the Pictures directory exists
 					if (!path.exists() && !path.mkdirs()) {
-						showToast("Could not create target directory");
+						showToastOnUiThread("Could not create target directory");
 						return;
 					}
 
