@@ -45,6 +45,8 @@
 	<string name="menu_screenshot">Screenshot</string>
 	<string name="menu_screenshot_jpeg">JPEG (verlustbehaftet)</string>
 	<string name="menu_screenshot_png">PNG (verlustlos)</string>
+	<string name="menu_addressfile">Addressdatei</string>
+	<string name="menu_search">Suchen</string>
 	<string name="ok">OK</string>
 	<string name="preferences_debug">Entwicklungs-Einstellungen</string>
 	<string name="preferences_general">Allgemeine Einstellungen</string>
@@ -78,4 +80,10 @@
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoomstufe</string>
+	
+	<!-- search intent -->
+	<string name="label_city">Gemeinde</string>
+	<string name="label_road">Straße</string>
+	<string name="button_search">suchen</string>
+	<string name="label_results">Ergebnisse:</string>
 </resources>
