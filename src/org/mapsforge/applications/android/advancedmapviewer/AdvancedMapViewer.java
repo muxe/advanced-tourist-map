@@ -14,9 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
-// Test file for addresses: http://page.mi.fu-berlin.de/sebkur/germany.database.sqlite
-
 package org.mapsforge.applications.android.advancedmapviewer;
 
 import java.io.File;
@@ -31,9 +28,9 @@ import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
 import org.mapsforge.android.maps.MapDatabase;
 import org.mapsforge.android.maps.MapView;
-import org.mapsforge.android.maps.MapView.TextField;
 import org.mapsforge.android.maps.MapViewMode;
 import org.mapsforge.android.maps.OverlayCircle;
+import org.mapsforge.android.maps.MapView.TextField;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -41,11 +38,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -56,15 +52,13 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -85,8 +79,6 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final String SCREENSHOT_FILE_NAME = "Map screenshot";
 	private static final int SCREENSHOT_QUALITY = 90;
 	private static final int SELECT_MAP_FILE = 0;
-	private static final int SELECT_ADDRESS_FILE = 1;
-	private static final int INTENT_SEARCH = 2;
 
 	/**
 	 * The default size of the memory card cache.
@@ -119,7 +111,6 @@ public class AdvancedMapViewer extends MapActivity {
 	private SharedPreferences preferences;
 	private Toast toast;
 	private WakeLock wakeLock;
-	private String fileAddressDatabase = null;
 	ImageView gpsView;
 	MapController mapController;
 	MapView mapView;
@@ -135,19 +126,6 @@ public class AdvancedMapViewer extends MapActivity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.options_menu, menu);
 		return true;
-	}
-
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		super.onKeyDown(keyCode, event);
-		if (keyCode == KeyEvent.KEYCODE_BACK) {
-			finish();
-			return true;
-		} else if (keyCode == KeyEvent.KEYCODE_SEARCH) {
-			startSearch();
-			return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -202,14 +180,6 @@ public class AdvancedMapViewer extends MapActivity {
 
 			case R.id.menu_mapfile:
 				startFileBrowser();
-				return true;
-
-			case R.id.menu_addressfile:
-				startFileBrowserForAddressDatabase();
-				return true;
-
-			case R.id.menu_search:
-				startSearch();
 				return true;
 
 			default:
@@ -321,8 +291,8 @@ public class AdvancedMapViewer extends MapActivity {
 				GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
 				AdvancedMapViewer.this.mapController.setCenter(point);
 				AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
-				AdvancedMapViewer.this.overlayCircle.setCircleData(point,
-						location.getAccuracy());
+				AdvancedMapViewer.this.overlayCircle.setCircleData(point, location
+						.getAccuracy());
 			}
 
 			@Override
@@ -364,7 +334,7 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	/**
-	 * Sets all file filters and starts the FilePicker for a map file.
+	 * Sets all file filters and starts the FilePicker.
 	 */
 	private void startFileBrowser() {
 		// set the FileDisplayFilter
@@ -398,39 +368,6 @@ public class AdvancedMapViewer extends MapActivity {
 		startActivityForResult(new Intent(this, FilePicker.class), SELECT_MAP_FILE);
 	}
 
-	/**
-	 * Sets all file filters and starts the FilePicker for a address database file.
-	 */
-	private void startFileBrowserForAddressDatabase() {
-		// set the FileDisplayFilter
-		FilePicker.setFileDisplayFilter(new FileFilter() {
-			@Override
-			public boolean accept(File file) {
-				// accept only readable files
-				if (file.canRead()) {
-					if (file.isFile() && file.getName().endsWith(".sqlite")) {
-						// accept all files with a ".map" extension
-						return true;
-					}
-				}
-				return false;
-			}
-		});
-
-		// set the FileSelectFilter
-		FilePicker.setFileSelectFilter(new FileFilter() {
-			@Override
-			public boolean accept(File file) {
-				// accept only valid database files.
-				// TODO: implement a test for this. how ???
-				return true;
-			}
-		});
-
-		// start the FilePicker
-		startActivityForResult(new Intent(this, FilePicker.class), SELECT_ADDRESS_FILE);
-	}
-
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == SELECT_MAP_FILE) {
@@ -444,34 +381,7 @@ public class AdvancedMapViewer extends MapActivity {
 					&& !this.mapView.hasValidMapFile()) {
 				finish();
 			}
-		} else if (requestCode == SELECT_ADDRESS_FILE) {
-			if (resultCode == RESULT_OK) {
-				if (data != null && data.getStringExtra("selectedFile") != null) {
-					String file = data.getStringExtra("selectedFile");
-					this.fileAddressDatabase = file;
-
-					Editor prefs = getSharedPreferences(Search.PREFERENCES_FILE, MODE_PRIVATE)
-							.edit();
-					if (this.fileAddressDatabase != null) {
-						prefs.putString("addressFile", this.fileAddressDatabase);
-						Log.i("geocoding", "storing " + this.fileAddressDatabase);
-					}
-					prefs.commit();
-				}
-			}
-		} else if (requestCode == INTENT_SEARCH) {
-			if (resultCode == RESULT_OK) {
-				// TODO: use getSerializableExtra (GeoPosition not serializable)
-				if (data != null && data.hasExtra("lon") && data.hasExtra("lat")) {
-					double lon = data.getDoubleExtra("lon", 0.0);
-					double lat = data.getDoubleExtra("lat", 0.0);
-					GeoPoint point = new GeoPoint(lat, lon);
-					this.mapView.getController().setCenter(point);
-					this.mapView.getController().setZoom(16);
-				}
-			}
 		}
-
 	}
 
 	@Override
@@ -707,13 +617,10 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 		this.mapView.setMemoryCardCachePersistence(this.preferences.getBoolean(
 				"cachePersistence", false));
-		this.mapView.setMemoryCardCacheSize(Math.min(
-				this.preferences.getInt("cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT),
-				MEMORY_CARD_CACHE_SIZE_MAX));
-		this.mapView
-				.setMoveSpeed(Math.min(
-						this.preferences.getInt("moveSpeed", MOVE_SPEED_DEFAULT),
-						MOVE_SPEED_MAX) / 10f);
+		this.mapView.setMemoryCardCacheSize(Math.min(this.preferences.getInt("cacheSize",
+				MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
+		this.mapView.setMoveSpeed(Math.min(this.preferences.getInt("moveSpeed",
+				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
 
 		// set the debug settings
 		this.mapView.setFpsCounter(this.preferences.getBoolean("showFpsCounter", false));
@@ -726,14 +633,6 @@ public class AdvancedMapViewer extends MapActivity {
 		if (!this.mapView.getMapViewMode().requiresInternetConnection()
 				&& !this.mapView.hasValidMapFile()) {
 			startFileBrowser();
-		}
-
-		SharedPreferences prefs = getSharedPreferences(Search.PREFERENCES_FILE, MODE_PRIVATE);
-		if (prefs.contains("addressFile")) {
-			this.fileAddressDatabase = prefs.getString("addressFile", null);
-			Log.i("geocoding", "loaded " + this.fileAddressDatabase);
-		} else {
-			Log.i("geocoding", "loaded nothing");
 		}
 	}
 
@@ -783,16 +682,4 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 		this.toast.show();
 	}
-
-	/**
-	 * Show the search activity.
-	 */
-	private void startSearch() {
-		if (this.fileAddressDatabase == null) {
-			showToast("no address database selected");
-		} else {
-			startActivityForResult(new Intent(this, Search.class), INTENT_SEARCH);
-		}
-	}
-
 }

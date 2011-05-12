@@ -11,8 +11,7 @@
 		<activity android:name=".EditPreferences" />
 		<activity android:name=".FilePicker" />
 		<activity android:name=".InfoView" android:theme="@android:style/Theme.NoTitleBar" />
-		<activity android:name="Search"></activity>
-</application>
+	</application>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />

@@ -18,8 +18,7 @@
 	<string name="application_name">AdvancedMapViewer</string>
 	<string name="cancel">Cancel</string>
 	<string name="error">Error</string>
-	<string name="file_invalid">The selected file is invalid. Please select another
-		one.</string>
+	<string name="file_invalid">The selected file is invalid. Please select another one.</string>
 	<string name="file_select">Please select a file.</string>
 	<string name="follow_gps_disabled">Follow GPS signal has been disabled</string>
 	<string name="go_to_position">Go to position</string>
@@ -46,8 +45,6 @@
 	<string name="menu_screenshot">Screenshot</string>
 	<string name="menu_screenshot_jpeg">JPEG (lossy)</string>
 	<string name="menu_screenshot_png">PNG (lossless)</string>
-	<string name="menu_addressfile">Address file</string>
-	<string name="menu_search">Search</string>
 	<string name="ok">OK</string>
 	<string name="preferences_debug">Debug settings</string>
 	<string name="preferences_general">General settings</string>
@@ -73,8 +70,7 @@
 	<string name="preferences_show_tile_frames">Tile boundaries</string>
 	<string name="preferences_show_tile_frames_desc">Draw tile boundaries</string>
 	<string name="preferences_show_water_tiles">Water tiles</string>
-	<string name="preferences_show_water_tiles_desc">Highlight tiles which have the water flag set
-	</string>
+	<string name="preferences_show_water_tiles_desc">Highlight tiles which have the water flag set</string>
 	<string name="preferences_text_scale">Font size</string>
 	<string name="preferences_text_scale_desc">Select the text size of map labels</string>
 	<string name="preferences_wake_lock">Stay awake</string>
@@ -82,12 +78,4 @@
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoom level</string>
-
-	<!-- search intent -->
-	<string name="label_city">city</string>
-	<string name="label_road">road</string>
-	<string name="default_city"></string>
-	<string name="default_road"></string>
-	<string name="button_search">search</string>
-	<string name="label_results">Results:</string>
 </resources>
