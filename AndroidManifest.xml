@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.mapsforge.applications.android.advancedmapviewer"
-	android:versionCode="4" android:versionName="0.2.2" android:installLocation="auto">
+	android:versionCode="5" android:versionName="0.2.3" android:installLocation="auto">
 	<application android:label="@string/application_name" android:icon="@drawable/globe">
 		<activity android:name=".AdvancedMapViewer" android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
