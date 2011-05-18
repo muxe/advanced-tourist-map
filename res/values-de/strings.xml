@@ -2,80 +2,80 @@
 <resources>
 	<string-array name="preferences_map_view_mode_values">
 		<item>Canvas renderer</item>
-		<item>Mapnik (in linea)</item>
-		<item>Osmarender (in linea)</item>
-		<item>OpenCycleMap (in linea)</item>
+		<item>Mapnik (online)</item>
+		<item>Osmarender (online)</item>
+		<item>OpenCycleMap (online)</item>
 	</string-array>
 
 	<string-array name="preferences_text_scale_values">
-		<item>minuscola</item>
-		<item>piccola</item>
-		<item>normale</item>
-		<item>grande</item>
-		<item>enorme</item>
+		<item>winzig</item>
+		<item>klein</item>
+		<item>normal</item>
+		<item>groß</item>
+		<item>riesig</item>
 	</string-array>
 
 	<string name="application_name">AdvancedMapViewer</string>
-	<string name="cancel">Annulla</string>
-	<string name="error">Errore</string>
-	<string name="file_invalid">Il file selezionato non è valido. Si prega di scegliene un altro.</string>
-	<string name="file_select">Si prega di selezionare un file.</string>
-	<string name="follow_gps_disabled">Seguire segnale GPS è disattivato</string>
-	<string name="go_to_position">Vai alla posizione</string>
-	<string name="gps_disabled">Il ricevitore GPS è disattivato</string>
-	<string name="info_map_file_area">Area</string>
-	<string name="info_map_file_comment">Commento</string>
-	<string name="info_map_file_date">Data</string>
-	<string name="info_map_file_debug">Informazioni di debug</string>
-	<string name="info_map_file_debug_no">non incluso</string>
-	<string name="info_map_file_debug_yes">incluso</string>
-	<string name="info_map_file_name">File</string>
-	<string name="info_map_file_start">Punto di partenza</string>
-	<string name="latitude">Grado di latitudine</string>
-	<string name="longitude">Meridiano</string>
+	<string name="cancel">Abbrechen</string>
+	<string name="error">Fehler</string>
+	<string name="file_invalid">Die gewählte Datei ist ungültig. Bitte wählen Sie eine andere.</string>
+	<string name="file_select">Bitte wählen Sie eine Datei.</string>
+	<string name="follow_gps_disabled">GPS-Signal folgen wurde deaktiviert</string>
+	<string name="go_to_position">Gehe zu Position</string>
+	<string name="gps_disabled">Der GPS-Empfänger ist deaktiviert</string>
+	<string name="info_map_file_area">Fläche</string>
+	<string name="info_map_file_comment">Kommentar</string>
+	<string name="info_map_file_date">Datum</string>
+	<string name="info_map_file_debug">Debug-Informationen</string>
+	<string name="info_map_file_debug_no">nicht enthalten</string>
+	<string name="info_map_file_debug_yes">enthalten</string>
+	<string name="info_map_file_name">Datei</string>
+	<string name="info_map_file_start">Startposition</string>
+	<string name="latitude">Breitengrad</string>
+	<string name="longitude">Längengrad</string>
 	<string name="menu_info">Info</string>
-	<string name="menu_info_map_file">Informazioni sul file mappa</string>
-	<string name="menu_info_about">A proposito di questo software</string>
-	<string name="menu_mapfile">Mappa</string>
-	<string name="menu_position">Posizione</string>
-	<string name="menu_position_enter_coordinates">Inserisci le coordinate</string>
-	<string name="menu_position_gps_follow">Segui segnale GPS</string>
-	<string name="menu_position_map_file_center">Centro della mappa</string>
-	<string name="menu_preferences">Impostazioni</string>
+	<string name="menu_info_map_file">Kartendatei-Info</string>
+	<string name="menu_info_about">Über diese Software</string>
+	<string name="menu_mapfile">Kartendatei</string>
+	<string name="menu_position">Position</string>
+	<string name="menu_position_enter_coordinates">Koordinaten eingeben</string>
+	<string name="menu_position_gps_follow">GPS-Signal folgen</string>
+	<string name="menu_position_map_file_center">Zentrum der Kartendatei</string>
+	<string name="menu_preferences">Einstellungen</string>
 	<string name="menu_screenshot">Screenshot</string>
-	<string name="menu_screenshot_jpeg">JPEG (con perdita di dati)</string>
-	<string name="menu_screenshot_png">PNG (senza perdita di dati)</string>
+	<string name="menu_screenshot_jpeg">JPEG (verlustbehaftet)</string>
+	<string name="menu_screenshot_png">PNG (verlustlos)</string>
 	<string name="ok">OK</string>
-	<string name="preferences_debug">Impostazioni sviluppo</string>
-	<string name="preferences_general">Impostazioni generali</string>
-	<string name="preferences_cache_persistence">Persistenza cache</string>
-	<string name="preferences_cache_persistence_desc">Mantenere il cache in uscita</string>
-	<string name="preferences_cache_size">Memoria esterna</string>
-	<string name="preferences_cache_size_desc">Impostare la dimensione della cache</string>
+	<string name="preferences_debug">Entwicklungs-Einstellungen</string>
+	<string name="preferences_general">Allgemeine Einstellungen</string>
+	<string name="preferences_cache_persistence">Cache-Persistenz</string>
+	<string name="preferences_cache_persistence_desc">Zwischenspeicher beim Beenden beibehalten</string>
+	<string name="preferences_cache_size">Externer Speicher</string>
+	<string name="preferences_cache_size_desc">Größe des Caches anpassen</string>
 	<string name="preferences_cache_size_value">%.1f MB</string>
-	<string name="preferences_fullscreen">A schermo intero</string>
-	<string name="preferences_fullscreen_desc">Nascondere la barra di stato</string>
-	<string name="preferences_map">Impostazioni mappa</string>
-	<string name="preferences_map_view_mode">Modalitá della mappa</string>
-	<string name="preferences_map_view_mode_desc">Selezionare la modalità della mappa</string>
-	<string name="preferences_move_speed">Velocità di scorrimento</string>
-	<string name="preferences_move_speed_desc">Impostare velocità di scorrimento della mappa</string>
-	<string name="preferences_move_speed_value">%d %% velocità di scorrimento</string>
-	<string name="preferences_show_fps_counter">Frame rate</string>
-	<string name="preferences_show_fps_counter_desc">Visualizzare contatore di frame rate</string>
-	<string name="preferences_show_scale_bar">Scala della mappa</string>
-	<string name="preferences_show_scale_bar_desc">Visualizzare barra della scala della mappa</string>
-	<string name="preferences_show_tile_coordinates">Coordinate del Tile</string>
-	<string name="preferences_show_tile_coordinates_desc">Dipingere le coordinate sul Tile</string>
-	<string name="preferences_show_tile_frames">Bordare del Tile</string>
-	<string name="preferences_show_tile_frames_desc">Dipingere bordare attorno Tile</string>
-	<string name="preferences_show_water_tiles">Tiles di acqua</string>
-	<string name="preferences_show_water_tiles_desc">Accentare i Tiles con acqua-bit</string>
-	<string name="preferences_text_scale">Grandezza del carattere</string>
-	<string name="preferences_text_scale_desc">Scegli la grandezza standard per le diciture della mappa</string>
-	<string name="preferences_wake_lock">Rimanere attivo</string>
-	<string name="preferences_wake_lock_desc">Impedisce la chiusura dello schermo</string>
+	<string name="preferences_fullscreen">Vollbildmodus</string>
+	<string name="preferences_fullscreen_desc">Verberge die Statusleiste</string>
+	<string name="preferences_map">Karteneinstellungen</string>
+	<string name="preferences_map_view_mode">Karten-Modus</string>
+	<string name="preferences_map_view_mode_desc">Arbeitsmodus der Karte auswählen</string>
+	<string name="preferences_move_speed">Scrollgeschwindigkeit</string>
+	<string name="preferences_move_speed_desc">Scrollgeschwindigkeit der Karte anpassen</string>
+	<string name="preferences_move_speed_value">%d %% Scrollgeschwindigkeit</string>
+	<string name="preferences_show_fps_counter">Bildfrequenz</string>
+	<string name="preferences_show_fps_counter_desc">FPS-Zähler anzeigen</string>
+	<string name="preferences_show_scale_bar">Kartenmaßstab</string>
+	<string name="preferences_show_scale_bar_desc">Maßstabsbalken der Karte anzeigen</string>
+	<string name="preferences_show_tile_coordinates">Tile-Koordinaten</string>
+	<string name="preferences_show_tile_coordinates_desc">Koordinaten auf Kacheln malen</string>
+	<string name="preferences_show_tile_frames">Tile-Umrandungen</string>
+	<string name="preferences_show_tile_frames_desc">Rahmen um Tiles malen</string>
+	<string name="preferences_show_water_tiles">Wasser-Kacheln</string>
+	<string name="preferences_show_water_tiles_desc">Kacheln mit gesetztem Wasser-Bit hervorheben</string>
+	<string name="preferences_text_scale">Schriftgröße</string>
+	<string name="preferences_text_scale_desc">Basisgröße für Karten-Beschriftungen auswählen</string>
+	<string name="preferences_wake_lock">Aktiv bleiben</string>
+	<string name="preferences_wake_lock_desc">Abschaltung des Bildschirms verhindern</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
-	<string name="zoomlevel">Livello di zoom</string>
+	<string name="zoomlevel">Zoomstufe</string>
 </resources>
