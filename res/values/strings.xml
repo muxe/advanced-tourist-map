@@ -78,4 +78,6 @@
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoom level</string>
+	
+	<string name="branch_test">Im testing my branch</string>
 </resources>
