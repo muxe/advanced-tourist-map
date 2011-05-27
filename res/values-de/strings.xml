@@ -20,7 +20,7 @@
 	<string name="error">Fehler</string>
 	<string name="file_invalid">Die gewählte Datei ist ungültig. Bitte wählen Sie eine andere.</string>
 	<string name="file_select">Bitte wählen Sie eine Datei.</string>
-	<string name="follow_gps_disabled">GPS-Signal folgen wurde deaktiviert</string>
+	<string name="follow_gps_disabled">Ortung wurde deaktiviert</string>
 	<string name="go_to_position">Gehe zu Position</string>
 	<string name="gps_disabled">Der GPS-Empfänger ist deaktiviert</string>
 	<string name="info_map_file_area">Fläche</string>
@@ -39,7 +39,8 @@
 	<string name="menu_mapfile">Kartendatei</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Koordinaten eingeben</string>
-	<string name="menu_position_gps_follow">GPS-Signal folgen</string>
+	<string name="menu_position_gps_enable">Ortung aktivieren</string>
+	<string name="menu_position_gps_disable">Ortung deaktivieren</string>
 	<string name="menu_position_map_file_center">Zentrum der Kartendatei</string>
 	<string name="menu_preferences">Einstellungen</string>
 	<string name="menu_screenshot">Screenshot</string>

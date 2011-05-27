@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.mapsforge.applications.android.advancedmapviewer"
 	android:versionCode="5" android:versionName="0.2.3" android:installLocation="auto">
-	<application android:label="@string/application_name" android:icon="@drawable/globe">
+	<application android:label="@string/application_name" android:icon="@drawable/globe" android:name=".AdvancedMapViewerApplication">
 		<activity android:name=".AdvancedMapViewer" android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -11,6 +11,9 @@
 		<activity android:name=".EditPreferences" />
 		<activity android:name=".FilePicker" />
 		<activity android:name=".InfoView" android:theme="@android:style/Theme.NoTitleBar" />
+		<activity android:name=".PositionInfo" />
+		<activity android:name=".RouteCalculator" />
+		<activity android:name=".Search" />
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" />

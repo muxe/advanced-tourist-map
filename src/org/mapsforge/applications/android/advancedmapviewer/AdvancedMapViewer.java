@@ -26,9 +26,11 @@ import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
 import org.mapsforge.android.maps.MapDatabase;
 import org.mapsforge.android.maps.MapView;
-import org.mapsforge.android.maps.MapViewMode;
-import org.mapsforge.android.maps.OverlayCircle;
 import org.mapsforge.android.maps.MapView.TextField;
+import org.mapsforge.android.maps.MapViewMode;
+import org.mapsforge.android.maps.Overlay;
+import org.mapsforge.android.maps.OverlayCircle;
+import org.mapsforge.android.maps.Projection;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -36,10 +38,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.Rect;
-import android.graphics.Bitmap.CompressFormat;
 import android.graphics.drawable.AnimationDrawable;
 import android.location.Location;
 import android.location.LocationListener;
@@ -50,13 +54,14 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SeekBar;
@@ -98,10 +103,12 @@ public class AdvancedMapViewer extends MapActivity {
 	 */
 	static final int MOVE_SPEED_MAX = 30;
 
-	private ArrayCircleOverlay circleOverlay;
+	ArrayCircleOverlay circleOverlay;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
 	private boolean followGpsEnabled;
+	boolean centerGpsEnabled;
+	GeoPoint lastPosition;
 	private LocationListener locationListener;
 	private LocationManager locationManager;
 	private MapViewMode mapViewMode;
@@ -110,13 +117,19 @@ public class AdvancedMapViewer extends MapActivity {
 	private Toast toast;
 	private WakeLock wakeLock;
 	ImageView gpsView;
+	ImageView centerView;
 	MapController mapController;
 	MapView mapView;
 	OverlayCircle overlayCircle;
 
+	private GestureDetector mGestureDetector;
+
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
-		// insert code here to handle touch events on the screen
+		// disable auto following position on scrolling the map
+		if (this.followGpsEnabled && this.centerGpsEnabled) {
+			this.mGestureDetector.onTouchEvent(ev);
+		}
 		return super.dispatchTouchEvent(ev);
 	}
 
@@ -143,11 +156,18 @@ public class AdvancedMapViewer extends MapActivity {
 			case R.id.menu_position:
 				return true;
 
-			case R.id.menu_position_gps_follow:
-				if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-					enableFollowGPS();
+			case R.id.menu_position_gps_toggle:
+				if (this.followGpsEnabled) {
+					disableFollowGPS(true);
 				} else {
-					showDialog(DIALOG_GPS_DISABLED);
+					if (this.locationManager
+							.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+							|| this.locationManager
+									.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+						enableFollowGPS();
+					} else {
+						showDialog(DIALOG_GPS_DISABLED);
+					}
 				}
 				return true;
 
@@ -193,10 +213,13 @@ public class AdvancedMapViewer extends MapActivity {
 			menu.findItem(R.id.menu_info_map_file).setEnabled(true);
 		}
 
-		if (this.locationManager == null || this.followGpsEnabled) {
-			menu.findItem(R.id.menu_position_gps_follow).setEnabled(false);
+		MenuItem toggleGps = menu.findItem(R.id.menu_position_gps_toggle);
+		if (this.locationManager == null) {
+			toggleGps.setEnabled(false);
+		} else if (this.followGpsEnabled) {
+			toggleGps.setTitle(R.string.menu_position_gps_disable);
 		} else {
-			menu.findItem(R.id.menu_position_gps_follow).setEnabled(true);
+			toggleGps.setTitle(R.string.menu_position_gps_enable);
 		}
 
 		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
@@ -283,14 +306,20 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.getOverlays().add(this.circleOverlay);
 
 		this.followGpsEnabled = true;
+		this.centerGpsEnabled = true;
 		this.locationListener = new LocationListener() {
 			@Override
 			public void onLocationChanged(Location location) {
 				GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
-				AdvancedMapViewer.this.mapController.setCenter(point);
+				AdvancedMapViewer.this.lastPosition = point;
+				if (AdvancedMapViewer.this.centerGpsEnabled) {
+					AdvancedMapViewer.this.mapController.setCenter(point);
+				} else {
+					AdvancedMapViewer.this.circleOverlay.requestRedraw();
+				}
 				AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
-				AdvancedMapViewer.this.overlayCircle.setCircleData(point, location
-						.getAccuracy());
+				AdvancedMapViewer.this.overlayCircle.setCircleData(point,
+						location.getAccuracy());
 			}
 
 			@Override
@@ -319,14 +348,36 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 		};
 
-		this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0,
-				this.locationListener);
+		if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0,
+					this.locationListener);
+		} else {
+			this.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,
+					0, this.locationListener);
+			showToast("Enable GPS for blaa");
+		}
 		this.gpsView.setImageResource(R.drawable.stat_sys_gps_acquiring);
 		this.gpsView.setVisibility(View.VISIBLE);
 		this.gpsView.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				disableFollowGPS(true);
+			}
+		});
+
+		// the icon to center the view to position
+		this.centerView.setImageResource(android.R.drawable.ic_secure);
+		this.centerView.setVisibility(View.VISIBLE);
+		this.centerView.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AdvancedMapViewer.this.centerGpsEnabled = true;
+				AdvancedMapViewer.this.centerView
+						.setImageResource(android.R.drawable.ic_secure);
+				if (AdvancedMapViewer.this.lastPosition != null) {
+					AdvancedMapViewer.this.mapController
+							.setCenter(AdvancedMapViewer.this.lastPosition);
+				}
 			}
 		});
 	}
@@ -390,6 +441,7 @@ public class AdvancedMapViewer extends MapActivity {
 		setContentView(R.layout.activity_advanced_map_viewer);
 		this.mapView = (MapView) findViewById(R.id.mapView);
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
+		this.centerView = (ImageView) findViewById(R.id.centerView);
 
 		configureMapView();
 
@@ -416,6 +468,52 @@ public class AdvancedMapViewer extends MapActivity {
 			} else {
 				showDialog(DIALOG_GPS_DISABLED);
 			}
+		}
+
+		this.mGestureDetector = new GestureDetector(this, new ScrollListener());
+
+		this.mapView.getOverlays().add(new Overlay() {
+
+			@Override
+			protected void drawOverlayBitmap(Canvas canvas, Point drawPosition,
+					Projection projection, byte drawZoomLevel) {
+
+			}
+
+			@Override
+			public boolean onTap(GeoPoint geoPoint, MapView mv) {
+				// Log.d("long", geoPoint.getLatitude() + " " + geoPoint.getLongitude());
+				startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class).putExtra(
+						"LATITUDE", geoPoint.getLatitude()).putExtra("LONGITUDE",
+						geoPoint.getLongitude()));
+				// return super.onTap(geoPoint, mv);
+				return true;
+			}
+
+		});
+
+		// try {
+		// this.router = new HHRouter(new File(ROUTING_BINARY_FILE),
+		// ROUTING_MAIN_MEMORY_CACHE_SIZE);
+		// } catch (IOException e) {
+		// e.printStackTrace();
+		// }
+
+	}
+
+	class ScrollListener extends GestureDetector.SimpleOnGestureListener {
+
+		@Override
+		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+			double delta = Math.sqrt(Math.pow((e1.getX() - e2.getX()), 2)
+					+ Math.pow((e1.getY() - e2.getY()), 2));
+			// only disable, if scrolled for a certain distance
+			if (delta > 50) {
+				AdvancedMapViewer.this.centerGpsEnabled = false;
+				AdvancedMapViewer.this.centerView
+						.setImageResource(android.R.drawable.ic_lock_idle_lock);
+			}
+			return true;
 		}
 	}
 
@@ -615,10 +713,13 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 		this.mapView.setMemoryCardCachePersistence(this.preferences.getBoolean(
 				"cachePersistence", false));
-		this.mapView.setMemoryCardCacheSize(Math.min(this.preferences.getInt("cacheSize",
-				MEMORY_CARD_CACHE_SIZE_DEFAULT), MEMORY_CARD_CACHE_SIZE_MAX));
-		this.mapView.setMoveSpeed(Math.min(this.preferences.getInt("moveSpeed",
-				MOVE_SPEED_DEFAULT), MOVE_SPEED_MAX) / 10f);
+		this.mapView.setMemoryCardCacheSize(Math.min(
+				this.preferences.getInt("cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT),
+				MEMORY_CARD_CACHE_SIZE_MAX));
+		this.mapView
+				.setMoveSpeed(Math.min(
+						this.preferences.getInt("moveSpeed", MOVE_SPEED_DEFAULT),
+						MOVE_SPEED_MAX) / 10f);
 
 		// set the debug settings
 		this.mapView.setFpsCounter(this.preferences.getBoolean("showFpsCounter", false));
@@ -656,7 +757,9 @@ public class AdvancedMapViewer extends MapActivity {
 				this.locationManager.removeUpdates(this.locationListener);
 				this.locationListener = null;
 			}
+			this.lastPosition = null;
 			this.gpsView.setVisibility(View.GONE);
+			this.centerView.setVisibility(View.GONE);
 			if (showToastMessage) {
 				showToast(getString(R.string.follow_gps_disabled));
 			}

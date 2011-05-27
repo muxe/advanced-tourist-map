@@ -20,7 +20,7 @@
 	<string name="error">Error</string>
 	<string name="file_invalid">The selected file is invalid. Please select another one.</string>
 	<string name="file_select">Please select a file.</string>
-	<string name="follow_gps_disabled">Follow GPS signal has been disabled</string>
+	<string name="follow_gps_disabled">Following your Position has been disabled</string>
 	<string name="go_to_position">Go to position</string>
 	<string name="gps_disabled">The GPS receiver is disabled</string>
 	<string name="info_map_file_area">Area</string>
@@ -39,7 +39,8 @@
 	<string name="menu_mapfile">Map file</string>
 	<string name="menu_position">Position</string>
 	<string name="menu_position_enter_coordinates">Enter coordinates</string>
-	<string name="menu_position_gps_follow">Follow GPS signal</string>
+	<string name="menu_position_gps_enable">Find and Follow your Position</string>
+	<string name="menu_position_gps_disable">Stop following your Position</string>
 	<string name="menu_position_map_file_center">Map file center</string>
 	<string name="menu_preferences">Preferences</string>
 	<string name="menu_screenshot">Screenshot</string>
@@ -78,6 +79,16 @@
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoom level</string>
+	<string name="calculate_route">Calculate route</string>
+	<string name="find_pois">Find nearby POIs</string>
+	<string name="show_on_map">Show on map</string>
+	<string name="select_installed_routingfile">Select a routing file</string>
 	
-	<string name="branch_test">Im testing my branch</string>
+		<!-- search intent -->
+	<string name="label_city">city</string>
+	<string name="label_road">road</string>
+	<string name="default_city"></string>
+	<string name="default_road"></string>
+	<string name="button_search">search</string>
+	<string name="label_results">Results:</string>
 </resources>

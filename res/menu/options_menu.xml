@@ -9,7 +9,7 @@
 	<item android:id="@+id/menu_position" android:title="@string/menu_position"
 		android:icon="@drawable/ic_menu_mylocation">
 		<menu>
-			<item android:id="@+id/menu_position_gps_follow" android:title="@string/menu_position_gps_follow" />
+			<item android:id="@+id/menu_position_gps_toggle" android:title="@string/menu_position_gps_enable" />
 			<item android:id="@+id/menu_position_enter_coordinates" android:title="@string/menu_position_enter_coordinates" />
 			<item android:id="@+id/menu_position_map_center" android:title="@string/menu_position_map_file_center" />
 		</menu>
