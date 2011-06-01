@@ -91,4 +91,7 @@
 	<string name="default_road"></string>
 	<string name="button_search">search</string>
 	<string name="label_results">Results:</string>
+	
+	<string name="context_delete">Delete</string>
+	<string name="context_modify">Modify</string>
 </resources>

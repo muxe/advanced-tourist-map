@@ -12,7 +12,8 @@
 		<activity android:name=".FilePicker" />
 		<activity android:name=".InfoView" android:theme="@android:style/Theme.NoTitleBar" />
 		<activity android:name=".PositionInfo" />
-		<activity android:name=".RouteCalculator" />
+		<activity android:name=".routing.RouteCalculator" />
+		<activity android:name=".routing.RoutingFileSettings" />
 		<activity android:name=".Search" />
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

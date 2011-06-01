@@ -5,7 +5,7 @@ import android.os.Bundle;
 
 public class BaseActivity extends Activity {
 
-	AdvancedMapViewerApplication advancedMapViewer;
+	protected AdvancedMapViewerApplication advancedMapViewer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

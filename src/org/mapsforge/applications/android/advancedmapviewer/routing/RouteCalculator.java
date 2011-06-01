@@ -1,28 +1,39 @@
-package org.mapsforge.applications.android.advancedmapviewer;
+package org.mapsforge.applications.android.advancedmapviewer.routing;
 
 import org.mapsforge.android.maps.GeoPoint;
+import org.mapsforge.applications.android.advancedmapviewer.BaseActivity;
+import org.mapsforge.applications.android.advancedmapviewer.R;
+import org.mapsforge.applications.android.advancedmapviewer.Search;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 public class RouteCalculator extends BaseActivity {
 	private static final String TAG = RouteCalculator.class.getSimpleName();
 
 	protected static final int INTENT_SEARCH = 0;
 
-	private GeoPoint startPoint;
-	private GeoPoint destPoint;
+	GeoPoint startPoint;
+	GeoPoint destPoint;
 
 	private Button chooseStartButton;
 	private Button chooseDestButton;
+	private Button calcRouteButton;
+	private Button tempManageRoutesButton;
 
 	private EditText startEditText;
 	private EditText destEditText;
 	int viewToSet;
+
+	private Spinner routingFileSpinner;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +51,10 @@ public class RouteCalculator extends BaseActivity {
 
 		this.chooseStartButton = (Button) findViewById(R.id.calculate_route_button_choose_start);
 		this.chooseDestButton = (Button) findViewById(R.id.calculate_route_button_choose_dest);
+		this.calcRouteButton = (Button) findViewById(R.id.calculate_route_button_calculate);
+		this.tempManageRoutesButton = (Button) findViewById(R.id.calculate_route_manage_button);
+
+		this.routingFileSpinner = (Spinner) findViewById(R.id.calculate_route_spinner_routing_file);
 
 		OnClickListener startDestChooserListener = new OnClickListener() {
 			@Override
@@ -52,6 +67,33 @@ public class RouteCalculator extends BaseActivity {
 
 		this.chooseStartButton.setOnClickListener(startDestChooserListener);
 		this.chooseDestButton.setOnClickListener(startDestChooserListener);
+
+		this.calcRouteButton.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO: if no routing file selected?
+				Log.d(TAG, ((RoutingFile) RouteCalculator.this.routingFileSpinner
+						.getSelectedItem()).path);
+				if (RouteCalculator.this.startPoint == null) {
+					Toast.makeText(RouteCalculator.this, "No Start selected", Toast.LENGTH_LONG)
+							.show();
+					return;
+				}
+				if (RouteCalculator.this.destPoint == null) {
+					Toast.makeText(RouteCalculator.this, "No Destination selected",
+							Toast.LENGTH_LONG).show();
+					return;
+				}
+			}
+		});
+
+		this.tempManageRoutesButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getApplicationContext(), RoutingFileSettings.class));
+			}
+		});
 	}
 
 	@Override
@@ -84,6 +126,12 @@ public class RouteCalculator extends BaseActivity {
 			this.destEditText.setText(this.destPoint.getLatitude() + " "
 					+ this.destPoint.getLongitude());
 		}
-	}
 
+		RoutingFile[] routingFiles = this.advancedMapViewer.getRoutingFiles();
+
+		ArrayAdapter<RoutingFile> adapter = new ArrayAdapter<RoutingFile>(this,
+				android.R.layout.simple_spinner_item, routingFiles);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		this.routingFileSpinner.setAdapter(adapter);
+	}
 }

@@ -492,13 +492,51 @@ public class AdvancedMapViewer extends MapActivity {
 
 		});
 
-		// try {
-		// this.router = new HHRouter(new File(ROUTING_BINARY_FILE),
-		// ROUTING_MAIN_MEMORY_CACHE_SIZE);
-		// } catch (IOException e) {
-		// e.printStackTrace();
-		// }
+		/*
+		 * POI STUFF EXPERIMENTAL
+		 */
 
+		// Log.d("Restaurant", "achtung jetzt:");
+		// IPersistenceManager perstManager = PersistenceManagerFactory
+		// .getPerstPersistenceManager("/sdcard/perstPoi.dbs");
+		// PoiCategory restCat = new CategoryBuilder("Restaurant").build();
+		// long id = 1337;
+		// PointOfInterest poi = new PoiBuilder(id, 52.455667, 13.298357, "My Test", "",
+		// restCat)
+		// .build();
+		// perstManager.insertPointOfInterest(poi);
+		// TODO: isnt permanent
+		// LinkedList<PointOfInterest> restaurants = new LinkedList<PointOfInterest>(
+		// perstManager.findNearPosition(new GeoCoordinate(52.4561009222, 13.297641277),
+		// 1000, "Restaurant", 50));
+		// perstManager.close();
+		//
+		// // create the default paint objects for overlay circles
+		// Paint circleDefaultPaintFill = new Paint(Paint.ANTI_ALIAS_FLAG);
+		// circleDefaultPaintFill.setStyle(Paint.Style.FILL);
+		// circleDefaultPaintFill.setColor(Color.BLUE);
+		// circleDefaultPaintFill.setAlpha(64);
+		//
+		// Paint circleDefaultPaintOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
+		// circleDefaultPaintOutline.setStyle(Paint.Style.STROKE);
+		// circleDefaultPaintOutline.setColor(Color.BLUE);
+		// circleDefaultPaintOutline.setAlpha(128);
+		// circleDefaultPaintOutline.setStrokeWidth(3);
+		//
+		// // create the CircleOverlay and add the circles
+		// ArrayCircleOverlay circleOverlay2 = new ArrayCircleOverlay(circleDefaultPaintFill,
+		// circleDefaultPaintOutline, this);
+		// // OverlayCircle circle1 = new OverlayCircle(restaurants.get(0).getGeoPoint(), 10,
+		// // restaurants.get(0).getName());
+		// // circleOverlay2.addCircle(circle1);
+		//
+		// for (int i = 0; i < restaurants.size(); i++) {
+		// Log.d("Restaurant", restaurants.get(i).getName());
+		// circleOverlay2.addCircle(new OverlayCircle(restaurants.get(i).getGeoPoint(), 50,
+		// restaurants.get(i).getName()));
+		// }
+		//
+		// this.mapView.getOverlays().add(circleOverlay2);
 	}
 
 	class ScrollListener extends GestureDetector.SimpleOnGestureListener {
