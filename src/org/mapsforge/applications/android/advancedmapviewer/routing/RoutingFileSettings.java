@@ -19,9 +19,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class RoutingFileSettings extends BaseActivity {
-	private static final String TAG = RoutingFileSettings.class.getSimpleName();
+	static final String TAG = RoutingFileSettings.class.getSimpleName();
 
 	protected static final int CONTEXTMENU_MODIFY = 0;
 	protected static final int CONTEXTMENU_DELETE = 1;
@@ -32,7 +33,11 @@ public class RoutingFileSettings extends BaseActivity {
 	private ListView installedRoutingFilesList;
 	private TextView emptyListText;
 
-	private RoutingFile[] routingFiles;
+	private ArrayAdapter<RoutingFile> routingFileAdapter;
+
+	int storedRoutingFilePosition = -1;
+
+	RoutingFile[] routingFiles;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -43,26 +48,12 @@ public class RoutingFileSettings extends BaseActivity {
 		this.installedRoutingFilesList = (ListView) findViewById(R.id.manage_routingfiles_list);
 		this.emptyListText = (TextView) findViewById(R.id.manage_routing_files_empty_text);
 
-		this.routingFiles = this.advancedMapViewer.getRoutingFiles();
-		// this.routingFiles = new RoutingFile[0];
-
-		// if there are no routing files, display help text
-		if (this.routingFiles == null || this.routingFiles.length == 0) {
-			this.installedRoutingFilesList.setVisibility(View.GONE);
-			this.emptyListText.setVisibility(View.VISIBLE);
-		}
-		ArrayAdapter<RoutingFile> adapter = new ArrayAdapter<RoutingFile>(this,
-				R.layout.installed_map_file_row, this.routingFiles);
-		this.installedRoutingFilesList.setAdapter(adapter);
-		// register a context menu for long click
-		registerForContextMenu(this.installedRoutingFilesList);
-
 		this.addRoutingFileButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				RoutingFileSettings.this.advancedMapViewer.getRoutingFileManager().store(
-						new RoutingFile("Car", "/sdcard/car.HH"));
-				RoutingFileSettings.this.advancedMapViewer.resetRoutingFiles();
+						new RoutingFile("muh", "/sdcard/muh.HH"));
+				RoutingFileSettings.this.refreshListView();
 			}
 		});
 	}
@@ -83,6 +74,9 @@ public class RoutingFileSettings extends BaseActivity {
 				.getMenuInfo();
 		Log.d(TAG, "position: " + info.position);
 		if (item.getItemId() == CONTEXTMENU_DELETE) {
+			// set the info about the calling RoutingFileRow (since bundle param just exists
+			// since api 8)
+			this.storedRoutingFilePosition = info.position;
 			showDialog(DIALOG_CONFIRM_DELETE);
 		} else if (item.getItemId() == CONTEXTMENU_MODIFY) {
 
@@ -93,21 +87,39 @@ public class RoutingFileSettings extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.d(TAG, "onResume()");
+
+		this.setListView();
+		// register a context menu for long click
+		registerForContextMenu(this.installedRoutingFilesList);
 	}
 
-	// TODO: what do? 1.6 doesnt support oncreatedialog with bundle param
+	// onCreateDialog(int, bundle) is only supported since api 8, so we have to store the
+	// calling view
 	@Override
 	protected Dialog onCreateDialog(int dialogId) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		// TODO: teste ma mit if true
 		if (dialogId == DIALOG_CONFIRM_DELETE) {
-			Log.d(TAG, "building confirm delete dialog");
+			if (this.storedRoutingFilePosition < 0) {
+				return null;
+			}
 			builder.setMessage("Are you sure you want to delete?").setCancelable(false)
 					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
 						@Override
 						public void onClick(DialogInterface dialog, int id) {
-							// TODO: do the delete
+							// TODO: catch exception
+							RoutingFile toDelete = RoutingFileSettings.this.routingFiles[RoutingFileSettings.this.storedRoutingFilePosition];
+							// do the delete
+							if (RoutingFileSettings.this.advancedMapViewer
+									.getRoutingFileManager().delete(toDelete)) {
+								RoutingFileSettings.this.refreshListView();
+							}
+							// reset the position
+							RoutingFileSettings.this.storedRoutingFilePosition = -1;
 							Log.d(TAG, "deleted");
+							Toast.makeText(RoutingFileSettings.this,
+									"Routingfile \"" + toDelete.name + "\" uninstalled",
+									Toast.LENGTH_LONG).show();
 						}
 					}).setNegativeButton("No", new DialogInterface.OnClickListener() {
 						@Override
@@ -117,8 +129,28 @@ public class RoutingFileSettings extends BaseActivity {
 					});
 			return builder.create();
 		}
-		Log.d(TAG, "didnt create any dialog");
 		return null;
 	}
 
+	private void setListView() {
+		this.routingFiles = this.advancedMapViewer.getRoutingFiles();
+
+		if (this.routingFiles == null || this.routingFiles.length == 0) {
+			this.installedRoutingFilesList.setVisibility(View.GONE);
+			this.emptyListText.setVisibility(View.VISIBLE);
+		} else {
+			this.installedRoutingFilesList.setVisibility(View.VISIBLE);
+			this.emptyListText.setVisibility(View.GONE);
+		}
+
+		this.routingFileAdapter = new ArrayAdapter<RoutingFile>(this,
+				R.layout.installed_map_file_row, this.routingFiles);
+		this.installedRoutingFilesList.setAdapter(this.routingFileAdapter);
+	}
+
+	void refreshListView() {
+		// unset the global list
+		this.advancedMapViewer.resetRoutingFiles();
+		this.setListView();
+	}
 }

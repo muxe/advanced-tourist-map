@@ -73,6 +73,7 @@ public class RouteCalculator extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				// TODO: if no routing file selected?
+				// still nullpointer exception on no routing files
 				Log.d(TAG, ((RoutingFile) RouteCalculator.this.routingFileSpinner
 						.getSelectedItem()).path);
 				if (RouteCalculator.this.startPoint == null) {

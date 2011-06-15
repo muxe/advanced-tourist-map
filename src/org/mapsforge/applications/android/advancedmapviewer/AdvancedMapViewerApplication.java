@@ -23,6 +23,8 @@ public class AdvancedMapViewerApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 		Log.d("Application", "onCreate()");
+		this.getRoutingFileManager().store(new RoutingFile("car", "/sdcard/car.HH"));
+		this.getRoutingFileManager().store(new RoutingFile("foot", "/sdcard/foot.HH"));
 	}
 
 	public Router getRouter() {

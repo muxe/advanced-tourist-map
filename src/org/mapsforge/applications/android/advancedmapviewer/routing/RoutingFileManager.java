@@ -11,6 +11,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 public class RoutingFileManager {
+	private static final String TAG = RoutingFileManager.class.getSimpleName();
+
 	static final int VERSION = 1;
 	static final String DATABASE = "routingFiles.db";
 	static final String TABLE = "routingfiles";
@@ -76,10 +78,24 @@ public class RoutingFileManager {
 		try {
 			db.insertOrThrow(TABLE, null, values);
 		} catch (SQLException e) {
-			Log.d("RouteCalculator", e.getMessage());
+			Log.d(TAG, e.getMessage());
 		} finally {
 			db.close();
 		}
 		return true;
+	}
+
+	public boolean delete(RoutingFile routingfile) {
+		Log.d(TAG, "delete routingFile: " + routingfile.name);
+		SQLiteDatabase db = this.dbHelper.getWritableDatabase();
+		try {
+			int deleted = db.delete(TABLE, C_PATH + "=?", new String[] { routingfile.path });
+			return deleted > 0;
+		} catch (SQLException e) {
+			Log.d(TAG, e.getMessage());
+		} finally {
+			db.close();
+		}
+		return false;
 	}
 }
