@@ -8,7 +8,7 @@
             <TableRow android:layout_width="match_parent" android:layout_height="wrap_content" android:baselineAligned="true">
 	            <TextView android:text="Start" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
 	            <EditText android:id="@+id/calculate_route_edittext_start" android:layout_height="wrap_content" android:text="select start" android:layout_width="wrap_content" android:enabled="false" />
-	             <Button android:text="choose" android:id="@+id/calculate_route_button_choose_start" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	            <Button android:text="choose" android:id="@+id/calculate_route_button_choose_start" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </TableRow>
             <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
 	            <TextView android:text="Destination" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>

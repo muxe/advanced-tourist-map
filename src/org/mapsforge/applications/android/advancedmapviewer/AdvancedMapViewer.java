@@ -18,9 +18,11 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.Arrays;
 import java.util.Date;
 
 import org.mapsforge.android.maps.ArrayCircleOverlay;
+import org.mapsforge.android.maps.ArrayWayOverlay;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
@@ -106,6 +108,8 @@ public class AdvancedMapViewer extends MapActivity {
 	ArrayCircleOverlay circleOverlay;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
+	private ArrayWayOverlay routeOverlay;
+	private ArrayCircleOverlay decisionPointOverlay;
 	private boolean followGpsEnabled;
 	boolean centerGpsEnabled;
 	GeoPoint lastPosition;
@@ -121,6 +125,7 @@ public class AdvancedMapViewer extends MapActivity {
 	MapController mapController;
 	MapView mapView;
 	OverlayCircle overlayCircle;
+	boolean locationPickerMode;
 
 	private GestureDetector mGestureDetector;
 
@@ -409,7 +414,7 @@ public class AdvancedMapViewer extends MapActivity {
 			@Override
 			public boolean accept(File file) {
 				// accept only valid map files
-				return MapView.isValidMapFile(file.getAbsolutePath());
+				return MapDatabase.isValidMapFile(file.getAbsolutePath());
 			}
 		});
 
@@ -462,6 +467,33 @@ public class AdvancedMapViewer extends MapActivity {
 		this.circleOverlayOutline.setAlpha(128);
 		this.circleOverlayOutline.setStrokeWidth(3);
 
+		// initialize route overlay
+		Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		fillPaint.setStyle(Paint.Style.STROKE);
+		fillPaint.setColor(Color.BLUE);
+		fillPaint.setAlpha(160);
+		fillPaint.setStrokeWidth(6);
+		fillPaint.setStrokeCap(Paint.Cap.ROUND);
+		fillPaint.setStrokeJoin(Paint.Join.ROUND);
+		this.routeOverlay = new ArrayWayOverlay(fillPaint, null);
+		this.mapView.getOverlays().add(this.routeOverlay);
+
+		// create the default paint objects for overlay circles
+		Paint circleDefaultPaintFill = new Paint(Paint.ANTI_ALIAS_FLAG);
+		circleDefaultPaintFill.setStyle(Paint.Style.FILL);
+		circleDefaultPaintFill.setColor(Color.BLUE);
+		circleDefaultPaintFill.setAlpha(150);
+
+		Paint circleDefaultPaintOutline = new Paint(Paint.ANTI_ALIAS_FLAG);
+		circleDefaultPaintOutline.setStyle(Paint.Style.STROKE);
+		circleDefaultPaintOutline.setColor(Color.BLUE);
+		circleDefaultPaintOutline.setAlpha(200);
+		circleDefaultPaintOutline.setStrokeWidth(3);
+
+		this.decisionPointOverlay = new ArrayCircleOverlay(circleDefaultPaintFill,
+				circleDefaultPaintOutline, this);
+		this.mapView.getOverlays().add(this.decisionPointOverlay);
+
 		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
 			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 				enableFollowGPS();
@@ -470,10 +502,7 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 		}
 
-		this.mGestureDetector = new GestureDetector(this, new ScrollListener());
-
 		this.mapView.getOverlays().add(new Overlay() {
-
 			@Override
 			protected void drawOverlayBitmap(Canvas canvas, Point drawPosition,
 					Projection projection, byte drawZoomLevel) {
@@ -481,8 +510,15 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 
 			@Override
-			public boolean onTap(GeoPoint geoPoint, MapView mv) {
-				// Log.d("long", geoPoint.getLatitude() + " " + geoPoint.getLongitude());
+			public boolean onLongPress(GeoPoint geoPoint, MapView mv) {
+				// map view is in locationPicerMode, so just return tap point
+				if (AdvancedMapViewer.this.locationPickerMode) {
+					setResult(RESULT_OK,
+							new Intent().putExtra("LONGITUDE", geoPoint.getLongitude())
+									.putExtra("LATITUDE", geoPoint.getLatitude()));
+					finish();
+					return true;
+				}
 				startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class).putExtra(
 						"LATITUDE", geoPoint.getLatitude()).putExtra("LONGITUDE",
 						geoPoint.getLongitude()));
@@ -491,6 +527,8 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 
 		});
+
+		this.mGestureDetector = new GestureDetector(this, new ScrollListener());
 
 		/*
 		 * POI STUFF EXPERIMENTAL
@@ -718,7 +756,12 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-
+		// check if mapview was started, just to return a position
+		Intent startingIntent = getIntent();
+		if (startingIntent.hasExtra("mode")
+				&& startingIntent.getStringExtra("mode").equals("LOCATION_PICKER")) {
+			this.locationPickerMode = true;
+		}
 		// Read the default shared preferences
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -770,6 +813,15 @@ public class AdvancedMapViewer extends MapActivity {
 		if (!this.mapView.getMapViewMode().requiresInternetConnection()
 				&& !this.mapView.hasValidMapFile()) {
 			startFileBrowser();
+		}
+
+		// draw the route, if there is any
+		AdvancedMapViewerApplication advancedmapviewer = (AdvancedMapViewerApplication) getApplication();
+		if (advancedmapviewer.currentRoute != null) {
+			// TODO: delete old routes
+			this.routeOverlay.addWay(advancedmapviewer.currentRoute.getOverlayWay());
+			this.decisionPointOverlay.addCircles(Arrays.asList(advancedmapviewer.currentRoute
+					.getOverlayCircles()));
 		}
 	}
 

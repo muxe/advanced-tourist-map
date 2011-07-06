@@ -74,7 +74,7 @@ public class Search extends Activity {
 		 * start stuff
 		 */
 		Editor edprefs = getSharedPreferences(Search.PREFERENCES_FILE, MODE_PRIVATE).edit();
-		edprefs.putString("addressFile", "/sdcard/germany.database.sqlite");
+		edprefs.putString("addressFile", "/sdcard/tourist-map/berlin/germany.database.sqlite");
 		edprefs.commit();
 		/*
 		 * end stuff
@@ -304,7 +304,7 @@ public class Search extends Activity {
 	}
 
 	void finish(double lon, double lat) {
-		setResult(RESULT_OK, new Intent().putExtra("lon", lon).putExtra("lat", lat));
+		setResult(RESULT_OK, new Intent().putExtra("LONGITUDE", lon).putExtra("LATITUDE", lat));
 		finish();
 	}
 

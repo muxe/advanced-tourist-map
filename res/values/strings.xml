@@ -14,6 +14,12 @@
 		<item>large</item>
 		<item>huge</item>
 	</string-array>
+	
+	<string-array name="routing_point_picker_values">
+		<item>Find by address</item>
+		<item>My current position</item>
+		<item>Point on map</item>
+	</string-array>
 
 	<string name="application_name">AdvancedMapViewer</string>
 	<string name="cancel">Cancel</string>
@@ -83,8 +89,9 @@
 	<string name="find_pois">Find nearby POIs</string>
 	<string name="show_on_map">Show on map</string>
 	<string name="select_installed_routingfile">Select a routing file</string>
+	<string name="dialog_title_find_location">Find a location</string>
 	
-		<!-- search intent -->
+	<!-- search intent -->
 	<string name="label_city">city</string>
 	<string name="label_road">road</string>
 	<string name="default_city"></string>

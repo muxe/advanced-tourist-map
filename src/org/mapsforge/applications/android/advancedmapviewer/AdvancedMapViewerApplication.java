@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.mapsforge.android.mobileHighwayHierarchies.HHRouter;
+import org.mapsforge.applications.android.advancedmapviewer.routing.Route;
 import org.mapsforge.applications.android.advancedmapviewer.routing.RoutingFile;
 import org.mapsforge.applications.android.advancedmapviewer.routing.RoutingFileManager;
 import org.mapsforge.core.Router;
@@ -11,20 +12,28 @@ import org.mapsforge.core.Router;
 import android.app.Application;
 import android.util.Log;
 
+/**
+ * Base Application class
+ * 
+ * @author Max Dörfler
+ */
 public class AdvancedMapViewerApplication extends Application {
 
 	static final int ROUTING_MAIN_MEMORY_CACHE_SIZE = 1024 * 2048;
-	static final String ROUTING_BINARY_FILE = "/sdcard/berlin.mobileHH";
+	static final String ROUTING_BINARY_FILE = "/sdcard/tourist-map/berlin/berlin.mobileHH";
 	private Router router;
 	private RoutingFileManager routingFileManager;
 	private RoutingFile[] routingFiles;
+	public Route currentRoute;
 
 	@Override
 	public void onCreate() {
 		super.onCreate();
 		Log.d("Application", "onCreate()");
-		this.getRoutingFileManager().store(new RoutingFile("car", "/sdcard/car.HH"));
-		this.getRoutingFileManager().store(new RoutingFile("foot", "/sdcard/foot.HH"));
+		this.getRoutingFileManager()
+				.store(new RoutingFile("car", "/sdcard/tourist-map/car.HH"));
+		this.getRoutingFileManager().store(
+				new RoutingFile("foot", "/sdcard/tourist-map/foot.HH"));
 	}
 
 	public Router getRouter() {
@@ -37,6 +46,11 @@ public class AdvancedMapViewerApplication extends Application {
 				e.printStackTrace();
 			}
 		}
+		Log.d("Application",
+				this.router.getBoundingBox().maxLatitudeE6 + ", "
+						+ this.router.getBoundingBox().maxLongitudeE6 + " / "
+						+ this.router.getBoundingBox().minLatitudeE6 + ", "
+						+ this.router.getBoundingBox().minLongitudeE6);
 		return this.router;
 	}
 
