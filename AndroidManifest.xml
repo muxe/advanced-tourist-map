@@ -14,7 +14,9 @@
 		<activity android:name=".PositionInfo" />
 		<activity android:name=".routing.RouteCalculator" />
 		<activity android:name=".routing.RoutingFileSettings" />
+		<activity android:name=".routing.RouteList" />
 		<activity android:name=".Search" />
+		<activity android:name=".LocationPicker" />
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" />

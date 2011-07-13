@@ -3,7 +3,7 @@ package org.mapsforge.applications.android.advancedmapviewer.routing;
 import java.util.ArrayList;
 
 import org.mapsforge.android.maps.GeoPoint;
-import org.mapsforge.android.maps.OverlayCircle;
+import org.mapsforge.android.maps.OverlayItem;
 import org.mapsforge.android.maps.OverlayWay;
 import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
@@ -20,14 +20,16 @@ public class Route {
 	private GeoPoint[] geoPoints;
 	private OverlayWay overlayWay;
 	private DecisionPoint[] decisionPoints;
-	private OverlayCircle[] overlayCircles;
+	private OverlayItem[] overlayItems;
+	public DecisionPoint currentDecisionPoint;
 
 	public Route(Edge[] edges) {
 		this.edges = edges;
 		this.setGeoPoints(routeToGeoPoints(edges));
 		this.overlayWay = new OverlayWay(new GeoPoint[][] { this.getGeoPoints() });
 		this.decisionPoints = Route.calculateDecisionPoints(edges);
-		this.overlayCircles = this.decisionPointsToOverlayCircles(this.decisionPoints);
+		this.overlayItems = this.decisionPointsToOverlayItems(this.decisionPoints);
+		this.currentDecisionPoint = this.decisionPoints[0];
 	}
 
 	static GeoPoint[] routeToGeoPoints(Edge[] route) {
@@ -68,8 +70,8 @@ public class Route {
 		return this.decisionPoints;
 	}
 
-	public OverlayCircle[] getOverlayCircles() {
-		return this.overlayCircles;
+	public OverlayItem[] getOverlayItems() {
+		return this.overlayItems;
 	}
 
 	public static DecisionPoint[] calculateDecisionPoints(Edge[] edges) {
@@ -77,26 +79,56 @@ public class Route {
 
 		String lastStreet = "";
 		for (Edge edge : edges) {
-			if (!edge.getName().equals(lastStreet)) {
-				lastStreet = edge.getName();
-				decisionList.add(new DecisionPoint(edge.getName(), edge.getSource()));
-				Log.d(TAG, edge.getName());
+			// TODO: externalize string
+			String streetName = edge.getName() == null ? "unknown" : edge.getName();
+			if (!streetName.equals(lastStreet)) {
+				lastStreet = streetName;
+				decisionList.add(new DecisionPoint(streetName, edge.getSource()));
+				Log.d(TAG, streetName);
 			}
 		}
+
 		DecisionPoint[] arr;
 		arr = new DecisionPoint[decisionList.size()];
 		decisionList.toArray(arr);
 		return arr;
 	}
 
-	// TODO: change to itemized, looks better
-	private OverlayCircle[] decisionPointsToOverlayCircles(DecisionPoint[] decisionPoints1) {
-		OverlayCircle[] arr = new OverlayCircle[decisionPoints1.length];
+	private OverlayItem[] decisionPointsToOverlayItems(DecisionPoint[] decisionPoints1) {
+		OverlayItem[] arr = new OverlayItem[decisionPoints1.length];
 		for (int i = 0; i < decisionPoints1.length; i++) {
-			arr[i] = new OverlayCircle(decisionPoints1[i].getGeoPoint(), 10,
-					decisionPoints1[i].getName());
+			arr[i] = new OverlayItem(decisionPoints1[i].getGeoPoint(),
+					decisionPoints1[i].getName(), null);
 		}
 		return arr;
+	}
+
+	public DecisionPoint getNextDP() {
+		for (int i = 0; i < this.decisionPoints.length; i++) {
+			if (this.decisionPoints[i] == this.currentDecisionPoint) {
+				try {
+					this.currentDecisionPoint = this.decisionPoints[i + 1];
+				} catch (ArrayIndexOutOfBoundsException e) {
+					this.currentDecisionPoint = this.decisionPoints[i];
+				}
+				break;
+			}
+		}
+		return this.currentDecisionPoint;
+	}
+
+	public DecisionPoint getPreviousDP() {
+		for (int i = 0; i < this.decisionPoints.length; i++) {
+			if (this.decisionPoints[i] == this.currentDecisionPoint) {
+				try {
+					this.currentDecisionPoint = this.decisionPoints[i - 1];
+				} catch (ArrayIndexOutOfBoundsException e) {
+					this.currentDecisionPoint = this.decisionPoints[i];
+				}
+				break;
+			}
+		}
+		return this.currentDecisionPoint;
 	}
 
 }

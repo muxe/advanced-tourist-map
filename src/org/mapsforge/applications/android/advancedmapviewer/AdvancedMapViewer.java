@@ -33,6 +33,9 @@ import org.mapsforge.android.maps.MapViewMode;
 import org.mapsforge.android.maps.Overlay;
 import org.mapsforge.android.maps.OverlayCircle;
 import org.mapsforge.android.maps.Projection;
+import org.mapsforge.applications.android.advancedmapviewer.routing.DecisionOverlay;
+import org.mapsforge.applications.android.advancedmapviewer.routing.Route;
+import org.mapsforge.applications.android.advancedmapviewer.routing.RouteList;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -56,6 +59,7 @@ import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -65,7 +69,9 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -109,7 +115,15 @@ public class AdvancedMapViewer extends MapActivity {
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
 	private ArrayWayOverlay routeOverlay;
-	private ArrayCircleOverlay decisionPointOverlay;
+	private DecisionOverlay decisionPointOverlay;
+	private boolean displayRoute;
+
+	// routing menu
+	LinearLayout routeMenu;
+	private ImageButton nextDecisionPointButton;
+	private ImageButton previousDecisionPointButton;
+	private ImageButton showRoutingListButton;
+
 	private boolean followGpsEnabled;
 	boolean centerGpsEnabled;
 	GeoPoint lastPosition;
@@ -305,7 +319,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 	private void enableFollowGPS() {
 		this.circleOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
-				this.circleOverlayOutline, this);
+				this.circleOverlayOutline);
 		this.overlayCircle = new OverlayCircle();
 		this.circleOverlay.addCircle(this.overlayCircle);
 		this.mapView.getOverlays().add(this.circleOverlay);
@@ -441,12 +455,14 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d("lifecycle", "amv onCreate");
 
 		// set up the layout views
 		setContentView(R.layout.activity_advanced_map_viewer);
 		this.mapView = (MapView) findViewById(R.id.mapView);
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
 		this.centerView = (ImageView) findViewById(R.id.centerView);
+		this.routeMenu = (LinearLayout) findViewById(R.id.routeMenu);
 
 		configureMapView();
 
@@ -490,8 +506,8 @@ public class AdvancedMapViewer extends MapActivity {
 		circleDefaultPaintOutline.setAlpha(200);
 		circleDefaultPaintOutline.setStrokeWidth(3);
 
-		this.decisionPointOverlay = new ArrayCircleOverlay(circleDefaultPaintFill,
-				circleDefaultPaintOutline, this);
+		this.decisionPointOverlay = new DecisionOverlay(getResources().getDrawable(
+				R.drawable.jog_tab_target_gray));
 		this.mapView.getOverlays().add(this.decisionPointOverlay);
 
 		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
@@ -513,10 +529,11 @@ public class AdvancedMapViewer extends MapActivity {
 			public boolean onLongPress(GeoPoint geoPoint, MapView mv) {
 				// map view is in locationPicerMode, so just return tap point
 				if (AdvancedMapViewer.this.locationPickerMode) {
-					setResult(RESULT_OK,
+					Log.d("RouteCalculator", "location picker mode on");
+					AdvancedMapViewer.this.setResult(RESULT_OK,
 							new Intent().putExtra("LONGITUDE", geoPoint.getLongitude())
 									.putExtra("LATITUDE", geoPoint.getLatitude()));
-					finish();
+					AdvancedMapViewer.this.finish();
 					return true;
 				}
 				startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class).putExtra(
@@ -643,6 +660,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		Log.d("lifecycle", "amv onDestroy");
 
 		// remove the toast messageText if visible
 		if (this.toast != null) {
@@ -663,6 +681,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		Log.d("lifecycle", "amv onPause");
 		// release the wake lock if necessary
 		if (this.wakeLock.isHeld()) {
 			this.wakeLock.release();
@@ -756,6 +775,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.d("lifecycle", "amv onResume");
 		// check if mapview was started, just to return a position
 		Intent startingIntent = getIntent();
 		if (startingIntent.hasExtra("mode")
@@ -817,12 +837,30 @@ public class AdvancedMapViewer extends MapActivity {
 
 		// draw the route, if there is any
 		AdvancedMapViewerApplication advancedmapviewer = (AdvancedMapViewerApplication) getApplication();
+		this.decisionPointOverlay.clear();
+		this.routeOverlay.clear();
 		if (advancedmapviewer.currentRoute != null) {
-			// TODO: delete old routes
+			this.displayRoute = true;
 			this.routeOverlay.addWay(advancedmapviewer.currentRoute.getOverlayWay());
-			this.decisionPointOverlay.addCircles(Arrays.asList(advancedmapviewer.currentRoute
-					.getOverlayCircles()));
+			this.decisionPointOverlay.addItems(Arrays.asList(advancedmapviewer.currentRoute
+					.getOverlayItems()));
+			this.setupRoutingMenu(advancedmapviewer.currentRoute);
+			if (startingIntent.getBooleanExtra("ROUTE_OVERVIEW", false)) {
+				// TODO: better centering of the route
+				this.mapController.setCenter(advancedmapviewer.currentRoute.getGeoPoints()[0]);
+				this.mapController.setZoom(16);
+			}
+			if (startingIntent.getBooleanExtra("CENTER_DP", false)) {
+				this.mapController
+						.setCenter(advancedmapviewer.currentRoute.currentDecisionPoint
+								.getGeoPoint());
+				// this.mapController.setZoom(16);
+			}
+		} else {
+			this.displayRoute = false;
+			this.routeMenu.setVisibility(View.GONE);
 		}
+
 	}
 
 	@Override
@@ -872,5 +910,38 @@ public class AdvancedMapViewer extends MapActivity {
 			this.toast.setText(text);
 		}
 		this.toast.show();
+	}
+
+	private void setupRoutingMenu(final Route route) {
+		if (this.showRoutingListButton == null) {
+			this.showRoutingListButton = (ImageButton) findViewById(R.id.route_menu_list);
+		}
+		if (this.nextDecisionPointButton == null) {
+			this.nextDecisionPointButton = (ImageButton) findViewById(R.id.route_menu_next);
+		}
+		if (this.previousDecisionPointButton == null) {
+			this.previousDecisionPointButton = (ImageButton) findViewById(R.id.route_menu_prev);
+		}
+
+		this.showRoutingListButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(AdvancedMapViewer.this, RouteList.class));
+			}
+		});
+		this.nextDecisionPointButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AdvancedMapViewer.this.mapController.setCenter(route.getNextDP().getGeoPoint());
+			}
+		});
+		this.previousDecisionPointButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				AdvancedMapViewer.this.mapController.setCenter(route.getPreviousDP()
+						.getGeoPoint());
+			}
+		});
+		this.routeMenu.setVisibility(View.VISIBLE);
 	}
 }

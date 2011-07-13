@@ -1,8 +1,8 @@
 package org.mapsforge.applications.android.advancedmapviewer.routing;
 
 import org.mapsforge.android.maps.GeoPoint;
-import org.mapsforge.applications.android.advancedmapviewer.AdvancedMapViewer;
 import org.mapsforge.applications.android.advancedmapviewer.BaseActivity;
+import org.mapsforge.applications.android.advancedmapviewer.LocationPicker;
 import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.applications.android.advancedmapviewer.Search;
 import org.mapsforge.core.Edge;
@@ -62,6 +62,7 @@ public class RouteCalculator extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		Log.d("lifecycle", "routeCalculator onCreate");
 		setContentView(R.layout.activity_calculate_route);
 
 		Intent startingIntent = getIntent();
@@ -127,15 +128,23 @@ public class RouteCalculator extends BaseActivity {
 
 				Edge[] edges = RouteCalculator.this.advancedMapViewer.getRouter(rf)
 						.getShortestPath(start.getId(), dest.getId());
-				RouteCalculator.this.advancedMapViewer.currentRoute = new Route(edges);
-				Log.d(TAG, "done");
+				if (edges.length > 0) {
+					RouteCalculator.this.advancedMapViewer.currentRoute = new Route(edges);
+					Log.d(TAG, "done");
+					Log.d(TAG, "length: " + edges.length);
+					startActivity(new Intent(RouteCalculator.this, RouteList.class));
+				} else {
+					Log.d(TAG, "No Route Found");
+					Toast.makeText(RouteCalculator.this, "No Route Found", Toast.LENGTH_LONG)
+							.show();
+				}
 			}
 		});
 
 		this.tempManageRoutesButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(getApplicationContext(), RoutingFileSettings.class));
+				startActivity(new Intent(RouteCalculator.this, RoutingFileSettings.class));
 			}
 		});
 	}
@@ -191,9 +200,17 @@ public class RouteCalculator extends BaseActivity {
 					} else if (items_keys[item].equals("POSITION")) {
 						startPositionSearch();
 					} else if (items_keys[item].equals("MAP")) {
-						startActivityForResult(new Intent(RouteCalculator.this,
-								AdvancedMapViewer.class).putExtra("mode", "LOCATION_PICKER"),
+						startActivityForResult(
+								// TODO: hier spinnt er rum (vermutlich da er den kompletten amv
+								// wieder
+								// in den back stack lädt). loesung: extra "schlanke" mapview
+								// nur fuer
+								// diesen zweck?
+
+								new Intent(RouteCalculator.this, LocationPicker.class),
 								INTENT_MAP);
+						// new Intent(RouteCalculator.this, AdvancedMapViewer.class)
+						// .putExtra("mode", "LOCATION_PICKER"), INTENT_MAP);
 					}
 				}
 			});
@@ -205,6 +222,7 @@ public class RouteCalculator extends BaseActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		Log.d("lifecycle", "routeCalculator onResume");
 
 		if (this.locationManager == null) {
 			this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -239,18 +257,18 @@ public class RouteCalculator extends BaseActivity {
 		Location currentLocation;
 		for (String provider : this.locationManager.getProviders(true)) {
 			currentLocation = this.locationManager.getLastKnownLocation(provider);
-			if (isBetterLocation(currentLocation, this.currentBestLocation)) {
-				this.currentBestLocation = currentLocation;
-				changeStartStop(
-						RouteCalculator.this.viewToSet,
-						new GeoPoint(currentLocation.getLatitude(), currentLocation
-								.getLongitude()));
-				Log.d(TAG, "got better cached location from: " + provider + " ("
-						+ currentLocation.getAccuracy() + ")");
-			} else {
-				Log.d(TAG,
-						"dismissed location from: " + provider + " ("
-								+ currentLocation.getAccuracy() + ")");
+			if (currentLocation != null) {
+				if (isBetterLocation(currentLocation, this.currentBestLocation)) {
+					this.currentBestLocation = currentLocation;
+					changeStartStop(RouteCalculator.this.viewToSet, new GeoPoint(
+							currentLocation.getLatitude(), currentLocation.getLongitude()));
+					Log.d(TAG, "got better cached location from: " + provider + " ("
+							+ currentLocation.getAccuracy() + ")");
+				} else {
+					Log.d(TAG,
+							"dismissed location from: " + provider + " ("
+									+ currentLocation.getAccuracy() + ")");
+				}
 			}
 		}
 
@@ -369,6 +387,7 @@ public class RouteCalculator extends BaseActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		Log.d("lifecycle", "routeCalculator onPause");
 		stopPositionSearch();
 	}
 

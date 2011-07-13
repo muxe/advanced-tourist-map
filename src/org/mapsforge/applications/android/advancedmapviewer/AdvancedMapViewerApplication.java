@@ -21,6 +21,7 @@ public class AdvancedMapViewerApplication extends Application {
 
 	static final int ROUTING_MAIN_MEMORY_CACHE_SIZE = 1024 * 2048;
 	static final String ROUTING_BINARY_FILE = "/sdcard/tourist-map/berlin/berlin.mobileHH";
+	// static final String ROUTING_BINARY_FILE = "/sdcard/berlin.mobileHH";
 	private Router router;
 	private RoutingFileManager routingFileManager;
 	private RoutingFile[] routingFiles;
@@ -29,11 +30,11 @@ public class AdvancedMapViewerApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Log.d("Application", "onCreate()");
-		this.getRoutingFileManager()
-				.store(new RoutingFile("car", "/sdcard/tourist-map/car.HH"));
-		this.getRoutingFileManager().store(
-				new RoutingFile("foot", "/sdcard/tourist-map/foot.HH"));
+		// Log.d("Application", "onCreate()");
+		// this.getRoutingFileManager()
+		// .store(new RoutingFile("car", "/sdcard/tourist-map/car.HH"));
+		// this.getRoutingFileManager().store(
+		// new RoutingFile("foot", "/sdcard/tourist-map/foot.HH"));
 	}
 
 	public Router getRouter() {

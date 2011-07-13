@@ -13,4 +13,24 @@
 		android:layout_alignParentTop="true" android:layout_alignParentLeft="true"
 		android:layout_marginTop="5dip" android:layout_marginRight="5dip" android:scaleType="center"
 		android:visibility="gone" />
+	<LinearLayout android:id="@+id/routeMenu"
+		android:visibility="gone"
+		android:orientation="vertical"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerVertical="true"
+		android:layout_alignParentLeft="true">
+		<ImageButton android:id="@+id/route_menu_list" 
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content" 
+			android:src="@android:drawable/ic_menu_directions" />
+		<ImageButton android:id="@+id/route_menu_next" 
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content" 
+			android:src="@android:drawable/ic_media_next" />
+		<ImageButton android:id="@+id/route_menu_prev" 
+			android:layout_height="wrap_content" 
+			android:layout_width="wrap_content" 
+			android:src="@android:drawable/ic_media_previous" />
+	</LinearLayout>
 </RelativeLayout>
