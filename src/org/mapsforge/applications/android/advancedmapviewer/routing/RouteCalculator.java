@@ -11,6 +11,7 @@ import org.mapsforge.core.Vertex;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +19,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -25,6 +27,7 @@ import android.view.View.OnClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -44,14 +47,16 @@ public class RouteCalculator extends BaseActivity {
 	GeoPoint startPoint;
 	GeoPoint destPoint;
 
-	Button chooseStartButton;
-	Button chooseDestButton;
+	ImageButton chooseStartButton;
+	ImageButton chooseDestButton;
 	private Button calcRouteButton;
 	private Button tempManageRoutesButton;
 
 	private EditText startEditText;
 	private EditText destEditText;
 	int viewToSet;
+
+	ProgressDialog dialog;
 
 	private LocationManager locationManager;
 	private LocationListener locationListener;
@@ -74,8 +79,8 @@ public class RouteCalculator extends BaseActivity {
 		this.startEditText = (EditText) findViewById(R.id.calculate_route_edittext_start);
 		this.destEditText = (EditText) findViewById(R.id.calculate_route_edittext_dest);
 
-		this.chooseStartButton = (Button) findViewById(R.id.calculate_route_button_choose_start);
-		this.chooseDestButton = (Button) findViewById(R.id.calculate_route_button_choose_dest);
+		this.chooseStartButton = (ImageButton) findViewById(R.id.calculate_route_button_choose_start);
+		this.chooseDestButton = (ImageButton) findViewById(R.id.calculate_route_button_choose_dest);
 		this.calcRouteButton = (Button) findViewById(R.id.calculate_route_button_calculate);
 		this.tempManageRoutesButton = (Button) findViewById(R.id.calculate_route_manage_button);
 
@@ -107,37 +112,18 @@ public class RouteCalculator extends BaseActivity {
 						.getSelectedItem();
 				Log.d(TAG, rf.path);
 				if (RouteCalculator.this.startPoint == null) {
-					Toast.makeText(RouteCalculator.this, "No Start selected", Toast.LENGTH_LONG)
+					Toast.makeText(RouteCalculator.this,
+							getString(R.string.routing_no_start_selected), Toast.LENGTH_LONG)
 							.show();
 					return;
 				}
 				if (RouteCalculator.this.destPoint == null) {
-					Toast.makeText(RouteCalculator.this, "No Destination selected",
+					Toast.makeText(RouteCalculator.this,
+							getString(R.string.routing_no_destination_selected),
 							Toast.LENGTH_LONG).show();
 					return;
 				}
-				Vertex start = RouteCalculator.this.advancedMapViewer.getRouter(rf)
-						.getNearestVertex(
-								new GeoCoordinate(
-										RouteCalculator.this.startPoint.getLatitude(),
-										RouteCalculator.this.startPoint.getLongitude()));
-				Vertex dest = RouteCalculator.this.advancedMapViewer.getRouter(rf)
-						.getNearestVertex(
-								new GeoCoordinate(RouteCalculator.this.destPoint.getLatitude(),
-										RouteCalculator.this.destPoint.getLongitude()));
-
-				Edge[] edges = RouteCalculator.this.advancedMapViewer.getRouter(rf)
-						.getShortestPath(start.getId(), dest.getId());
-				if (edges.length > 0) {
-					RouteCalculator.this.advancedMapViewer.currentRoute = new Route(edges);
-					Log.d(TAG, "done");
-					Log.d(TAG, "length: " + edges.length);
-					startActivity(new Intent(RouteCalculator.this, RouteList.class));
-				} else {
-					Log.d(TAG, "No Route Found");
-					Toast.makeText(RouteCalculator.this, "No Route Found", Toast.LENGTH_LONG)
-							.show();
-				}
+				new CalculateRouteAsync().execute(rf);
 			}
 		});
 
@@ -407,6 +393,70 @@ public class RouteCalculator extends BaseActivity {
 			this.destPoint = point;
 			this.destEditText.setText(this.destPoint.getLatitude() + " "
 					+ this.destPoint.getLongitude());
+		}
+	}
+
+	private class CalculateRouteAsync extends AsyncTask<RoutingFile, Void, Route> {
+
+		public CalculateRouteAsync() {
+			super();
+		}
+
+		@Override
+		protected void onPreExecute() {
+			RouteCalculator.this.dialog = ProgressDialog.show(RouteCalculator.this, "",
+					"Loading. Please wait...", true);
+		}
+
+		@Override
+		protected Route doInBackground(RoutingFile... routingFiles) {
+			// calculate
+			RoutingFile rf = null;
+			try {
+				rf = routingFiles[0];
+			} catch (ArrayIndexOutOfBoundsException e) {
+				// TODO: exit?
+			}
+			Vertex start = RouteCalculator.this.advancedMapViewer.getRouter(rf)
+					.getNearestVertex(
+							new GeoCoordinate(RouteCalculator.this.startPoint.getLatitude(),
+									RouteCalculator.this.startPoint.getLongitude()));
+			Vertex dest = RouteCalculator.this.advancedMapViewer.getRouter(rf)
+					.getNearestVertex(
+							new GeoCoordinate(RouteCalculator.this.destPoint.getLatitude(),
+									RouteCalculator.this.destPoint.getLongitude()));
+
+			Edge[] edges = RouteCalculator.this.advancedMapViewer.getRouter(rf)
+					.getShortestPath(start.getId(), dest.getId());
+
+			// try {
+			// Thread.sleep(10000);
+			// } catch (InterruptedException e) {
+			//
+			// }
+
+			if (edges.length > 0) {
+				Route route = new Route(edges);
+				Log.d(TAG, "done");
+				Log.d(TAG, "length: " + edges.length);
+				return route;
+			}
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(Route route) {
+			// remove progress bar
+			RouteCalculator.this.dialog.dismiss();
+			// show route
+			if (route != null) {
+				RouteCalculator.this.advancedMapViewer.currentRoute = route;
+				startActivity(new Intent(RouteCalculator.this, RouteList.class));
+			} else {
+				Log.d(TAG, "No Route Found");
+				Toast.makeText(RouteCalculator.this,
+						getString(R.string.routing_no_route_found), Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 }

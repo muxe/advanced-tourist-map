@@ -4,6 +4,6 @@
   android:orientation="vertical"
   android:layout_width="match_parent"
   android:layout_height="match_parent">
-    <Button android:id="@+id/view_on_map_button" android:text="View on Map" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+    <Button android:id="@+id/view_on_map_button" android:text="@string/show_on_map" android:layout_width="fill_parent" android:layout_height="wrap_content" />
     <ListView android:id="@+id/routing_list" android:layout_width="fill_parent" android:layout_height="fill_parent" />
 </LinearLayout>

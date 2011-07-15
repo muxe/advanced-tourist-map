@@ -15,9 +15,14 @@ public class LocationPicker extends MapActivity {
 
 	private MapView mapView;
 
+	// AdvancedMapViewerApplication advancedMapViewerApplication;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// this.advancedMapViewerApplication = (AdvancedMapViewerApplication) getApplication();
+
 		this.mapView = new MapView(this);
 		this.mapView.setClickable(true);
 		this.mapView.setBuiltInZoomControls(true);

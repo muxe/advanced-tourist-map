@@ -11,18 +11,37 @@ import org.mapsforge.core.Vertex;
 
 import android.util.Log;
 
+/**
+ * Holds all information about a calculated Route
+ */
 public class Route {
 	static final String TAG = RouteCalculator.class.getSimpleName();
 
 	private Edge[] edges;
 	private Vertex startVertex;
 	private Vertex destVertex;
+
+	/** contains all points of the route to draw the route */
 	private GeoPoint[] geoPoints;
+
+	/** The Overlay which displays the route */
 	private OverlayWay overlayWay;
+
+	/** contains all DecisionPoints along the route */
 	private DecisionPoint[] decisionPoints;
+
+	/** all DecisionPoints as OverlayItems to display them in an ItemizedOverlay */
 	private OverlayItem[] overlayItems;
+
+	/** to hold the state of the last watched DecisionPoint, needed to jump from point */
 	public DecisionPoint currentDecisionPoint;
 
+	/**
+	 * Constructs a route out of an Edge array returned by the Router class
+	 * 
+	 * @param edges
+	 *            the Edge Array defining the Route
+	 */
 	public Route(Edge[] edges) {
 		this.edges = edges;
 		this.setGeoPoints(routeToGeoPoints(edges));
@@ -32,6 +51,13 @@ public class Route {
 		this.currentDecisionPoint = this.decisionPoints[0];
 	}
 
+	/**
+	 * Converts an Edge array to an Array of GeoPoints needed to display a Route on the map
+	 * 
+	 * @param route
+	 *            edge array like the output of the Router class
+	 * @return array of GeoPoints
+	 */
 	static GeoPoint[] routeToGeoPoints(Edge[] route) {
 		GeoPoint[] arr = null;
 		if (route != null) {
@@ -74,6 +100,13 @@ public class Route {
 		return this.overlayItems;
 	}
 
+	/**
+	 * Converts an array of Edges to an array of DecisionPoints. Duplicate street names (in a
+	 * row) get filtered
+	 * 
+	 * @param edges
+	 * @return
+	 */
 	public static DecisionPoint[] calculateDecisionPoints(Edge[] edges) {
 		ArrayList<DecisionPoint> decisionList = new ArrayList<DecisionPoint>();
 
@@ -94,6 +127,14 @@ public class Route {
 		return arr;
 	}
 
+	/**
+	 * Converts an array of DecisionPoints to an array of OverlayItems which is needed to
+	 * display them in an ItemizedOverlay
+	 * 
+	 * @param decisionPoints1
+	 *            array of DecisionPoints
+	 * @return array of OverlayItems
+	 */
 	private OverlayItem[] decisionPointsToOverlayItems(DecisionPoint[] decisionPoints1) {
 		OverlayItem[] arr = new OverlayItem[decisionPoints1.length];
 		for (int i = 0; i < decisionPoints1.length; i++) {
@@ -103,6 +144,12 @@ public class Route {
 		return arr;
 	}
 
+	/**
+	 * Gets the following DecisionPoint of the currently active DecisionPoint in the route
+	 * 
+	 * @return following DecisionPoint or the current DecisionPoint if current has no following
+	 *         (is the last in the route)
+	 */
 	public DecisionPoint getNextDP() {
 		for (int i = 0; i < this.decisionPoints.length; i++) {
 			if (this.decisionPoints[i] == this.currentDecisionPoint) {
@@ -117,6 +164,12 @@ public class Route {
 		return this.currentDecisionPoint;
 	}
 
+	/**
+	 * Gets the parent DecisionPoint to the currently active DecisionPoint in the route
+	 * 
+	 * @return parent DecisionPoint or the current DecisionPoint if current has no parent (is
+	 *         the first in the route)
+	 */
 	public DecisionPoint getPreviousDP() {
 		for (int i = 0; i < this.decisionPoints.length; i++) {
 			if (this.decisionPoints[i] == this.currentDecisionPoint) {

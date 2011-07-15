@@ -6,22 +6,22 @@
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
         <TableLayout android:stretchColumns="1" android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_weight="1">
             <TableRow android:layout_width="match_parent" android:layout_height="wrap_content" android:baselineAligned="true">
-	            <TextView android:text="Start" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
-	            <EditText android:id="@+id/calculate_route_edittext_start" android:layout_height="wrap_content" android:text="select start" android:layout_width="wrap_content" android:enabled="false" />
-	            <Button android:text="choose" android:id="@+id/calculate_route_button_choose_start" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	            <TextView android:text="@string/routing_start_point" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
+	            <EditText android:id="@+id/calculate_route_edittext_start" android:layout_height="wrap_content" android:text="@string/routing_select_start" android:layout_width="wrap_content" android:enabled="false" />
+	            <ImageButton android:src="@drawable/ic_btn_round_more_normal" android:id="@+id/calculate_route_button_choose_start" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </TableRow>
             <TableRow android:layout_width="match_parent" android:layout_height="wrap_content">
-	            <TextView android:text="Destination" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
-	            <EditText android:text="select destination" android:id="@+id/calculate_route_edittext_dest" android:layout_width="wrap_content" android:layout_height="wrap_content" android:editable="false" android:enabled="false"></EditText>
-	            <Button android:text="choose" android:id="@+id/calculate_route_button_choose_dest" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+	            <TextView android:text="@string/routing_destination_point" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
+	            <EditText android:text="@string/routing_select_destination" android:id="@+id/calculate_route_edittext_dest" android:layout_width="wrap_content" android:layout_height="wrap_content" android:editable="false" android:enabled="false"></EditText>
+	            <ImageButton android:src="@drawable/ic_btn_round_more_normal" android:id="@+id/calculate_route_button_choose_dest" android:layout_width="wrap_content" android:layout_height="wrap_content" />
             </TableRow>
             <TableRow>
-            	<TextView android:text="Routing File" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
+            	<TextView android:text="@string/routing_file" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center"/>
 				<Spinner android:id="@+id/calculate_route_spinner_routing_file" android:layout_height="wrap_content" android:prompt="@string/select_installed_routingfile" android:layout_width="match_parent" android:layout_span="2" />
             </TableRow>
         </TableLayout>
 <!--         <Button android:text="Switch" android:id="@+id/calculate_route_button_switch" android:layout_width="wrap_content" android:layout_height="wrap_content" /> -->
     </LinearLayout>
-    <Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="Find Route" android:id="@+id/calculate_route_button_calculate" android:layout_margin="5dp" />
-    <Button android:text="Manage Routing Files" android:id="@+id/calculate_route_manage_button" android:layout_height="wrap_content" android:layout_margin="5dp" android:layout_width="match_parent"/>
+    <Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="@string/routing_btn_calculate_route" android:id="@+id/calculate_route_button_calculate" android:layout_margin="5dp" />
+    <Button android:text="@string/manage_routing_files" android:id="@+id/calculate_route_manage_button" android:layout_height="wrap_content" android:layout_margin="5dp" android:layout_width="match_parent"/>
 </LinearLayout>

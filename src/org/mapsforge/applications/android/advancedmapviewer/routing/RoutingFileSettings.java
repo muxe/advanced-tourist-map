@@ -52,7 +52,7 @@ public class RoutingFileSettings extends BaseActivity {
 			@Override
 			public void onClick(View v) {
 				RoutingFileSettings.this.advancedMapViewer.getRoutingFileManager().store(
-						new RoutingFile("muh", "/sdcard/muh.HH"));
+						new RoutingFile("car", "/sdcard/muh.HH"));
 				RoutingFileSettings.this.refreshListView();
 			}
 		});
@@ -103,30 +103,36 @@ public class RoutingFileSettings extends BaseActivity {
 			if (this.storedRoutingFilePosition < 0) {
 				return null;
 			}
-			builder.setMessage("Are you sure you want to delete?").setCancelable(false)
-					.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int id) {
-							// TODO: catch exception
-							RoutingFile toDelete = RoutingFileSettings.this.routingFiles[RoutingFileSettings.this.storedRoutingFilePosition];
-							// do the delete
-							if (RoutingFileSettings.this.advancedMapViewer
-									.getRoutingFileManager().delete(toDelete)) {
-								RoutingFileSettings.this.refreshListView();
-							}
-							// reset the position
-							RoutingFileSettings.this.storedRoutingFilePosition = -1;
-							Log.d(TAG, "deleted");
-							Toast.makeText(RoutingFileSettings.this,
-									"Routingfile \"" + toDelete.name + "\" uninstalled",
-									Toast.LENGTH_LONG).show();
-						}
-					}).setNegativeButton("No", new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.cancel();
-						}
-					});
+			builder.setMessage(getString(R.string.confirm_delete_qst))
+					.setCancelable(false)
+					.setPositiveButton(getString(R.string.yes),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int id) {
+									// TODO: catch exception
+									RoutingFile toDelete = RoutingFileSettings.this.routingFiles[RoutingFileSettings.this.storedRoutingFilePosition];
+									// do the delete
+									if (RoutingFileSettings.this.advancedMapViewer
+											.getRoutingFileManager().delete(toDelete)) {
+										RoutingFileSettings.this.refreshListView();
+									}
+									// reset the position
+									RoutingFileSettings.this.storedRoutingFilePosition = -1;
+									Log.d(TAG, "deleted");
+									Toast.makeText(
+											RoutingFileSettings.this,
+											String.format(
+													getString(R.string.routing_routingfile_uninstalled_formatted),
+													toDelete.name), Toast.LENGTH_LONG).show();
+								}
+							})
+					.setNegativeButton(getString(R.string.no),
+							new DialogInterface.OnClickListener() {
+								@Override
+								public void onClick(DialogInterface dialog, int id) {
+									dialog.cancel();
+								}
+							});
 			return builder.create();
 		}
 		return null;

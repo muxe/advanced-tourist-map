@@ -91,6 +91,30 @@
 	<string name="select_installed_routingfile">Select a routing file</string>
 	<string name="dialog_title_find_location">Find a location</string>
 	
+	<!-- routing -->
+	<string name="manage_routing_files">Manage Routing Files</string>
+	<string name="routing_start_point">Start</string>
+	<string name="routing_destination_point">Destination</string>
+	<string name="routing_select_start">Select Start</string>
+	<string name="routing_select_destination">Select Destination</string>
+	<string name="routing_btn_calculate_route">Find Route</string>
+	<string name="routing_file">Routing File</string>
+	<string name="routing_installed_files">Installed Routing Files</string>
+	<string name="routing_no_routingfile_found">No Routing File found</string>
+	<string name="routing_add_routingfile">Add Routing File</string>
+	<string name="routing_no_start_selected">No start selected</string>
+	<string name="routing_no_destination_selected">No destination selected</string>
+	<string name="routing_no_route_found">No route found</string>
+	<string name="routing_routingfile_uninstalled_formatted">Routingfile "%1$s" uninstalled</string>
+	
+	<string name="loading_message">Loading, please wait...</string>
+	<string name="confirm_delete_qst">Are you sure you want to delete?</string>
+	<string name="yes">yes</string>
+	<string name="no">no</string>
+	
+	<!-- Position Info -->
+	<string name="positioninfo_nearest_junction">Nearest Junction</string>
+	
 	<!-- search intent -->
 	<string name="label_city">city</string>
 	<string name="label_road">road</string>

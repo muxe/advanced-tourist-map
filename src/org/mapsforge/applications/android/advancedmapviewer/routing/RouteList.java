@@ -15,6 +15,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 
+/**
+ * Activity to display all DecisionPoints (Streets) of a Route in a list, which clicking of
+ * street names
+ */
 public class RouteList extends BaseActivity {
 
 	private ListView routingList;
@@ -56,7 +60,8 @@ public class RouteList extends BaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO: set focus
+				// currently clears all routing stuff from the activity stack and displays the
+				// main AMV activity
 				startActivity(new Intent(RouteList.this, AdvancedMapViewer.class).putExtra(
 						"ROUTE_OVERVIEW", true).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
 			}

@@ -18,6 +18,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * Activity to display infos about a geo-position, like coordinates, nearby streets/junctions
+ * and nearby POIs
+ */
 public class PositionInfo extends BaseActivity {
 	private static final String TAG = PositionInfo.class.getSimpleName();
 	private TextView positionInfoLatitude;
@@ -29,9 +33,14 @@ public class PositionInfo extends BaseActivity {
 	double latitude;
 	double longitude;
 
+	/**
+	 * Class to asynchronously set the info about the nearest junction, since this may take some
+	 * time.
+	 */
 	private class SetNearestJunctionInfo extends AsyncTask<Void, Void, Edge[]> {
 
 		public SetNearestJunctionInfo() {
+			super();
 		}
 
 		@Override
@@ -81,11 +90,21 @@ public class PositionInfo extends BaseActivity {
 		new SetNearestJunctionInfo().execute();
 	}
 
+	/**
+	 * Converts an array of Edges to a human readable string representation. Most likely used to
+	 * display the name of a junction. Filters duplicates and Edges without name.
+	 * 
+	 * @param edges
+	 *            array of Edges to convert
+	 * @return a human readable string
+	 */
 	String edgesToStringInfo(Edge[] edges) {
 		// TODO: filter null (52.482675, 13.30337)
 		List<String> names = new LinkedList<String>();
 		for (Edge e : edges) {
-			names.add(e.getName());
+			if (e.getName() != null) {
+				names.add(e.getName());
+			}
 		}
 
 		// filter duplicates
