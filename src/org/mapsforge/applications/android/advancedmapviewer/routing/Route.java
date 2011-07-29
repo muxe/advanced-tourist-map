@@ -105,7 +105,8 @@ public class Route {
 	 * row) get filtered
 	 * 
 	 * @param edges
-	 * @return
+	 *            ArrayList of DecisionPoints
+	 * @return Array of DecisionPoints
 	 */
 	public static DecisionPoint[] calculateDecisionPoints(Edge[] edges) {
 		ArrayList<DecisionPoint> decisionList = new ArrayList<DecisionPoint>();

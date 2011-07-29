@@ -15,7 +15,6 @@
 package org.mapsforge.applications.android.advancedmapviewer;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Arrays;
@@ -36,6 +35,8 @@ import org.mapsforge.android.maps.Projection;
 import org.mapsforge.applications.android.advancedmapviewer.routing.DecisionOverlay;
 import org.mapsforge.applications.android.advancedmapviewer.routing.Route;
 import org.mapsforge.applications.android.advancedmapviewer.routing.RouteList;
+import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileManagerActivity;
+import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.MapBundle;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -217,8 +218,11 @@ public class AdvancedMapViewer extends MapActivity {
 				startActivity(new Intent(this, EditPreferences.class));
 				return true;
 
+				// case R.id.menu_mapfile:
+				// startFileBrowser();
+				// return true;
 			case R.id.menu_mapfile:
-				startFileBrowser();
+				startBundleBrowser();
 				return true;
 
 			default:
@@ -403,39 +407,43 @@ public class AdvancedMapViewer extends MapActivity {
 		});
 	}
 
-	/**
-	 * Sets all file filters and starts the FilePicker.
-	 */
-	private void startFileBrowser() {
-		// set the FileDisplayFilter
-		FilePicker.setFileDisplayFilter(new FileFilter() {
-			@Override
-			public boolean accept(File file) {
-				// accept only readable files
-				if (file.canRead()) {
-					if (file.isDirectory()) {
-						// accept all directories
-						return true;
-					} else if (file.isFile() && file.getName().endsWith(".map")) {
-						// accept all files with a ".map" extension
-						return true;
-					}
-				}
-				return false;
-			}
-		});
+	// /**
+	// * Sets all file filters and starts the FilePicker.
+	// */
+	// private void startFileBrowser() {
+	// // set the FileDisplayFilter
+	// FilePicker.setFileDisplayFilter(new FileFilter() {
+	// @Override
+	// public boolean accept(File file) {
+	// // accept only readable files
+	// if (file.canRead()) {
+	// if (file.isDirectory()) {
+	// // accept all directories
+	// return true;
+	// } else if (file.isFile() && file.getName().endsWith(".map")) {
+	// // accept all files with a ".map" extension
+	// return true;
+	// }
+	// }
+	// return false;
+	// }
+	// });
+	//
+	// // set the FileSelectFilter
+	// FilePicker.setFileSelectFilter(new FileFilter() {
+	// @Override
+	// public boolean accept(File file) {
+	// // accept only valid map files
+	// return MapDatabase.isValidMapFile(file.getAbsolutePath());
+	// }
+	// });
+	//
+	// // start the FilePicker
+	// startActivityForResult(new Intent(this, FilePicker.class), SELECT_MAP_FILE);
+	// }
 
-		// set the FileSelectFilter
-		FilePicker.setFileSelectFilter(new FileFilter() {
-			@Override
-			public boolean accept(File file) {
-				// accept only valid map files
-				return MapDatabase.isValidMapFile(file.getAbsolutePath());
-			}
-		});
-
-		// start the FilePicker
-		startActivityForResult(new Intent(this, FilePicker.class), SELECT_MAP_FILE);
+	private void startBundleBrowser() {
+		startActivity(new Intent(this, FileManagerActivity.class));
 	}
 
 	@Override
@@ -825,9 +833,32 @@ public class AdvancedMapViewer extends MapActivity {
 		this.mapView.setWaterTiles(this.preferences.getBoolean("showWaterTiles", false));
 
 		// check if the file browser needs to be displayed
-		if (!this.mapView.getMapViewMode().requiresInternetConnection()
-				&& !this.mapView.hasValidMapFile()) {
-			startFileBrowser();
+		// if (!this.mapView.getMapViewMode().requiresInternetConnection()
+		// && !this.mapView.hasValidMapFile()) {
+		// startFileBrowser();
+		// }
+
+		// TODO: imma workin here
+		// problem: ändert man den basepath über die settings, kann er zwar das bundle noch
+		// laden (da voller path drinsteht), aber dann die einzelnen files nicht mehr (da
+		// diesese zusammengesetzt werden)
+		MapBundle mapBundle = this.advancedMapViewerApplication.getCurrentMapBundle();
+		if (mapBundle == null) {
+			this.startBundleBrowser();
+		} else {
+
+			// String mapBinary = this.preferences.getString("mapBinary", null);
+			String mapBinary = this.advancedMapViewerApplication.getBaseBundlePath()
+					+ File.separator + mapBundle.getMapFile().getRelativePath();
+			Log.d("Application", mapBinary);
+			// if offlinemap AND (map isnt set yet OR current set map differs from map to set)
+			if (!this.mapView.getMapViewMode().requiresInternetConnection()
+					&& (this.mapView.getMapFile() == null || !this.mapView.getMapFile().equals(
+							mapBinary))) {
+				Log.d("Application", "Had to reset mapfile! old: " + this.mapView.getMapFile()
+						+ ", new: " + mapBinary);
+				this.mapView.setMapFile(mapBinary);
+			}
 		}
 
 		// draw the route, if there is any

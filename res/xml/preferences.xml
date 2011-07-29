@@ -21,11 +21,10 @@
 		<CheckBoxPreference android:title="@string/preferences_cache_persistence"
 			android:summary="@string/preferences_cache_persistence_desc" android:key="cachePersistence" />
 		<org.mapsforge.applications.android.advancedmapviewer.CacheSizePreference
-			android:title="@string/preferences_cache_size" android:summary="@string/preferences_cache_size_desc"
-			android:key="cacheSize" />
+			android:key="cacheSize" android:title="@string/preferences_cache_size" android:summary="@string/preferences_cache_size_desc"/>
 		<org.mapsforge.applications.android.advancedmapviewer.MoveSpeedPreference
-			android:title="@string/preferences_move_speed" android:summary="@string/preferences_move_speed_desc"
-			android:key="moveSpeed" />
+			android:title="@string/preferences_move_speed" android:summary="@string/preferences_move_speed_desc" android:key="moveSpeed"/>
+		<Preference android:title="todo: Mapfile Path" android:summary="todo: Directory in which the Mapfiles are stored" android:key="baseBundlePath"/>
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/preferences_debug">

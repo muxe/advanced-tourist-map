@@ -5,6 +5,8 @@ import org.mapsforge.applications.android.advancedmapviewer.BaseActivity;
 import org.mapsforge.applications.android.advancedmapviewer.LocationPicker;
 import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.applications.android.advancedmapviewer.Search;
+import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileManagerActivity;
+import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.RoutingFile;
 import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Vertex;
@@ -56,7 +58,7 @@ public class RouteCalculator extends BaseActivity {
 	private EditText destEditText;
 	int viewToSet;
 
-	ProgressDialog dialog;
+	ProgressDialog progressDialog;
 
 	private LocationManager locationManager;
 	private LocationListener locationListener;
@@ -110,7 +112,6 @@ public class RouteCalculator extends BaseActivity {
 				// still nullpointer exception on no routing files
 				RoutingFile rf = (RoutingFile) RouteCalculator.this.routingFileSpinner
 						.getSelectedItem();
-				Log.d(TAG, rf.path);
 				if (RouteCalculator.this.startPoint == null) {
 					Toast.makeText(RouteCalculator.this,
 							getString(R.string.routing_no_start_selected), Toast.LENGTH_LONG)
@@ -130,7 +131,8 @@ public class RouteCalculator extends BaseActivity {
 		this.tempManageRoutesButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity(new Intent(RouteCalculator.this, RoutingFileSettings.class));
+				// startActivity(new Intent(RouteCalculator.this, RoutingFileSettings.class));
+				startActivity(new Intent(RouteCalculator.this, FileManagerActivity.class));
 			}
 		});
 	}
@@ -223,7 +225,8 @@ public class RouteCalculator extends BaseActivity {
 					+ this.destPoint.getLongitude());
 		}
 
-		RoutingFile[] routingFiles = this.advancedMapViewer.getRoutingFiles();
+		RoutingFile[] routingFiles = this.advancedMapViewer.getCurrentMapBundle()
+				.getRoutingFilesArray();
 
 		ArrayAdapter<RoutingFile> adapter = new ArrayAdapter<RoutingFile>(this,
 				android.R.layout.simple_spinner_item, routingFiles);
@@ -404,10 +407,11 @@ public class RouteCalculator extends BaseActivity {
 
 		@Override
 		protected void onPreExecute() {
-			RouteCalculator.this.dialog = ProgressDialog.show(RouteCalculator.this, "",
+			RouteCalculator.this.progressDialog = ProgressDialog.show(RouteCalculator.this, "",
 					"Loading. Please wait...", true);
 		}
 
+		// TODO: which rf to use?
 		@Override
 		protected Route doInBackground(RoutingFile... routingFiles) {
 			// calculate
@@ -417,17 +421,15 @@ public class RouteCalculator extends BaseActivity {
 			} catch (ArrayIndexOutOfBoundsException e) {
 				// TODO: exit?
 			}
-			Vertex start = RouteCalculator.this.advancedMapViewer.getRouter(rf)
-					.getNearestVertex(
-							new GeoCoordinate(RouteCalculator.this.startPoint.getLatitude(),
-									RouteCalculator.this.startPoint.getLongitude()));
-			Vertex dest = RouteCalculator.this.advancedMapViewer.getRouter(rf)
-					.getNearestVertex(
-							new GeoCoordinate(RouteCalculator.this.destPoint.getLatitude(),
-									RouteCalculator.this.destPoint.getLongitude()));
+			Vertex start = RouteCalculator.this.advancedMapViewer.getRouter().getNearestVertex(
+					new GeoCoordinate(RouteCalculator.this.startPoint.getLatitude(),
+							RouteCalculator.this.startPoint.getLongitude()));
+			Vertex dest = RouteCalculator.this.advancedMapViewer.getRouter().getNearestVertex(
+					new GeoCoordinate(RouteCalculator.this.destPoint.getLatitude(),
+							RouteCalculator.this.destPoint.getLongitude()));
 
-			Edge[] edges = RouteCalculator.this.advancedMapViewer.getRouter(rf)
-					.getShortestPath(start.getId(), dest.getId());
+			Edge[] edges = RouteCalculator.this.advancedMapViewer.getRouter().getShortestPath(
+					start.getId(), dest.getId());
 
 			// try {
 			// Thread.sleep(10000);
@@ -447,7 +449,7 @@ public class RouteCalculator extends BaseActivity {
 		@Override
 		protected void onPostExecute(Route route) {
 			// remove progress bar
-			RouteCalculator.this.dialog.dismiss();
+			RouteCalculator.this.progressDialog.dismiss();
 			// show route
 			if (route != null) {
 				RouteCalculator.this.advancedMapViewer.currentRoute = route;

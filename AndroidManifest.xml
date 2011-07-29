@@ -17,6 +17,8 @@
 		<activity android:name=".routing.RouteList" />
 		<activity android:name=".Search" />
 		<activity android:name=".LocationPicker" />
+		<activity android:name=".LocationPicker" />
+		<activity android:name=".sourcefiles.FileManagerActivity" />
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" />

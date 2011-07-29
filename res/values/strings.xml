@@ -115,6 +115,22 @@
 	<!-- Position Info -->
 	<string name="positioninfo_nearest_junction">Nearest Junction</string>
 	
+	<!-- Source Files -->
+	<string name="mapfile">Map-File</string>
+	<string name="addressfile">Address-File</string>
+	<string name="addressfile_avaiability">Searching for addresses will be:</string>
+	<string name="routingfiles">Routing-Files</string>
+	<string name="routingfile">Routing-File</string>
+	<string name="routingfile_avaiability">Routing will be:</string>
+	<string name="poifile">POI-File</string>
+	<string name="poifile_avaiability">Searching for POIs will be:</string>
+	
+	<string name="filemanager_no_bundle_found">No mapfiles found. Either install some or go to settings and change the base directory to the directory, where your mapfiles are</string>
+	
+	<string name="enabled">enabled</string>
+	<string name="disabled">disabled</string>
+	
+	
 	<!-- search intent -->
 	<string name="label_city">city</string>
 	<string name="label_road">road</string>

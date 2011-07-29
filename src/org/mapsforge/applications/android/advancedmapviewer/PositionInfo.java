@@ -45,13 +45,21 @@ public class PositionInfo extends BaseActivity {
 
 		@Override
 		protected Edge[] doInBackground(Void... arg0) {
+			if (PositionInfo.this.advancedMapViewer.getRouter() == null) {
+				// TODO: quickfix
+				return new Edge[0];
+			}
 			Vertex nearestVertex = PositionInfo.this.advancedMapViewer.getRouter()
 					.getNearestVertex(
 							new GeoCoordinate(PositionInfo.this.latitude,
 									PositionInfo.this.longitude));
-			double distance = GeoCoordinate.sphericalDistance(PositionInfo.this.longitude,
-					PositionInfo.this.latitude, nearestVertex.getCoordinate().getLongitude(),
-					nearestVertex.getCoordinate().getLatitude());
+			// double distance = GeoCoordinate.sphericalDistance(PositionInfo.this.longitude,
+			// PositionInfo.this.latitude, nearestVertex.getCoordinate().getLongitude(),
+			// nearestVertex.getCoordinate().getLatitude());
+			if (nearestVertex == null) {
+				// TODO: quickfix
+				return new Edge[0];
+			}
 			Edge[] edges = nearestVertex.getOutboundEdges();
 			return edges;
 		}
