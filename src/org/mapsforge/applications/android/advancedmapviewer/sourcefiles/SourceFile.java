@@ -3,6 +3,8 @@ package org.mapsforge.applications.android.advancedmapviewer.sourcefiles;
 import java.io.File;
 import java.util.Date;
 
+import android.util.Log;
+
 /**
  * Abstract class to model a SourceFile
  * 
@@ -23,7 +25,7 @@ public abstract class SourceFile {
 	private Date created;
 
 	public SourceFile() {
-
+		this.description = "";
 	}
 
 	public abstract SourceFileType getType();
@@ -80,8 +82,28 @@ public abstract class SourceFile {
 		return this.path + File.separator + this.filename;
 	}
 
-	public boolean isValid(boolean checkMD5) {
-		// TODO: implement, check if all fields are set and not null
+	public boolean isValid(String basepath, boolean checkMD5) {
+		// check if all fields are set and not null
+		if (this.filename == null || this.created == null || this.description == null
+				|| this.filesize <= 0 || this.md5 == null || this.path == null) {
+			Log.d("FileManager", "Some field(s) wasn't/weren't set");
+			return false;
+		}
+
+		// check if file exists
+		String fullpath = basepath + File.separator + this.getRelativePath();
+		Log.d("FileManager", "Check if " + fullpath + " is valid");
+		try {
+			File file = new File(fullpath);
+			if (!file.isFile()) {
+				Log.d("FileManager", "File " + fullpath + " is no file");
+				return false;
+			}
+		} catch (Exception e) {
+			Log.d("FileManager", "File " + fullpath + " doesn't exist");
+			return false;
+		}
+
 		if (checkMD5) {
 			return checkMD5();
 		}

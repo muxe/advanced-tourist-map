@@ -61,6 +61,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.util.TimingLogger;
 import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -465,6 +466,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		TimingLogger timings = new TimingLogger("timing", "onCreate");
 		Log.d("lifecycle", "amv onCreate");
 
 		this.advancedMapViewerApplication = (AdvancedMapViewerApplication) getApplication();
@@ -592,6 +594,7 @@ public class AdvancedMapViewer extends MapActivity {
 		// }
 		//
 		// this.mapView.getOverlays().add(circleOverlay2);
+		timings.dumpToLog();
 	}
 
 	/**
@@ -778,6 +781,7 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		TimingLogger timings = new TimingLogger("timing", "onResume");
 		Log.d("lifecycle", "amv onResume");
 		// check if mapview was started, just to return a position
 		Intent startingIntent = getIntent();
@@ -801,6 +805,7 @@ public class AdvancedMapViewer extends MapActivity {
 		} catch (NumberFormatException e) {
 			this.mapView.setTextScale(1);
 		}
+		timings.addSplit("set map settings");
 
 		// set the general settings
 		if (this.preferences.getBoolean("fullscreen", false)) {
@@ -832,6 +837,7 @@ public class AdvancedMapViewer extends MapActivity {
 				false));
 		this.mapView.setWaterTiles(this.preferences.getBoolean("showWaterTiles", false));
 
+		timings.addSplit("set general settings");
 		// check if the file browser needs to be displayed
 		// if (!this.mapView.getMapViewMode().requiresInternetConnection()
 		// && !this.mapView.hasValidMapFile()) {
@@ -844,6 +850,7 @@ public class AdvancedMapViewer extends MapActivity {
 		// diesese zusammengesetzt werden)
 		MapBundle mapBundle = this.advancedMapViewerApplication.getCurrentMapBundle();
 		if (mapBundle == null) {
+			showToast("Todo: Can't show map, please select a valid Mapfile");
 			this.startBundleBrowser();
 		} else {
 
@@ -860,6 +867,7 @@ public class AdvancedMapViewer extends MapActivity {
 				this.mapView.setMapFile(mapBinary);
 			}
 		}
+		timings.addSplit("set map file");
 
 		// draw the route, if there is any
 		this.decisionPointOverlay.clear();
@@ -887,7 +895,8 @@ public class AdvancedMapViewer extends MapActivity {
 			this.displayRoute = false;
 			this.routeMenu.setVisibility(View.GONE);
 		}
-
+		timings.addSplit("set route");
+		timings.dumpToLog();
 	}
 
 	@Override

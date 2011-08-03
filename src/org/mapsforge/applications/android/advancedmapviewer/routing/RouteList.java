@@ -40,7 +40,7 @@ public class RouteList extends BaseActivity {
 			DecisionPoint[] decisionPoints = route.getDecisionPoints();
 
 			this.routingAdapter = new ArrayAdapter<DecisionPoint>(this,
-					R.layout.installed_map_file_row, decisionPoints);
+					android.R.layout.simple_list_item_1, decisionPoints);
 			this.routingList.setAdapter(this.routingAdapter);
 
 			this.routingList.setOnItemClickListener(new OnItemClickListener() {

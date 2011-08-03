@@ -23,5 +23,4 @@
 <!--         <Button android:text="Switch" android:id="@+id/calculate_route_button_switch" android:layout_width="wrap_content" android:layout_height="wrap_content" /> -->
     </LinearLayout>
     <Button android:layout_height="wrap_content" android:layout_width="match_parent" android:text="@string/routing_btn_calculate_route" android:id="@+id/calculate_route_button_calculate" android:layout_margin="5dp" />
-    <Button android:text="@string/manage_routing_files" android:id="@+id/calculate_route_manage_button" android:layout_height="wrap_content" android:layout_margin="5dp" android:layout_width="match_parent"/>
 </LinearLayout>

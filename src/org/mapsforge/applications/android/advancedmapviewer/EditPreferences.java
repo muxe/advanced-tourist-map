@@ -99,7 +99,8 @@ public class EditPreferences extends PreferenceActivity {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		}
 
-		this.fileChooser.setSummary(this.appPreferences.getString("baseBundlePath", ""));
+		this.fileChooser.setSummary(this.appPreferences.getString("baseBundlePath",
+				getString(R.string.preferences_no_path_selected)));
 	}
 
 	@Override
@@ -113,10 +114,14 @@ public class EditPreferences extends PreferenceActivity {
 				Editor editor = this.appPreferences.edit();
 
 				editor.putString("baseBundlePath", path);
+				editor.remove("bundlePath");
 				editor.commit();
 				// unset in Application
+				// TODO: consider using OnSharedPreferenceChangeListener:
+				// http://developer.android.com/reference/android/content/SharedPreferences.OnSharedPreferenceChangeListener.html
 				AdvancedMapViewerApplication amvapp = (AdvancedMapViewerApplication) getApplication();
 				amvapp.resetBaseBundlePath();
+				// amvapp.resetCurrentMapBundle();
 				this.fileChooser.setSummary(path);
 			}
 

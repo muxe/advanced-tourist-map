@@ -29,6 +29,7 @@ public class PositionInfo extends BaseActivity {
 	// private Button showOnMapButton;
 	private Button calculateRouteButton;
 	TextView nearestJunktionText;
+	private TextView nearestJunktionHeadline;
 
 	double latitude;
 	double longitude;
@@ -77,6 +78,7 @@ public class PositionInfo extends BaseActivity {
 		this.positionInfoLatitude = (TextView) findViewById(R.id.position_info_latitude);
 		this.positionInfoLongitude = (TextView) findViewById(R.id.position_info_longitude);
 		this.nearestJunktionText = (TextView) findViewById(R.id.position_info_text_nearest_junktion);
+		this.nearestJunktionHeadline = (TextView) findViewById(R.id.position_info_nearest_junktion);
 		this.calculateRouteButton = (Button) findViewById(R.id.position_info_button_route);
 
 		Intent intent = getIntent();
@@ -94,8 +96,19 @@ public class PositionInfo extends BaseActivity {
 						PositionInfo.this.longitude));
 			}
 		});
+	}
 
-		new SetNearestJunctionInfo().execute();
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		if (!this.advancedMapViewer.getCurrentMapBundle().isRoutable()) {
+			this.calculateRouteButton.setVisibility(View.GONE);
+			this.nearestJunktionHeadline.setVisibility(View.GONE);
+			this.nearestJunktionText.setVisibility(View.GONE);
+		} else {
+			new SetNearestJunctionInfo().execute();
+		}
 	}
 
 	/**
@@ -130,5 +143,4 @@ public class PositionInfo extends BaseActivity {
 		}
 		return result;
 	}
-
 }

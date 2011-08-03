@@ -83,4 +83,30 @@ public class MapBundle {
 	public void setPoiFile(PoiFile poiFile) {
 		this.poiFile = poiFile;
 	}
+
+	public boolean isRoutable() {
+		return this.getRoutingFiles().size() > 0;
+	}
+
+	public boolean isSearchable() {
+		return this.getAddressFile() != null;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (getClass() != obj.getClass()) {
+			return false;
+		}
+		final MapBundle other = (MapBundle) obj;
+		if (!this.filepathXml.equals(other.filepathXml)) {
+			return false;
+		}
+		return true;
+	}
 }

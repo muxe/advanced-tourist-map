@@ -1,14 +1,16 @@
 package org.mapsforge.applications.android.advancedmapviewer.routing;
 
+import java.io.File;
+
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.applications.android.advancedmapviewer.BaseActivity;
 import org.mapsforge.applications.android.advancedmapviewer.LocationPicker;
 import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.applications.android.advancedmapviewer.Search;
-import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileManagerActivity;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.RoutingFile;
 import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
+import org.mapsforge.core.Router;
 import org.mapsforge.core.Vertex;
 
 import android.app.AlertDialog;
@@ -52,7 +54,6 @@ public class RouteCalculator extends BaseActivity {
 	ImageButton chooseStartButton;
 	ImageButton chooseDestButton;
 	private Button calcRouteButton;
-	private Button tempManageRoutesButton;
 
 	private EditText startEditText;
 	private EditText destEditText;
@@ -84,7 +85,6 @@ public class RouteCalculator extends BaseActivity {
 		this.chooseStartButton = (ImageButton) findViewById(R.id.calculate_route_button_choose_start);
 		this.chooseDestButton = (ImageButton) findViewById(R.id.calculate_route_button_choose_dest);
 		this.calcRouteButton = (Button) findViewById(R.id.calculate_route_button_calculate);
-		this.tempManageRoutesButton = (Button) findViewById(R.id.calculate_route_manage_button);
 
 		this.routingFileSpinner = (Spinner) findViewById(R.id.calculate_route_spinner_routing_file);
 
@@ -125,14 +125,6 @@ public class RouteCalculator extends BaseActivity {
 					return;
 				}
 				new CalculateRouteAsync().execute(rf);
-			}
-		});
-
-		this.tempManageRoutesButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// startActivity(new Intent(RouteCalculator.this, RoutingFileSettings.class));
-				startActivity(new Intent(RouteCalculator.this, FileManagerActivity.class));
 			}
 		});
 	}
@@ -183,8 +175,15 @@ public class RouteCalculator extends BaseActivity {
 				@Override
 				public void onClick(DialogInterface dialog, int item) {
 					if (items_keys[item].equals("ADDRESS")) {
-						startActivityForResult(new Intent(RouteCalculator.this, Search.class),
-								INTENT_SEARCH);
+						if (RouteCalculator.this.advancedMapViewer.getCurrentMapBundle()
+								.isSearchable()) {
+							startActivityForResult(new Intent(RouteCalculator.this,
+									Search.class), INTENT_SEARCH);
+						} else {
+							// TODO:
+							Toast.makeText(RouteCalculator.this, "todo: no addressfile",
+									Toast.LENGTH_LONG).show();
+						}
 					} else if (items_keys[item].equals("POSITION")) {
 						startPositionSearch();
 					} else if (items_keys[item].equals("MAP")) {
@@ -411,7 +410,6 @@ public class RouteCalculator extends BaseActivity {
 					"Loading. Please wait...", true);
 		}
 
-		// TODO: which rf to use?
 		@Override
 		protected Route doInBackground(RoutingFile... routingFiles) {
 			// calculate
@@ -420,16 +418,23 @@ public class RouteCalculator extends BaseActivity {
 				rf = routingFiles[0];
 			} catch (ArrayIndexOutOfBoundsException e) {
 				// TODO: exit?
+				return null;
 			}
-			Vertex start = RouteCalculator.this.advancedMapViewer.getRouter().getNearestVertex(
-					new GeoCoordinate(RouteCalculator.this.startPoint.getLatitude(),
-							RouteCalculator.this.startPoint.getLongitude()));
-			Vertex dest = RouteCalculator.this.advancedMapViewer.getRouter().getNearestVertex(
-					new GeoCoordinate(RouteCalculator.this.destPoint.getLatitude(),
-							RouteCalculator.this.destPoint.getLongitude()));
 
-			Edge[] edges = RouteCalculator.this.advancedMapViewer.getRouter().getShortestPath(
-					start.getId(), dest.getId());
+			String path = RouteCalculator.this.advancedMapViewer.getBaseBundlePath()
+					+ File.separator + rf.getRelativePath();
+			Router router = RouteCalculator.this.advancedMapViewer.getRouter(path);
+			if (router == null) {
+				return null;
+			}
+			Vertex start = router.getNearestVertex(new GeoCoordinate(
+					RouteCalculator.this.startPoint.getLatitude(),
+					RouteCalculator.this.startPoint.getLongitude()));
+			Vertex dest = router.getNearestVertex(new GeoCoordinate(
+					RouteCalculator.this.destPoint.getLatitude(),
+					RouteCalculator.this.destPoint.getLongitude()));
+
+			Edge[] edges = router.getShortestPath(start.getId(), dest.getId());
 
 			// try {
 			// Thread.sleep(10000);

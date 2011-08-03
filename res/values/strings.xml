@@ -82,6 +82,8 @@
 	<string name="preferences_text_scale_desc">Select the text size of map labels</string>
 	<string name="preferences_wake_lock">Stay awake</string>
 	<string name="preferences_wake_lock_desc">Stop the screen from dimming</string>
+	<string name="preferences_no_path_selected">no path selected</string>
+	<string name="preferences_bundle_path">Mapfile Path</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoom level</string>

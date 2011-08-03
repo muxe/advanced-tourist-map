@@ -30,7 +30,7 @@
 			<algorithm>HH</algorithm>
 		</routingfile>
 		<routingfile>
-			<filename>berlin.foot.mobileHH</filename>
+			<filename>berlin_foot.mobileHH</filename>
 			<desc>Routing in Berlin by foot</desc>
 			<desc_de>Fußgängerrouting in Berlin</desc_de>
 			<path>/berlin/</path>

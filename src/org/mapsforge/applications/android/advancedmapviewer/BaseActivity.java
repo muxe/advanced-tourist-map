@@ -15,7 +15,7 @@ public class BaseActivity extends Activity {
 	/**
 	 * A reference to the App's Application
 	 */
-	protected AdvancedMapViewerApplication advancedMapViewer;
+	public AdvancedMapViewerApplication advancedMapViewer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
