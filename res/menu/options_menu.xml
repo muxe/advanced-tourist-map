@@ -25,4 +25,14 @@
 		android:icon="@drawable/ic_menu_preferences" />
 	<item android:id="@+id/menu_mapfile" android:title="@string/menu_mapfile"
 		android:icon="@drawable/ic_menu_archive" />
+	<item android:id="@+id/menu_route" android:title="@string/menu_route"
+		android:icon="@drawable/ic_menu_directions">
+		<menu>
+			<item android:id="@+id/menu_route_new" android:title="@string/menu_route_new" />
+			<group android:id="@+id/menu_route_group_visible">
+				<item android:id="@+id/menu_route_list" android:title="@string/menu_route_list" />
+				<item android:id="@+id/menu_route_clear" android:title="@string/menu_route_clear" />
+			</group>
+		</menu>
+	</item>
 </menu>

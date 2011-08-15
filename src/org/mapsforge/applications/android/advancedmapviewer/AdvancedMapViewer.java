@@ -21,22 +21,26 @@ import java.util.Arrays;
 import java.util.Date;
 
 import org.mapsforge.android.maps.ArrayCircleOverlay;
+import org.mapsforge.android.maps.ArrayItemizedOverlay;
 import org.mapsforge.android.maps.ArrayWayOverlay;
 import org.mapsforge.android.maps.GeoPoint;
+import org.mapsforge.android.maps.ItemizedOverlay;
 import org.mapsforge.android.maps.MapActivity;
 import org.mapsforge.android.maps.MapController;
 import org.mapsforge.android.maps.MapDatabase;
 import org.mapsforge.android.maps.MapView;
 import org.mapsforge.android.maps.MapView.TextField;
 import org.mapsforge.android.maps.MapViewMode;
-import org.mapsforge.android.maps.Overlay;
 import org.mapsforge.android.maps.OverlayCircle;
-import org.mapsforge.android.maps.Projection;
+import org.mapsforge.android.maps.OverlayItem;
 import org.mapsforge.applications.android.advancedmapviewer.routing.DecisionOverlay;
 import org.mapsforge.applications.android.advancedmapviewer.routing.Route;
+import org.mapsforge.applications.android.advancedmapviewer.routing.RouteCalculator;
 import org.mapsforge.applications.android.advancedmapviewer.routing.RouteList;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileManagerActivity;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.MapBundle;
+import org.mapsforge.core.GeoCoordinate;
+import org.mapsforge.core.Vertex;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -44,30 +48,34 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
-import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.drawable.AnimationDrawable;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.location.LocationProvider;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
-import android.preference.PreferenceManager;
 import android.util.Log;
 import android.util.TimingLogger;
 import android.view.GestureDetector;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SubMenu;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -120,13 +128,16 @@ public class AdvancedMapViewer extends MapActivity {
 	private Paint circleOverlayOutline;
 	private ArrayWayOverlay routeOverlay;
 	private DecisionOverlay decisionPointOverlay;
+	SelectionOverlay selectionOverlay;
+	// Drawable selectionDrawable;
+	OverlayItem selectionOverlayItem;
 	private boolean displayRoute;
 
 	// routing menu
 	LinearLayout routeMenu;
 	private ImageButton nextDecisionPointButton;
 	private ImageButton previousDecisionPointButton;
-	private ImageButton showRoutingListButton;
+	// private ImageButton showRoutingListButton;
 
 	private boolean followGpsEnabled;
 	boolean centerGpsEnabled;
@@ -135,7 +146,7 @@ public class AdvancedMapViewer extends MapActivity {
 	private LocationManager locationManager;
 	private MapViewMode mapViewMode;
 	private PowerManager powerManager;
-	private SharedPreferences preferences;
+	SharedPreferences preferences;
 	private Toast toast;
 	private WakeLock wakeLock;
 	ImageView gpsView;
@@ -161,6 +172,22 @@ public class AdvancedMapViewer extends MapActivity {
 		getMenuInflater().inflate(R.menu.options_menu, menu);
 		return true;
 	}
+
+	// @Override
+	// public boolean onMenuOpened(int featureId, Menu menu) {
+	// // http://code.google.com/p/android/issues/detail?id=8359
+	// SubMenu routingSubmenu = menu.findItem(R.id.menu_route).getSubMenu();
+	// if (!this.displayRoute) {
+	// Log.d("Application", "set group invisible");
+	// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, false);
+	// routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, false);
+	// } else {
+	// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, true);
+	// routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, true);
+	// }
+	// return true;
+	//
+	// }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -225,7 +252,15 @@ public class AdvancedMapViewer extends MapActivity {
 			case R.id.menu_mapfile:
 				startBundleBrowser();
 				return true;
-
+			case R.id.menu_route_clear:
+				disableShowRoute();
+				return true;
+			case R.id.menu_route_new:
+				startActivity(new Intent(this, RouteCalculator.class));
+				return true;
+			case R.id.menu_route_list:
+				startActivity(new Intent(AdvancedMapViewer.this, RouteList.class));
+				return true;
 			default:
 				return false;
 		}
@@ -254,10 +289,21 @@ public class AdvancedMapViewer extends MapActivity {
 			menu.findItem(R.id.menu_position_map_center).setEnabled(true);
 		}
 
-		if (this.mapView.getMapViewMode().requiresInternetConnection()) {
-			menu.findItem(R.id.menu_mapfile).setEnabled(false);
+		// if (this.mapView.getMapViewMode().requiresInternetConnection()) {
+		// menu.findItem(R.id.menu_mapfile).setEnabled(false);
+		// } else {
+		// menu.findItem(R.id.menu_mapfile).setEnabled(true);
+		// }
+
+		// http://code.google.com/p/android/issues/detail?id=8359
+		SubMenu routingSubmenu = menu.findItem(R.id.menu_route).getSubMenu();
+		if (!this.displayRoute) {
+			Log.d("Application", "set group invisible");
+			// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, false);
+			routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, false);
 		} else {
-			menu.findItem(R.id.menu_mapfile).setEnabled(true);
+			// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, true);
+			routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, true);
 		}
 
 		return true;
@@ -466,6 +512,10 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		// just visible if title bar is visible
+		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+
 		TimingLogger timings = new TimingLogger("timing", "onCreate");
 		Log.d("lifecycle", "amv onCreate");
 
@@ -512,6 +562,11 @@ public class AdvancedMapViewer extends MapActivity {
 				R.drawable.jog_tab_target_gray));
 		this.mapView.getOverlays().add(this.decisionPointOverlay);
 
+		this.selectionOverlay = new SelectionOverlay(null, false);
+		// this.selectionOverlay = new SelectionOverlay(this, getResources().getDrawable(
+		// R.drawable.marker_red), true);
+		this.mapView.getOverlays().add(this.selectionOverlay);
+
 		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
 			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 				enableFollowGPS();
@@ -521,31 +576,31 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 
 		// Basic "invisible" Overlay to handle long presses on map
-		this.mapView.getOverlays().add(new Overlay() {
-			@Override
-			protected void drawOverlayBitmap(Canvas canvas, Point drawPosition,
-					Projection projection, byte drawZoomLevel) {
-
-			}
-
-			@Override
-			public boolean onLongPress(GeoPoint geoPoint, MapView mv) {
-				// map view is in locationPicerMode, so just return tap point
-				if (AdvancedMapViewer.this.locationPickerMode) {
-					Log.d("RouteCalculator", "location picker mode on");
-					AdvancedMapViewer.this.setResult(RESULT_OK,
-							new Intent().putExtra("LONGITUDE", geoPoint.getLongitude())
-									.putExtra("LATITUDE", geoPoint.getLatitude()));
-					AdvancedMapViewer.this.finish();
-					return true;
-				}
-				startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class).putExtra(
-						"LATITUDE", geoPoint.getLatitude()).putExtra("LONGITUDE",
-						geoPoint.getLongitude()));
-				return true;
-			}
-
-		});
+		// this.mapView.getOverlays().add(new Overlay() {
+		// @Override
+		// protected void drawOverlayBitmap(Canvas canvas, Point drawPosition,
+		// Projection projection, byte drawZoomLevel) {
+		//
+		// }
+		//
+		// @Override
+		// public boolean onLongPress(GeoPoint geoPoint, MapView mv) {
+		// // map view is in locationPicerMode, so just return tap point
+		// if (AdvancedMapViewer.this.locationPickerMode) {
+		// Log.d("RouteCalculator", "location picker mode on");
+		// AdvancedMapViewer.this.setResult(RESULT_OK,
+		// new Intent().putExtra("LONGITUDE", geoPoint.getLongitude())
+		// .putExtra("LATITUDE", geoPoint.getLatitude()));
+		// AdvancedMapViewer.this.finish();
+		// return true;
+		// }
+		// startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class).putExtra(
+		// "LATITUDE", geoPoint.getLatitude()).putExtra("LONGITUDE",
+		// geoPoint.getLongitude()));
+		// return true;
+		// }
+		//
+		// });
 
 		this.mGestureDetector = new GestureDetector(this, new ScrollListener());
 
@@ -783,14 +838,17 @@ public class AdvancedMapViewer extends MapActivity {
 		super.onResume();
 		TimingLogger timings = new TimingLogger("timing", "onResume");
 		Log.d("lifecycle", "amv onResume");
+		// TODO: still needed?
 		// check if mapview was started, just to return a position
 		Intent startingIntent = getIntent();
 		if (startingIntent.hasExtra("mode")
 				&& startingIntent.getStringExtra("mode").equals("LOCATION_PICKER")) {
 			this.locationPickerMode = true;
 		}
+		// TODO: use the one from application?
 		// Read the default shared preferences
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		// this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		this.preferences = this.advancedMapViewerApplication.prefs;
 
 		// set the map settings
 		this.mapView.setScaleBar(this.preferences.getBoolean("showScaleBar", false));
@@ -899,6 +957,14 @@ public class AdvancedMapViewer extends MapActivity {
 		timings.dumpToLog();
 	}
 
+	private void disableShowRoute() {
+		this.decisionPointOverlay.clear();
+		this.routeOverlay.clear();
+		this.displayRoute = false;
+		this.routeMenu.setVisibility(View.GONE);
+
+	}
+
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
@@ -957,9 +1023,9 @@ public class AdvancedMapViewer extends MapActivity {
 	 *            the route to set the menu for
 	 */
 	private void setupRoutingMenu(final Route route) {
-		if (this.showRoutingListButton == null) {
-			this.showRoutingListButton = (ImageButton) findViewById(R.id.route_menu_list);
-		}
+		// if (this.showRoutingListButton == null) {
+		// this.showRoutingListButton = (ImageButton) findViewById(R.id.route_menu_list);
+		// }
 		if (this.nextDecisionPointButton == null) {
 			this.nextDecisionPointButton = (ImageButton) findViewById(R.id.route_menu_next);
 		}
@@ -967,12 +1033,12 @@ public class AdvancedMapViewer extends MapActivity {
 			this.previousDecisionPointButton = (ImageButton) findViewById(R.id.route_menu_prev);
 		}
 
-		this.showRoutingListButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity(new Intent(AdvancedMapViewer.this, RouteList.class));
-			}
-		});
+		// this.showRoutingListButton.setOnClickListener(new OnClickListener() {
+		// @Override
+		// public void onClick(View v) {
+		// startActivity(new Intent(AdvancedMapViewer.this, RouteList.class));
+		// }
+		// });
 		this.nextDecisionPointButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -987,5 +1053,173 @@ public class AdvancedMapViewer extends MapActivity {
 			}
 		});
 		this.routeMenu.setVisibility(View.VISIBLE);
+	}
+
+	private class InfoSetterAsync extends AsyncTask<GeoPoint, String, Void> {
+
+		public InfoSetterAsync() {
+			super();
+		}
+
+		@Override
+		protected Void doInBackground(GeoPoint... params) {
+			Log.d("Application", "doInBackground");
+			if (params.length != 1) {
+				return null;
+			}
+			GeoPoint geoPoint = params[0];
+
+			publishProgress(getString(R.string.selection_this_point));
+			// TODO: maybe animation while loading
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+
+			// if map is routable, set street name from router
+			if (!this.isCancelled()
+					&& AdvancedMapViewer.this.advancedMapViewerApplication
+							.getCurrentMapBundle().isRoutable()) {
+				// TODO: not very nice yet
+				if (!AdvancedMapViewer.this.advancedMapViewerApplication.getRouter()
+						.getBoundingBox()
+						.includes(geoPoint.getLatitudeE6(), geoPoint.getLongitudeE6())) {
+					publishProgress("out of box");
+					return null;
+				}
+				Vertex vertex = AdvancedMapViewer.this.advancedMapViewerApplication.getRouter()
+						.getNearestVertex(
+								new GeoCoordinate(geoPoint.getLatitude(), geoPoint
+										.getLongitude()));
+				if (vertex != null) {
+					String info = PositionInfo.edgesToStringInfo(vertex.getOutboundEdges());
+					if (info != null && !info.equals("")) {
+						publishProgress(info);
+					}
+				}
+			}
+			return null;
+		}
+
+		@Override
+		protected void onProgressUpdate(String... values) {
+			// build the bubbleView
+			TextView bubbleView = new TextView(AdvancedMapViewer.this);
+			bubbleView.setBackgroundDrawable(getResources().getDrawable(R.drawable.map_label));
+			bubbleView.setGravity(Gravity.CENTER);
+			bubbleView.setMaxEms(20);
+			// bubbleView
+			// .setMaxWidth((int) (AdvancedMapViewer.this.mapView.getWidth() * (4.0 / 5.0)));
+
+			// set text size according to textScale setting
+			float textSize = 15;
+			try {
+				textSize *= Float.parseFloat(AdvancedMapViewer.this.preferences.getString(
+						"textScale", "1"));
+			} catch (NumberFormatException e) {
+				e.printStackTrace();
+			}
+			bubbleView.setTextSize(textSize);
+			bubbleView.setTextColor(Color.WHITE);
+			bubbleView.setCompoundDrawablesWithIntrinsicBounds(0, 0,
+					R.drawable.ic_menu_info_details, 0);
+			// set the text
+			if (values.length == 1 && values[0] != null) {
+				Log.d("Application", "set text to: " + values[0]);
+				bubbleView.setText(values[0]);
+			}
+			// build the drawable from the bubbleView
+			Drawable drawable = ItemizedOverlay.boundCenterBottom(viewToDrawable(bubbleView));
+			AdvancedMapViewer.this.selectionOverlayItem.setMarker(drawable);
+			AdvancedMapViewer.this.selectionOverlay.requestRedraw();
+		}
+
+		@Override
+		protected void onPreExecute() {
+			// just visible if title bar is visible
+			// setProgressBarIndeterminateVisibility(true);
+		}
+
+	}
+
+	Drawable viewToDrawable(View view) {
+		view.measure(MeasureSpec.getSize(view.getMeasuredWidth()),
+				MeasureSpec.getSize(view.getMeasuredHeight()));
+		view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
+		view.setDrawingCacheEnabled(true);
+		// TODO: check for null
+		Drawable drawable = new BitmapDrawable(Bitmap.createBitmap(view.getDrawingCache()));
+		view.setDrawingCacheEnabled(false);
+		return drawable;
+	}
+
+	private class SelectionOverlay extends ArrayItemizedOverlay {
+
+		public SelectionOverlay(Drawable defaultMarker, boolean alignMarker) {
+			super(defaultMarker, alignMarker);
+		}
+
+		@Override
+		public boolean onLongPress(GeoPoint geoPoint, MapView overlayMapView) {
+			// clear last label bubble
+			this.clear();
+			if (AdvancedMapViewer.this.selectionOverlayItem == null) {
+				AdvancedMapViewer.this.selectionOverlayItem = new OverlayItem(geoPoint, null,
+						null, ItemizedOverlay.boundCenterBottom(getResources().getDrawable(
+								R.drawable.map_label)));
+			} else {
+				AdvancedMapViewer.this.selectionOverlayItem.setPoint(geoPoint);
+			}
+			addItem(AdvancedMapViewer.this.selectionOverlayItem);
+
+			Log.d("Application", "longPress, builded overlayitem");
+			// asynchronously set the text
+			AdvancedMapViewer.this.runOnUiThread(new myRunnable(geoPoint));
+
+			return true;
+		}
+
+		private class myRunnable implements Runnable {
+			private GeoPoint geoPoint;
+
+			public myRunnable(GeoPoint geoPoint) {
+				this.geoPoint = geoPoint;
+			}
+
+			@Override
+			public void run() {
+				new InfoSetterAsync().execute(this.geoPoint);
+			}
+		}
+
+		@Override
+		protected boolean onTap(int index) {
+			OverlayItem item = createItem(index);
+			if (item != null) {
+				if (AdvancedMapViewer.this.locationPickerMode) {
+					Log.d("RouteCalculator", "location picker mode on");
+					AdvancedMapViewer.this.setResult(RESULT_OK,
+							new Intent().putExtra("LONGITUDE", item.getPoint().getLongitude())
+									.putExtra("LATITUDE", item.getPoint().getLatitude()));
+					AdvancedMapViewer.this.finish();
+					return true;
+				}
+				startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class).putExtra(
+						"LATITUDE", item.getPoint().getLatitude()).putExtra("LONGITUDE",
+						item.getPoint().getLongitude()));
+			}
+			return true;
+		}
+
+		@Override
+		public boolean onTap(GeoPoint geoPoint, MapView mv) {
+			// TODO: label disappears on pinch zooming
+			if (!super.onTap(geoPoint, mv)) {
+				AdvancedMapViewer.this.selectionOverlay.clear();
+			}
+			return true;
+		}
+
 	}
 }

@@ -54,7 +54,7 @@
 	</poifile>
 
 	<addressfile>
-		<filename>germany.database.sqlite</filename>
+		<filename>berlin.mod.database.sqlite</filename>
 		<path>/berlin/</path>
 		<uri>?</uri>
 		<md5>1037870fb7cf46e6bf5507939c5cedd3</md5>

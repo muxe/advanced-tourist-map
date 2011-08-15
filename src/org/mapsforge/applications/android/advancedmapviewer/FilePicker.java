@@ -27,9 +27,12 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.WindowManager;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.GridView;
 
 /**
@@ -108,12 +111,14 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 		};
 	}
 
-	private File currentDirectory;
+	File currentDirectory;
 	private FilePickerIconAdapter filePickerIconAdapter;
 	private File[] files;
 	private File[] filesWithParentFolder;
 	private GridView gridView;
+	private Button directoryButton;
 	private File selectedFile;
+	private boolean directoryMode;
 
 	@Override
 	public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -122,8 +127,8 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 			this.currentDirectory = this.selectedFile;
 			browseToCurrentDirectory();
 		} else if (fileSelectFilter == null || fileSelectFilter.accept(this.selectedFile)) {
-			setResult(RESULT_OK, new Intent().putExtra("selectedFile", this.selectedFile
-					.getAbsolutePath()));
+			setResult(RESULT_OK,
+					new Intent().putExtra("selectedFile", this.selectedFile.getAbsolutePath()));
 			finish();
 		} else {
 			showDialog(DIALOG_FILE_INVALID);
@@ -168,10 +173,27 @@ public class FilePicker extends Activity implements AdapterView.OnItemClickListe
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_file_picker);
 
+		Intent startingIntent = getIntent();
+		this.directoryMode = startingIntent.getBooleanExtra("directory", false);
+
 		this.filePickerIconAdapter = new FilePickerIconAdapter(this);
 		this.gridView = (GridView) findViewById(R.id.filePickerView);
 		this.gridView.setOnItemClickListener(this);
 		this.gridView.setAdapter(this.filePickerIconAdapter);
+		this.directoryButton = (Button) findViewById(R.id.filePickerButton);
+		if (this.directoryMode) {
+			this.directoryButton.setOnClickListener(new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					setResult(RESULT_OK, new Intent().putExtra("selectedFile",
+							FilePicker.this.currentDirectory.getAbsolutePath()));
+					Log.d("FilePicker", FilePicker.this.currentDirectory.getAbsolutePath());
+					finish();
+				}
+			});
+		} else {
+			this.directoryButton.setVisibility(View.GONE);
+		}
 
 		if (savedInstanceState == null) {
 			// first start of this instance

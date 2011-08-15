@@ -20,10 +20,10 @@
 		android:layout_height="wrap_content"
 		android:layout_centerVertical="true"
 		android:layout_alignParentLeft="true">
-		<ImageButton android:id="@+id/route_menu_list" 
-			android:layout_height="wrap_content" 
-			android:layout_width="wrap_content" 
-			android:src="@android:drawable/ic_menu_directions" />
+<!-- 		<ImageButton android:id="@+id/route_menu_list"  -->
+<!-- 			android:layout_height="wrap_content"  -->
+<!-- 			android:layout_width="wrap_content"  -->
+<!-- 			android:src="@android:drawable/ic_menu_directions" /> -->
 		<ImageButton android:id="@+id/route_menu_next" 
 			android:layout_height="wrap_content" 
 			android:layout_width="wrap_content" 

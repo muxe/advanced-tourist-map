@@ -47,8 +47,7 @@ public class PositionInfo extends BaseActivity {
 		@Override
 		protected Edge[] doInBackground(Void... arg0) {
 			if (PositionInfo.this.advancedMapViewer.getRouter() == null) {
-				// TODO: quickfix
-				return new Edge[0];
+				return null;
 			}
 			Vertex nearestVertex = PositionInfo.this.advancedMapViewer.getRouter()
 					.getNearestVertex(
@@ -67,7 +66,11 @@ public class PositionInfo extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(Edge[] edges) {
-			PositionInfo.this.nearestJunktionText.setText(edgesToStringInfo(edges));
+			String stringInfo = edgesToStringInfo(edges);
+			if (stringInfo.equals("")) {
+				stringInfo = getString(R.string.positioninfo_unknown_road);
+			}
+			PositionInfo.this.nearestJunktionText.setText(stringInfo);
 		}
 	}
 
@@ -119,8 +122,11 @@ public class PositionInfo extends BaseActivity {
 	 *            array of Edges to convert
 	 * @return a human readable string
 	 */
-	String edgesToStringInfo(Edge[] edges) {
-		// TODO: filter null (52.482675, 13.30337)
+	public static String edgesToStringInfo(Edge[] edges) {
+		if (edges == null || edges.length <= 0) {
+			// alternative: pass context and call getString on it to get a not-found-string
+			return "";
+		}
 		List<String> names = new LinkedList<String>();
 		for (Edge e : edges) {
 			if (e.getName() != null) {

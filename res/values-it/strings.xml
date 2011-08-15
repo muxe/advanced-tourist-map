@@ -15,7 +15,7 @@
 		<item>enorme</item>
 	</string-array>
 
-	<string name="application_name">AdvancedMapViewer</string>
+	<string name="application_name">AMVTouristMap</string>
 	<string name="cancel">Annulla</string>
 	<string name="error">Errore</string>
 	<string name="file_invalid">Il file selezionato non è valido. Si prega di scegliene un altro.</string>

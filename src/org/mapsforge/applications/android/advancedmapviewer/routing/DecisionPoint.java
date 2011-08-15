@@ -17,6 +17,8 @@ public class DecisionPoint {
 	 */
 	private GeoPoint geoPoint;
 
+	private int distance;
+
 	/**
 	 * Constructs a DecisionPint out of a name and a GeoPoint
 	 * 
@@ -28,6 +30,7 @@ public class DecisionPoint {
 	public DecisionPoint(String name, GeoPoint geoPoint) {
 		this.name = name;
 		this.geoPoint = geoPoint;
+		// this.distance = 0;
 	}
 
 	/**
@@ -47,7 +50,7 @@ public class DecisionPoint {
 
 	@Override
 	public String toString() {
-		return this.name;
+		return this.name + " (" + this.distance + "m)";
 	}
 
 	/**
@@ -66,5 +69,9 @@ public class DecisionPoint {
 	 */
 	public String getName() {
 		return this.name;
+	}
+
+	public void setDistance(int distance) {
+		this.distance = distance;
 	}
 }

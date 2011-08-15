@@ -133,9 +133,9 @@ public class RouteCalculator extends BaseActivity {
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (requestCode == INTENT_SEARCH) {
 			if (resultCode == RESULT_OK) {
-				if (data != null && data.hasExtra("LONGITUDE") && data.hasExtra("LATITUDE")) {
-					double lon = data.getDoubleExtra("LONGITUDE", 0.0);
-					double lat = data.getDoubleExtra("LATITUDE", 0.0);
+				if (data != null && data.hasExtra("lon") && data.hasExtra("lat")) {
+					double lon = data.getDoubleExtra("lon", 0.0);
+					double lat = data.getDoubleExtra("lat", 0.0);
 					GeoPoint point = new GeoPoint(lat, lon);
 					if (this.viewToSet == RouteCalculator.START_FIELD) {
 						this.startPoint = point;
@@ -181,21 +181,15 @@ public class RouteCalculator extends BaseActivity {
 									Search.class), INTENT_SEARCH);
 						} else {
 							// TODO:
-							Toast.makeText(RouteCalculator.this, "todo: no addressfile",
+							Toast.makeText(RouteCalculator.this,
+									getString(R.string.addressfile_not_avaiable),
 									Toast.LENGTH_LONG).show();
 						}
 					} else if (items_keys[item].equals("POSITION")) {
 						startPositionSearch();
 					} else if (items_keys[item].equals("MAP")) {
-						startActivityForResult(
-								// TODO: hier spinnt er rum (vermutlich da er den kompletten amv
-								// wieder
-								// in den back stack lädt). loesung: extra "schlanke" mapview
-								// nur fuer
-								// diesen zweck?
-
-								new Intent(RouteCalculator.this, LocationPicker.class),
-								INTENT_MAP);
+						startActivityForResult(new Intent(RouteCalculator.this,
+								LocationPicker.class), INTENT_MAP);
 						// new Intent(RouteCalculator.this, AdvancedMapViewer.class)
 						// .putExtra("mode", "LOCATION_PICKER"), INTENT_MAP);
 					}
@@ -417,7 +411,6 @@ public class RouteCalculator extends BaseActivity {
 			try {
 				rf = routingFiles[0];
 			} catch (ArrayIndexOutOfBoundsException e) {
-				// TODO: exit?
 				return null;
 			}
 

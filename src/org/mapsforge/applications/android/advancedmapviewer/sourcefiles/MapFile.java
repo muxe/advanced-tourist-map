@@ -1,5 +1,9 @@
 package org.mapsforge.applications.android.advancedmapviewer.sourcefiles;
 
+import java.io.File;
+
+import org.mapsforge.android.maps.MapDatabase;
+
 public class MapFile extends SourceFile {
 	private double min_lat;
 	private double max_lat;
@@ -43,4 +47,10 @@ public class MapFile extends SourceFile {
 		return SourceFileType.MAP;
 	}
 
+	@Override
+	public boolean isValid(String basepath, boolean checkMD5) {
+		return super.isValid(basepath, checkMD5)
+				&& MapDatabase.isValidMapFile(basepath + File.separator
+						+ this.getRelativePath());
+	}
 }

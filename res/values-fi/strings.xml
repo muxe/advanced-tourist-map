@@ -15,7 +15,7 @@
 			<item>hyvin suuri</item>
 		</string-array>
                 
-        <string name="application_name">AdvancedMapViewer</string>
+        <string name="application_name">AMVTouristMap</string>
         <string name="cancel">Peruuta</string>
         <string name="error">Virhe</string>
         <string name="file_invalid">Valittu tiedosto ei ole kelvollinen karttatiedosto.

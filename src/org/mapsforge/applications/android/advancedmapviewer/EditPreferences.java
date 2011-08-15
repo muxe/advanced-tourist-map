@@ -69,17 +69,9 @@ public class EditPreferences extends PreferenceActivity {
 					}
 				});
 
-				// set the FileSelectFilter
-				// FilePicker.setFileSelectFilter(new FileFilter() {
-				// @Override
-				// public boolean accept(File file) {
-				// // accept only valid map files
-				// return MapDatabase.isValidMapFile(file.getAbsolutePath());
-				// }
-				// });
-
-				// start the FilePicker
-				startActivityForResult(new Intent(thisActivity, FilePicker.class),
+				// start the FilePicker (in directory return mode)
+				startActivityForResult(
+						new Intent(thisActivity, FilePicker.class).putExtra("directory", true),
 						SELECT_MAP_FILE);
 
 				return true;
@@ -110,10 +102,12 @@ public class EditPreferences extends PreferenceActivity {
 			if (resultCode == RESULT_OK) {
 				String filename = data.getStringExtra("selectedFile");
 				File file = new File(filename);
-				String path = file.getParent();
+				if (file.isFile()) {
+					filename = file.getParent();
+				}
 				Editor editor = this.appPreferences.edit();
 
-				editor.putString("baseBundlePath", path);
+				editor.putString("baseBundlePath", filename);
 				editor.remove("bundlePath");
 				editor.commit();
 				// unset in Application
@@ -122,7 +116,7 @@ public class EditPreferences extends PreferenceActivity {
 				AdvancedMapViewerApplication amvapp = (AdvancedMapViewerApplication) getApplication();
 				amvapp.resetBaseBundlePath();
 				// amvapp.resetCurrentMapBundle();
-				this.fileChooser.setSummary(path);
+				this.fileChooser.setSummary(filename);
 			}
 
 		}

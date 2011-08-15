@@ -20,37 +20,39 @@ package org.mapsforge.geocoding.widget;
 import java.util.ArrayList;
 import java.util.List;
 
-import model.address.android.SqRoad;
+import model.address.android.SqPlace;
+import model.address.android.SqPostcode;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
-public class RoadCompletionAdapter extends SqliteCompletionAdapter<SqRoad> {
+public class PlaceCompletionAdapter extends SqliteCompletionAdapter<SqPlace> {
 
 	private static final int limit = 20;
 
-	private SQLiteDatabase db;
-	private int cityId;
+	SQLiteDatabase db;
 
-	public RoadCompletionAdapter(SQLiteDatabase db, int cityId) {
+	public PlaceCompletionAdapter(SQLiteDatabase db) {
 		super();
 		this.db = db;
-		this.cityId = cityId;
 	}
 
 	@Override
-	public String getString(SqRoad road) {
-		return road.getName();
-	}
+	public String getString(SqPlace place) {
+		String result = place.getName();
 
-	@Override
-	public List<SqRoad> getResults(String needle) {
-		Log.i("sql", "request " + needle);
-		if (needle == null) {
-			return new ArrayList<SqRoad>();
+		SqPostcode postcode = place.getPostcode();
+		if (postcode != null) {
+			result += " (" + postcode.getPostcode() + ")";
 		}
-		List<SqRoad> cities = SqRoad.getRoadsByCity(this.db, this.cityId, needle, limit);
-		Log.i("sql", "results: " + cities.size());
-		return cities;
+		return result;
+	}
+
+	@Override
+	public List<SqPlace> getResults(String needle) {
+		if (needle == null) {
+			return new ArrayList<SqPlace>();
+		}
+		List<SqPlace> places = SqPlace.getPlaces(this.db, needle, false, limit);
+		return places;
 	}
 
 }

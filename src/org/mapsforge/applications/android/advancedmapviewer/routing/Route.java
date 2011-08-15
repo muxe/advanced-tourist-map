@@ -36,6 +36,8 @@ public class Route {
 	/** to hold the state of the last watched DecisionPoint, needed to jump from point */
 	public DecisionPoint currentDecisionPoint;
 
+	private int length;
+
 	/**
 	 * Constructs a route out of an Edge array returned by the Router class
 	 * 
@@ -44,9 +46,9 @@ public class Route {
 	 */
 	public Route(Edge[] edges) {
 		this.edges = edges;
-		this.setGeoPoints(routeToGeoPoints(edges));
+		this.geoPoints = routeToGeoPoints(edges);
 		this.overlayWay = new OverlayWay(new GeoPoint[][] { this.getGeoPoints() });
-		this.decisionPoints = Route.calculateDecisionPoints(edges);
+		this.decisionPoints = this.calculateDecisionPoints(edges);
 		this.overlayItems = this.decisionPointsToOverlayItems(this.decisionPoints);
 		this.currentDecisionPoint = this.decisionPoints[0];
 	}
@@ -80,10 +82,6 @@ public class Route {
 		return arr;
 	}
 
-	public void setGeoPoints(GeoPoint[] geoPoints) {
-		this.geoPoints = geoPoints;
-	}
-
 	public GeoPoint[] getGeoPoints() {
 		return this.geoPoints;
 	}
@@ -100,6 +98,10 @@ public class Route {
 		return this.overlayItems;
 	}
 
+	public int getLength() {
+		return this.length;
+	}
+
 	/**
 	 * Converts an array of Edges to an array of DecisionPoints. Duplicate street names (in a
 	 * row) get filtered
@@ -108,24 +110,61 @@ public class Route {
 	 *            ArrayList of DecisionPoints
 	 * @return Array of DecisionPoints
 	 */
-	public static DecisionPoint[] calculateDecisionPoints(Edge[] edges) {
+	private DecisionPoint[] calculateDecisionPoints(Edge[] edges) {
 		ArrayList<DecisionPoint> decisionList = new ArrayList<DecisionPoint>();
 
 		String lastStreet = "";
+		int distance = 0;
+		int part_distance = 0;
+		DecisionPoint dp = null;
+		// DecisionPoint lastDp = null;
 		for (Edge edge : edges) {
 			// TODO: externalize string
+			// TODO: setting of route length stuff (siehe log output)
+
 			String streetName = edge.getName() == null ? "unknown" : edge.getName();
+			Log.d("RouteCalculator", streetName + " - " + edgeLength(edge));
+			// set length of LAST decision point
 			if (!streetName.equals(lastStreet)) {
+				if (dp != null) {
+					dp.setDistance(part_distance);
+					distance += part_distance;
+				}
 				lastStreet = streetName;
-				decisionList.add(new DecisionPoint(streetName, edge.getSource()));
-				Log.d(TAG, streetName);
+				// lastDp = dp;
+				dp = new DecisionPoint(streetName, edge.getSource());
+				decisionList.add(dp);
+				part_distance = edgeLength(edge);
+				// Log.d(TAG, streetName);
+			} else {
+				part_distance += edgeLength(edge);
 			}
+
 		}
+		if (dp != null) {
+			dp.setDistance(part_distance);
+			distance += part_distance;
+		}
+		Log.d("RouteCalculator", "dist to set: " + distance);
+		this.length = distance;
 
 		DecisionPoint[] arr;
 		arr = new DecisionPoint[decisionList.size()];
 		decisionList.toArray(arr);
 		return arr;
+	}
+
+	private int edgeLength(Edge edge) {
+		int distance = 0;
+		GeoCoordinate lastGC = null;
+		for (GeoCoordinate gc : edge.getAllWaypoints()) {
+			if (lastGC != null) {
+				distance += gc.sphericalDistance(lastGC);
+			}
+			lastGC = gc;
+		}
+		return distance;
+
 	}
 
 	/**

@@ -15,7 +15,7 @@
 		<item>riesig</item>
 	</string-array>
 
-	<string name="application_name">AdvancedMapViewer</string>
+	<string name="application_name">AMVTouristMap</string>
 	<string name="cancel">Abbrechen</string>
 	<string name="error">Fehler</string>
 	<string name="file_invalid">Die gewählte Datei ist ungültig. Bitte wählen Sie eine andere.</string>

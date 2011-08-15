@@ -14,6 +14,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 /**
  * Activity to display all DecisionPoints (Streets) of a Route in a list, which clicking of
@@ -24,6 +25,7 @@ public class RouteList extends BaseActivity {
 	private ListView routingList;
 	private Button viewOnMapButton;
 	private ArrayAdapter<DecisionPoint> routingAdapter;
+	private TextView routeLengthView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,11 +35,13 @@ public class RouteList extends BaseActivity {
 
 		this.routingList = (ListView) findViewById(R.id.routing_list);
 		this.viewOnMapButton = (Button) findViewById(R.id.view_on_map_button);
+		this.routeLengthView = (TextView) findViewById(R.id.routing_list_length);
 
 		Route route = this.advancedMapViewer.currentRoute;
 
 		if (route != null) {
 			DecisionPoint[] decisionPoints = route.getDecisionPoints();
+			this.routeLengthView.setText(route.getLength() + "m");
 
 			this.routingAdapter = new ArrayAdapter<DecisionPoint>(this,
 					android.R.layout.simple_list_item_1, decisionPoints);

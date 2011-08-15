@@ -221,7 +221,9 @@ public class FileManager {
 						}
 					}
 				}
-				return mapBundle;
+				if (mapBundle.isValid()) {
+					return mapBundle;
+				}
 			}
 		} catch (SAXException e) {
 			e.printStackTrace();
