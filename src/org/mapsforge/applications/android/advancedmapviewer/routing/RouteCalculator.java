@@ -47,6 +47,10 @@ public class RouteCalculator extends BaseActivity {
 	protected static final int DIALOG_CHOOSE_INPUT = 0;
 
 	private static final int TWO_MINUTES = 1000 * 60 * 2;
+	private static final String SAVE_START_LAT = "saved_start_lat";
+	private static final String SAVE_START_LON = "saved_start_lon";
+	private static final String SAVE_DEST_LAT = "saved_dest_lat";
+	private static final String SAVE_DEST_LON = "saved_dest_lon";
 
 	GeoPoint startPoint;
 	GeoPoint destPoint;
@@ -401,7 +405,7 @@ public class RouteCalculator extends BaseActivity {
 		@Override
 		protected void onPreExecute() {
 			RouteCalculator.this.progressDialog = ProgressDialog.show(RouteCalculator.this, "",
-					"Loading. Please wait...", true);
+					getString(R.string.loading_message), true);
 		}
 
 		@Override
@@ -458,5 +462,33 @@ public class RouteCalculator extends BaseActivity {
 						getString(R.string.routing_no_route_found), Toast.LENGTH_LONG).show();
 			}
 		}
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Bundle savedInstanceState) {
+		super.onRestoreInstanceState(savedInstanceState);
+		double startLat = savedInstanceState.getDouble(SAVE_START_LAT);
+		double startLon = savedInstanceState.getDouble(SAVE_START_LON);
+		double destLat = savedInstanceState.getDouble(SAVE_DEST_LAT);
+		double destLon = savedInstanceState.getDouble(SAVE_DEST_LON);
+		if (startLat != 0.0 && startLon != 0.0) {
+			this.startPoint = new GeoPoint(startLat, startLon);
+		}
+		if (destLat != 0.0 && destLon != 0.0) {
+			this.destPoint = new GeoPoint(destLat, destLon);
+		}
+	}
+
+	@Override
+	protected void onSaveInstanceState(Bundle outState) {
+		if (this.startPoint != null) {
+			outState.putDouble(SAVE_START_LAT, this.startPoint.getLatitude());
+			outState.putDouble(SAVE_START_LON, this.startPoint.getLongitude());
+		}
+		if (this.destPoint != null) {
+			outState.putDouble(SAVE_DEST_LAT, this.destPoint.getLatitude());
+			outState.putDouble(SAVE_DEST_LON, this.destPoint.getLongitude());
+		}
+		super.onSaveInstanceState(outState);
 	}
 }

@@ -1,21 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-  xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="match_parent"
-  android:layout_height="match_parent" android:orientation="vertical">
-    <TableLayout android:layout_width="match_parent" android:layout_height="wrap_content">
-        <TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="10dp">
-        	<TextView android:text="@string/latitude" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="10dp" android:textStyle="bold" />
-        	<TextView android:id="@+id/position_info_latitude" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-        </TableRow>
-        <TableRow android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_margin="10dp">
-			<TextView android:text="@string/longitude" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="10dp" android:textStyle="bold" />
-        	<TextView android:id="@+id/position_info_longitude" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-        </TableRow>
-    </TableLayout>
-    <TextView android:text="@string/positioninfo_nearest_junction" android:id="@+id/position_info_nearest_junktion" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:layout_marginLeft="10dp"/>
-    <TextView android:text="@string/loading_message" android:id="@+id/position_info_text_nearest_junktion" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="10dp" android:layout_marginBottom="10dp"/>
-    <Button android:text="@string/show_on_map" android:id="@+id/position_info_button_show_on_map" android:layout_width="match_parent" android:layout_height="wrap_content" />
-    <Button android:text="@string/calculate_route" android:id="@+id/position_info_button_route" android:layout_height="wrap_content" android:layout_width="match_parent" />
-    <Button android:text="@string/find_pois" android:id="@+id/position_info_button_find_pois" android:layout_height="wrap_content" android:layout_width="match_parent" />
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:orientation="vertical">
+	<TableLayout android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<TableRow android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_margin="10dp">
+			<TextView android:text="@string/latitude"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:layout_marginRight="10dp" android:textStyle="bold" />
+			<TextView android:id="@+id/position_info_latitude"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+		</TableRow>
+		<TableRow android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_margin="10dp">
+			<TextView android:text="@string/longitude"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:layout_marginRight="10dp" android:textStyle="bold" />
+			<TextView android:id="@+id/position_info_longitude"
+				android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+		</TableRow>
+	</TableLayout>
+	<TextView android:text="@string/positioninfo_nearest_junction"
+		android:id="@+id/position_info_nearest_junktion" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:textStyle="bold"
+		android:layout_marginLeft="10dp" />
+	<TextView android:text="@string/loading_message"
+		android:id="@+id/position_info_text_nearest_junktion"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_marginLeft="10dp" android:layout_marginBottom="10dp" />
+	<LinearLayout android:layout_width="match_parent"
+		android:layout_height="wrap_content">
+		<Button android:text="@string/show_on_map" android:id="@+id/position_info_button_show_on_map"
+			android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		<Button android:text="@string/calculate_route" android:id="@+id/position_info_button_route"
+			android:layout_height="wrap_content" android:layout_width="wrap_content" />
+	</LinearLayout>
+
+	<Button android:text="@string/find_pois" android:id="@+id/position_info_button_find_pois"
+		android:layout_height="wrap_content" android:layout_width="match_parent" />
+	<ListView android:layout_height="fill_parent"
+		android:id="@+id/position_info_poi_list_view" android:layout_width="match_parent" />
 </LinearLayout>

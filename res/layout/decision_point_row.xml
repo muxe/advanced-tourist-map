@@ -3,18 +3,17 @@
 	android:orientation="horizontal" android:layout_width="match_parent"
 	android:layout_height="wrap_content">
 	<ImageView android:layout_height="wrap_content"
-		android:layout_width="wrap_content" android:id="@+id/installed_bundle_row_image"
-		android:maxHeight="72px" android:maxWidth="41px"
+		android:layout_width="wrap_content" android:id="@+id/decision_point_row_image"
 		android:layout_gravity="center_vertical" />
 	<LinearLayout android:layout_height="wrap_content"
 		android:layout_width="wrap_content" android:orientation="vertical"
 		android:layout_marginLeft="10dp" android:layout_marginTop="10dp"
 		android:layout_marginBottom="10dp">
-		<TextView android:text="Mapfile" android:layout_height="wrap_content"
+		<TextView android:text="Streetname" android:layout_height="wrap_content"
 			android:textAppearance="?android:attr/textAppearanceLarge"
-			android:id="@+id/installed_bundle_row_name" android:layout_width="wrap_content" />
-		<TextView android:text="Description"
-			android:id="@+id/installed_bundle_row_description"
+			android:id="@+id/decision_point_row_name" android:layout_width="wrap_content" />
+		<TextView android:text="1337m"
+			android:id="@+id/decision_point_row_description"
 			android:layout_width="wrap_content" android:layout_height="wrap_content" />
 	</LinearLayout>
 </LinearLayout>

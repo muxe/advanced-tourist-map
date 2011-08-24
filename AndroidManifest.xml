@@ -19,6 +19,7 @@
 		<activity android:name=".LocationPicker" />
 		<activity android:name=".LocationPicker" />
 		<activity android:name=".sourcefiles.FileManagerActivity" />
+		<activity android:name=".poi.PoiBrowserActivity" />
 	</application>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.INTERNET" />

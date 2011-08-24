@@ -71,8 +71,6 @@ public class Search extends BaseActivity {
 		super.onCreate(savedInstanceState);
 		Log.d(ANDROID_LOG_TAG, "create");
 
-		SharedPreferences prefs = getSharedPreferences(PREFERENCES_FILE, MODE_PRIVATE);
-		// this.filename = prefs.getString("addressFile", null);
 		this.filename = this.advancedMapViewer.getBaseBundlePath()
 				+ File.separator
 				+ this.advancedMapViewer.getCurrentMapBundle().getAddressFile()
@@ -92,7 +90,7 @@ public class Search extends BaseActivity {
 		// this.state = (State) savedInstanceState.getSerializable("state");
 		// }
 
-		showDependingOnState();
+		// showDependingOnState();
 	}
 
 	@Override
@@ -140,12 +138,12 @@ public class Search extends BaseActivity {
 
 		setContentView(R.layout.search_main);
 
-		if (this.state.view == State.VIEW_INPUT) {
-			showViewInput();
-		}
-		if (this.state.view == State.VIEW_RESULTS) {
-			showViewResults();
-		}
+		// if (this.state.view == State.VIEW_INPUT) {
+		showViewInput();
+		// }
+		// if (this.state.view == State.VIEW_RESULTS) {
+		// showViewResults();
+		// }
 	}
 
 	// AutoCompleteTextView editCity = null;

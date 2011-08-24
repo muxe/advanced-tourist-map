@@ -1,21 +1,30 @@
 package org.mapsforge.applications.android.advancedmapviewer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.mapsforge.applications.android.advancedmapviewer.poi.PoiBrowserActivity;
 import org.mapsforge.applications.android.advancedmapviewer.routing.RouteCalculator;
 import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Vertex;
+import org.mapsforge.poi.PointOfInterest;
 
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 /**
@@ -23,13 +32,24 @@ import android.widget.TextView;
  * and nearby POIs
  */
 public class PositionInfo extends BaseActivity {
+
+	private static final String IMAGEKEY = "image";
+	private static final String NAMEKEY = "name";
+	private static final String INFOKEY = "info";
+
 	private static final String TAG = PositionInfo.class.getSimpleName();
+	private static final int MAX_POIS = 20;
+
 	private TextView positionInfoLatitude;
 	private TextView positionInfoLongitude;
 	// private Button showOnMapButton;
 	private Button calculateRouteButton;
+	private Button findPoiButton;
 	TextView nearestJunktionText;
+	ListView poiListView;
 	private TextView nearestJunktionHeadline;
+
+	ArrayList<PointOfInterest> currentPois;
 
 	double latitude;
 	double longitude;
@@ -74,6 +94,51 @@ public class PositionInfo extends BaseActivity {
 		}
 	}
 
+	private class SetNearestPoisAsync extends
+			AsyncTask<Void, Void, List<HashMap<String, Object>>> {
+
+		public SetNearestPoisAsync() {
+		}
+
+		@Override
+		protected List<HashMap<String, Object>> doInBackground(Void... arg0) {
+			PositionInfo.this.currentPois = new ArrayList<PointOfInterest>();
+			List<HashMap<String, Object>> fillPois = new ArrayList<HashMap<String, Object>>();
+			Iterator<PointOfInterest> iterator = PositionInfo.this.advancedMapViewer
+					.getPerstManager().neighborIterator(
+							new GeoCoordinate(PositionInfo.this.latitude,
+									PositionInfo.this.longitude), "Root");
+			for (int i = 0; i < MAX_POIS && iterator.hasNext(); i++) {
+				PointOfInterest poi = iterator.next();
+				HashMap<String, Object> map = new HashMap<String, Object>();
+				int distance = (int) GeoCoordinate.sphericalDistance(
+						PositionInfo.this.longitude, PositionInfo.this.latitude,
+						poi.getLongitude(), poi.getLatitude());
+				String description;
+				if (poi.getName() != null) {
+					description = poi.getName() + " (" + poi.getCategory().getTitle() + ")";
+				} else {
+					description = poi.getCategory().getTitle();
+				}
+				map.put(IMAGEKEY, R.drawable.ic_menu_myplaces);
+				map.put(NAMEKEY, description);
+				map.put(INFOKEY, distance + " m");
+				fillPois.add(map);
+				PositionInfo.this.currentPois.add(poi);
+			}
+			return fillPois;
+		}
+
+		@Override
+		protected void onPostExecute(List<HashMap<String, Object>> result) {
+			String[] from = new String[] { IMAGEKEY, NAMEKEY, INFOKEY };
+			int[] to = new int[] { R.id.poi_row_image, R.id.poi_row_name, R.id.poi_row_distance };
+			PositionInfo.this.poiListView.setAdapter(new SimpleAdapter(PositionInfo.this,
+					result, R.layout.poi_row, from, to));
+		}
+
+	}
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -83,6 +148,18 @@ public class PositionInfo extends BaseActivity {
 		this.nearestJunktionText = (TextView) findViewById(R.id.position_info_text_nearest_junktion);
 		this.nearestJunktionHeadline = (TextView) findViewById(R.id.position_info_nearest_junktion);
 		this.calculateRouteButton = (Button) findViewById(R.id.position_info_button_route);
+		this.findPoiButton = (Button) findViewById(R.id.position_info_button_find_pois);
+		this.poiListView = (ListView) findViewById(R.id.position_info_poi_list_view);
+		this.poiListView.setOnItemClickListener(new OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> arg0, View arg1, int position, long arg3) {
+				PointOfInterest poi = PositionInfo.this.currentPois.get(position);
+				PositionInfo.this.advancedMapViewer.getCurrentPois().clear();
+				PositionInfo.this.advancedMapViewer.getCurrentPois().add(poi);
+				startActivity(new Intent(PositionInfo.this, AdvancedMapViewer.class)
+						.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+			}
+		});
 
 		Intent intent = getIntent();
 		this.latitude = intent.getDoubleExtra("LATITUDE", 0.0);
@@ -99,6 +176,15 @@ public class PositionInfo extends BaseActivity {
 						PositionInfo.this.longitude));
 			}
 		});
+
+		this.findPoiButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(PositionInfo.this, PoiBrowserActivity.class).putExtra(
+						"lat", PositionInfo.this.latitude).putExtra("lon",
+						PositionInfo.this.longitude));
+			}
+		});
 	}
 
 	@Override
@@ -111,6 +197,10 @@ public class PositionInfo extends BaseActivity {
 			this.nearestJunktionText.setVisibility(View.GONE);
 		} else {
 			new SetNearestJunctionInfo().execute();
+		}
+
+		if (this.advancedMapViewer.getCurrentMapBundle().isPoiable()) {
+			new SetNearestPoisAsync().execute();
 		}
 	}
 

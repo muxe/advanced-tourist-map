@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="fill_parent" android:layout_height="fill_parent">
 	<Button android:id="@+id/filePickerButton" android:layout_height="wrap_content"
-		android:text="This Directory" android:layout_width="fill_parent"
+		android:text="@string/file_picker_this_directory" android:layout_width="fill_parent"
 		android:layout_alignParentBottom="true" />
 	<GridView android:id="@+id/filePickerView"
 		android:layout_width="fill_parent" android:layout_height="fill_parent"

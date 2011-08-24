@@ -92,6 +92,10 @@ public class MapBundle {
 		return this.getAddressFile() != null;
 	}
 
+	public boolean isPoiable() {
+		return this.getPoiFile() != null;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {

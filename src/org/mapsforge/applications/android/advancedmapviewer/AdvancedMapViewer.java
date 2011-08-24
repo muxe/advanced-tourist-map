@@ -17,6 +17,7 @@ package org.mapsforge.applications.android.advancedmapviewer;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -33,6 +34,7 @@ import org.mapsforge.android.maps.MapView.TextField;
 import org.mapsforge.android.maps.MapViewMode;
 import org.mapsforge.android.maps.OverlayCircle;
 import org.mapsforge.android.maps.OverlayItem;
+import org.mapsforge.applications.android.advancedmapviewer.poi.PoiBrowserActivity;
 import org.mapsforge.applications.android.advancedmapviewer.routing.DecisionOverlay;
 import org.mapsforge.applications.android.advancedmapviewer.routing.Route;
 import org.mapsforge.applications.android.advancedmapviewer.routing.RouteCalculator;
@@ -41,8 +43,10 @@ import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileMana
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.MapBundle;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Vertex;
+import org.mapsforge.poi.PointOfInterest;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -69,6 +73,7 @@ import android.util.Log;
 import android.util.TimingLogger;
 import android.view.GestureDetector;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -100,6 +105,7 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final String SCREENSHOT_FILE_NAME = "Map screenshot";
 	private static final int SCREENSHOT_QUALITY = 90;
 	private static final int SELECT_MAP_FILE = 0;
+	private static final int INTENT_SEARCH = 1;
 
 	/**
 	 * The default size of the memory card cache.
@@ -123,11 +129,14 @@ public class AdvancedMapViewer extends MapActivity {
 
 	AdvancedMapViewerApplication advancedMapViewerApplication;
 
+	private InfoSetterAsync infoSetter;
+
 	ArrayCircleOverlay circleOverlay;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
 	private ArrayWayOverlay routeOverlay;
 	private DecisionOverlay decisionPointOverlay;
+	private PoiOverlay poiOverlay;
 	SelectionOverlay selectionOverlay;
 	// Drawable selectionDrawable;
 	OverlayItem selectionOverlayItem;
@@ -158,6 +167,11 @@ public class AdvancedMapViewer extends MapActivity {
 
 	private GestureDetector mGestureDetector;
 
+	void setInfosAsync(GeoPoint gp) {
+		this.infoSetter = new InfoSetterAsync();
+		this.infoSetter.execute(gp);
+	}
+
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 		// disable auto following position on scrolling the map
@@ -172,22 +186,6 @@ public class AdvancedMapViewer extends MapActivity {
 		getMenuInflater().inflate(R.menu.options_menu, menu);
 		return true;
 	}
-
-	// @Override
-	// public boolean onMenuOpened(int featureId, Menu menu) {
-	// // http://code.google.com/p/android/issues/detail?id=8359
-	// SubMenu routingSubmenu = menu.findItem(R.id.menu_route).getSubMenu();
-	// if (!this.displayRoute) {
-	// Log.d("Application", "set group invisible");
-	// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, false);
-	// routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, false);
-	// } else {
-	// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, true);
-	// routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, true);
-	// }
-	// return true;
-	//
-	// }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -259,7 +257,12 @@ public class AdvancedMapViewer extends MapActivity {
 				startActivity(new Intent(this, RouteCalculator.class));
 				return true;
 			case R.id.menu_route_list:
-				startActivity(new Intent(AdvancedMapViewer.this, RouteList.class));
+				startActivity(new Intent(this, RouteList.class));
+				return true;
+			case R.id.menu_poi:
+				startActivity(new Intent(this, PoiBrowserActivity.class).putExtra("lat",
+						this.mapView.getMapCenter().getLatitude()).putExtra("lon",
+						this.mapView.getMapCenter().getLongitude()));
 				return true;
 			default:
 				return false;
@@ -289,11 +292,21 @@ public class AdvancedMapViewer extends MapActivity {
 			menu.findItem(R.id.menu_position_map_center).setEnabled(true);
 		}
 
-		// if (this.mapView.getMapViewMode().requiresInternetConnection()) {
-		// menu.findItem(R.id.menu_mapfile).setEnabled(false);
-		// } else {
-		// menu.findItem(R.id.menu_mapfile).setEnabled(true);
-		// }
+		if (this.advancedMapViewerApplication.getCurrentMapBundle().isRoutable()) {
+			menu.findItem(R.id.menu_route).setEnabled(true);
+			menu.findItem(R.id.menu_route).setVisible(true);
+		} else {
+			menu.findItem(R.id.menu_route).setEnabled(false);
+			menu.findItem(R.id.menu_route).setVisible(false);
+		}
+
+		if (this.advancedMapViewerApplication.getCurrentMapBundle().isPoiable()) {
+			menu.findItem(R.id.menu_poi).setEnabled(true);
+			menu.findItem(R.id.menu_poi).setVisible(true);
+		} else {
+			menu.findItem(R.id.menu_poi).setEnabled(false);
+			menu.findItem(R.id.menu_poi).setVisible(false);
+		}
 
 		// http://code.google.com/p/android/issues/detail?id=8359
 		SubMenu routingSubmenu = menu.findItem(R.id.menu_route).getSubMenu();
@@ -454,41 +467,6 @@ public class AdvancedMapViewer extends MapActivity {
 		});
 	}
 
-	// /**
-	// * Sets all file filters and starts the FilePicker.
-	// */
-	// private void startFileBrowser() {
-	// // set the FileDisplayFilter
-	// FilePicker.setFileDisplayFilter(new FileFilter() {
-	// @Override
-	// public boolean accept(File file) {
-	// // accept only readable files
-	// if (file.canRead()) {
-	// if (file.isDirectory()) {
-	// // accept all directories
-	// return true;
-	// } else if (file.isFile() && file.getName().endsWith(".map")) {
-	// // accept all files with a ".map" extension
-	// return true;
-	// }
-	// }
-	// return false;
-	// }
-	// });
-	//
-	// // set the FileSelectFilter
-	// FilePicker.setFileSelectFilter(new FileFilter() {
-	// @Override
-	// public boolean accept(File file) {
-	// // accept only valid map files
-	// return MapDatabase.isValidMapFile(file.getAbsolutePath());
-	// }
-	// });
-	//
-	// // start the FilePicker
-	// startActivityForResult(new Intent(this, FilePicker.class), SELECT_MAP_FILE);
-	// }
-
 	private void startBundleBrowser() {
 		startActivity(new Intent(this, FileManagerActivity.class));
 	}
@@ -505,6 +483,17 @@ public class AdvancedMapViewer extends MapActivity {
 					&& !this.mapView.getMapViewMode().requiresInternetConnection()
 					&& !this.mapView.hasValidMapFile()) {
 				finish();
+			}
+		} else if (requestCode == INTENT_SEARCH) {
+			if (resultCode == RESULT_OK) {
+				if (data != null && data.hasExtra("lon") && data.hasExtra("lat")) {
+					double lon = data.getDoubleExtra("lon", 0.0);
+					double lat = data.getDoubleExtra("lat", 0.0);
+					GeoPoint point = new GeoPoint(lat, lon);
+					this.mapView.getController().setCenter(point);
+					// this.mapView.getController().setZoom(16);
+					this.selectionOverlay.setLabel(point);
+				}
 			}
 		}
 	}
@@ -562,9 +551,8 @@ public class AdvancedMapViewer extends MapActivity {
 				R.drawable.jog_tab_target_gray));
 		this.mapView.getOverlays().add(this.decisionPointOverlay);
 
+		// selection overlay to display labels with additional information
 		this.selectionOverlay = new SelectionOverlay(null, false);
-		// this.selectionOverlay = new SelectionOverlay(this, getResources().getDrawable(
-		// R.drawable.marker_red), true);
 		this.mapView.getOverlays().add(this.selectionOverlay);
 
 		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
@@ -574,33 +562,6 @@ public class AdvancedMapViewer extends MapActivity {
 				showDialog(DIALOG_GPS_DISABLED);
 			}
 		}
-
-		// Basic "invisible" Overlay to handle long presses on map
-		// this.mapView.getOverlays().add(new Overlay() {
-		// @Override
-		// protected void drawOverlayBitmap(Canvas canvas, Point drawPosition,
-		// Projection projection, byte drawZoomLevel) {
-		//
-		// }
-		//
-		// @Override
-		// public boolean onLongPress(GeoPoint geoPoint, MapView mv) {
-		// // map view is in locationPicerMode, so just return tap point
-		// if (AdvancedMapViewer.this.locationPickerMode) {
-		// Log.d("RouteCalculator", "location picker mode on");
-		// AdvancedMapViewer.this.setResult(RESULT_OK,
-		// new Intent().putExtra("LONGITUDE", geoPoint.getLongitude())
-		// .putExtra("LATITUDE", geoPoint.getLatitude()));
-		// AdvancedMapViewer.this.finish();
-		// return true;
-		// }
-		// startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class).putExtra(
-		// "LATITUDE", geoPoint.getLatitude()).putExtra("LONGITUDE",
-		// geoPoint.getLongitude()));
-		// return true;
-		// }
-		//
-		// });
 
 		this.mGestureDetector = new GestureDetector(this, new ScrollListener());
 
@@ -746,6 +707,9 @@ public class AdvancedMapViewer extends MapActivity {
 		// release the wake lock if necessary
 		if (this.wakeLock.isHeld()) {
 			this.wakeLock.release();
+		}
+		if (this.infoSetter != null) {
+			this.infoSetter.cancel(false);
 		}
 	}
 
@@ -902,13 +866,10 @@ public class AdvancedMapViewer extends MapActivity {
 		// startFileBrowser();
 		// }
 
-		// TODO: imma workin here
-		// problem: ändert man den basepath über die settings, kann er zwar das bundle noch
-		// laden (da voller path drinsteht), aber dann die einzelnen files nicht mehr (da
-		// diesese zusammengesetzt werden)
+		// check for valid map bundle and start bundle browser, if not present
 		MapBundle mapBundle = this.advancedMapViewerApplication.getCurrentMapBundle();
 		if (mapBundle == null) {
-			showToast("Todo: Can't show map, please select a valid Mapfile");
+			showToast(getString(R.string.select_a_valid_mapfile));
 			this.startBundleBrowser();
 		} else {
 
@@ -953,11 +914,30 @@ public class AdvancedMapViewer extends MapActivity {
 			this.displayRoute = false;
 			this.routeMenu.setVisibility(View.GONE);
 		}
+
+		if (this.advancedMapViewerApplication.getCurrentPois().size() > 0) {
+			this.displayPoiOverlay(this.advancedMapViewerApplication.getCurrentPois());
+		}
+
 		timings.addSplit("set route");
 		timings.dumpToLog();
 	}
 
+	private void displayPoiOverlay(ArrayList<PointOfInterest> pois) {
+		if (this.poiOverlay == null) {
+			this.poiOverlay = new PoiOverlay(this, getResources().getDrawable(
+					R.drawable.marker_poi), true);
+			this.mapView.getOverlays().add(0, this.poiOverlay);
+		}
+		this.poiOverlay.clear();
+		for (PointOfInterest poi : pois) {
+			this.poiOverlay.addItem(new OverlayItem(new GeoPoint(poi.getLatitude(), poi
+					.getLongitude()), poi.getCategory().getTitle(), poi.getName()));
+		}
+	}
+
 	private void disableShowRoute() {
+		this.advancedMapViewerApplication.currentRoute = null;
 		this.decisionPointOverlay.clear();
 		this.routeOverlay.clear();
 		this.displayRoute = false;
@@ -997,6 +977,27 @@ public class AdvancedMapViewer extends MapActivity {
 		}
 	}
 
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		super.onKeyDown(keyCode, event);
+		if (keyCode == KeyEvent.KEYCODE_SEARCH) {
+			startSearch();
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Show the search activity.
+	 */
+	private void startSearch() {
+		if (!this.advancedMapViewerApplication.getCurrentMapBundle().isSearchable()) {
+			showToast(getString(R.string.addressfile_not_avaiable));
+		} else {
+			startActivityForResult(new Intent(this, Search.class), INTENT_SEARCH);
+		}
+	}
+
 	/**
 	 * Displays a text message via the toast notification system. If a previous message is still
 	 * visible, the previous message is first removed.
@@ -1023,22 +1024,12 @@ public class AdvancedMapViewer extends MapActivity {
 	 *            the route to set the menu for
 	 */
 	private void setupRoutingMenu(final Route route) {
-		// if (this.showRoutingListButton == null) {
-		// this.showRoutingListButton = (ImageButton) findViewById(R.id.route_menu_list);
-		// }
 		if (this.nextDecisionPointButton == null) {
 			this.nextDecisionPointButton = (ImageButton) findViewById(R.id.route_menu_next);
 		}
 		if (this.previousDecisionPointButton == null) {
 			this.previousDecisionPointButton = (ImageButton) findViewById(R.id.route_menu_prev);
 		}
-
-		// this.showRoutingListButton.setOnClickListener(new OnClickListener() {
-		// @Override
-		// public void onClick(View v) {
-		// startActivity(new Intent(AdvancedMapViewer.this, RouteList.class));
-		// }
-		// });
 		this.nextDecisionPointButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -1071,11 +1062,11 @@ public class AdvancedMapViewer extends MapActivity {
 
 			publishProgress(getString(R.string.selection_this_point));
 			// TODO: maybe animation while loading
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			// try {
+			// Thread.sleep(1000);
+			// } catch (InterruptedException e) {
+			// e.printStackTrace();
+			// }
 
 			// if map is routable, set street name from router
 			if (!this.isCancelled()
@@ -1148,7 +1139,6 @@ public class AdvancedMapViewer extends MapActivity {
 				MeasureSpec.getSize(view.getMeasuredHeight()));
 		view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
 		view.setDrawingCacheEnabled(true);
-		// TODO: check for null
 		Drawable drawable = new BitmapDrawable(Bitmap.createBitmap(view.getDrawingCache()));
 		view.setDrawingCacheEnabled(false);
 		return drawable;
@@ -1162,7 +1152,12 @@ public class AdvancedMapViewer extends MapActivity {
 
 		@Override
 		public boolean onLongPress(GeoPoint geoPoint, MapView overlayMapView) {
-			// clear last label bubble
+			setLabel(geoPoint);
+			return true;
+		}
+
+		public void setLabel(GeoPoint geoPoint) {
+			// clear last label
 			this.clear();
 			if (AdvancedMapViewer.this.selectionOverlayItem == null) {
 				AdvancedMapViewer.this.selectionOverlayItem = new OverlayItem(geoPoint, null,
@@ -1172,12 +1167,8 @@ public class AdvancedMapViewer extends MapActivity {
 				AdvancedMapViewer.this.selectionOverlayItem.setPoint(geoPoint);
 			}
 			addItem(AdvancedMapViewer.this.selectionOverlayItem);
-
-			Log.d("Application", "longPress, builded overlayitem");
 			// asynchronously set the text
 			AdvancedMapViewer.this.runOnUiThread(new myRunnable(geoPoint));
-
-			return true;
 		}
 
 		private class myRunnable implements Runnable {
@@ -1189,7 +1180,8 @@ public class AdvancedMapViewer extends MapActivity {
 
 			@Override
 			public void run() {
-				new InfoSetterAsync().execute(this.geoPoint);
+				// new InfoSetterAsync().execute(this.geoPoint);
+				AdvancedMapViewer.this.setInfosAsync(this.geoPoint);
 			}
 		}
 
@@ -1212,11 +1204,36 @@ public class AdvancedMapViewer extends MapActivity {
 			return true;
 		}
 
+		// @Override
+		// public boolean onTap(GeoPoint geoPoint, MapView mv) {
+		// // TODO: label disappears on pinch zooming
+		// if (!super.onTap(geoPoint, mv)) {
+		// AdvancedMapViewer.this.selectionOverlay.clear();
+		// }
+		// return true;
+		// }
+
+	}
+
+	private class PoiOverlay extends ArrayItemizedOverlay {
+
+		private final Context context;
+
+		public PoiOverlay(Context context, Drawable defaultMarker, boolean alignMarker) {
+			super(defaultMarker, alignMarker);
+			this.context = context;
+		}
+
 		@Override
-		public boolean onTap(GeoPoint geoPoint, MapView mv) {
-			// TODO: label disappears on pinch zooming
-			if (!super.onTap(geoPoint, mv)) {
-				AdvancedMapViewer.this.selectionOverlay.clear();
+		protected boolean onTap(int index) {
+			OverlayItem item = createItem(index);
+			if (item != null) {
+				Builder builder = new AlertDialog.Builder(this.context);
+				builder.setIcon(android.R.drawable.ic_menu_info_details);
+				builder.setTitle(item.getTitle());
+				builder.setMessage(item.getSnippet());
+				builder.setPositiveButton("OK", null);
+				builder.show();
 			}
 			return true;
 		}

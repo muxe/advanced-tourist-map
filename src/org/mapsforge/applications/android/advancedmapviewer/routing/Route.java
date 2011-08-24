@@ -113,6 +113,7 @@ public class Route {
 	private DecisionPoint[] calculateDecisionPoints(Edge[] edges) {
 		ArrayList<DecisionPoint> decisionList = new ArrayList<DecisionPoint>();
 
+		Edge lastEdge = null;
 		String lastStreet = "";
 		int distance = 0;
 		int part_distance = 0;
@@ -120,8 +121,7 @@ public class Route {
 		// DecisionPoint lastDp = null;
 		for (Edge edge : edges) {
 			// TODO: externalize string
-			// TODO: setting of route length stuff (siehe log output)
-
+			// TODO: when angle is strange, add dp, even if streetname the same
 			String streetName = edge.getName() == null ? "unknown" : edge.getName();
 			Log.d("RouteCalculator", streetName + " - " + edgeLength(edge));
 			// set length of LAST decision point
@@ -133,13 +133,16 @@ public class Route {
 				lastStreet = streetName;
 				// lastDp = dp;
 				dp = new DecisionPoint(streetName, edge.getSource());
+				if (lastEdge != null) {
+					dp.setAngleFromPrevious(AngleCalc.getAngleOfEdges(lastEdge, edge));
+				}
 				decisionList.add(dp);
 				part_distance = edgeLength(edge);
 				// Log.d(TAG, streetName);
 			} else {
 				part_distance += edgeLength(edge);
 			}
-
+			lastEdge = edge;
 		}
 		if (dp != null) {
 			dp.setDistance(part_distance);

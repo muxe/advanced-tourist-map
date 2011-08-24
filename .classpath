@@ -7,5 +7,7 @@
 	<classpathentry kind="lib" path="lib/trove-3.0.0rc1.jar"/>
 	<classpathentry kind="lib" path="lib/mapsforge-map-0.2.4.jar"/>
 	<classpathentry kind="lib" path="lib/search_android.jar"/>
+	<classpathentry kind="lib" path="lib/perst-421.jar"/>
+	<classpathentry kind="lib" path="lib/mapsforge_poi.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -19,6 +19,8 @@ public class DecisionPoint {
 
 	private int distance;
 
+	private double angleFromPrevious;
+
 	/**
 	 * Constructs a DecisionPint out of a name and a GeoPoint
 	 * 
@@ -50,7 +52,8 @@ public class DecisionPoint {
 
 	@Override
 	public String toString() {
-		return this.name + " (" + this.distance + "m)";
+		return this.name + " (" + this.distance + "m " + angleToString(this.angleFromPrevious)
+				+ ")";
 	}
 
 	/**
@@ -73,5 +76,38 @@ public class DecisionPoint {
 
 	public void setDistance(int distance) {
 		this.distance = distance;
+	}
+
+	public int getDistance() {
+		return this.distance;
+	}
+
+	public void setAngleFromPrevious(double angleFromPrevious) {
+		this.angleFromPrevious = angleFromPrevious;
+	}
+
+	public double getAngleFromPrevious() {
+		return this.angleFromPrevious;
+	}
+
+	private String angleToString(double angle) {
+		if (angle > 337 || angle < 22) {
+			return "straight ahead";
+		} else if (angle > 22 && angle < 67) {
+			return "soft right";
+		} else if (angle > 67 && angle < 112) {
+			return "right";
+		} else if (angle > 112 && angle < 157) {
+			return "hard right";
+		} else if (angle > 157 && angle < 202) {
+			return "u turn";
+		} else if (angle > 202 && angle < 247) {
+			return "hard left";
+		} else if (angle > 247 && angle < 292) {
+			return "left";
+		} else if (angle > 292 && angle < 337) {
+			return "soft left";
+		}
+		return "";
 	}
 }

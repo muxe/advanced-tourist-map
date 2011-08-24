@@ -10,6 +10,9 @@ import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileMana
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.MapBundle;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.RoutingFile;
 import org.mapsforge.core.Router;
+import org.mapsforge.poi.PointOfInterest;
+import org.mapsforge.poi.persistence.IPersistenceManager;
+import org.mapsforge.poi.persistence.PersistenceManagerFactory;
 
 import android.app.Application;
 import android.content.SharedPreferences;
@@ -28,12 +31,16 @@ public class AdvancedMapViewerApplication extends Application {
 	// static final String ROUTING_BINARY_FILE = "/sdcard/berlin.mobileHH";
 	private Router router;
 	public Route currentRoute;
+
+	/** The currently displayed pois on map */
+	private ArrayList<PointOfInterest> currentPois;
 	private FileManager fileManager;
 	private String baseBundlePath;
 	private String currentUsedBundlePath;
 	private MapBundle currentMapBundle;
 	private String currentRoutingFile;
 	public SharedPreferences prefs;
+	private IPersistenceManager perstManager;
 
 	// MapView mapView;
 
@@ -67,6 +74,7 @@ public class AdvancedMapViewerApplication extends Application {
 	public void resetCurrentMapBundle() {
 		this.currentMapBundle = null;
 		this.resetRouter();
+		this.perstManager = null;
 	}
 
 	public synchronized FileManager getFileManager() {
@@ -155,5 +163,23 @@ public class AdvancedMapViewerApplication extends Application {
 		this.baseBundlePath = null;
 		// if the abse path is changed, the current bundles are useless
 		this.resetCurrentMapBundle();
+	}
+
+	public IPersistenceManager getPerstManager() {
+		if (this.perstManager == null) {
+			if (getCurrentMapBundle().isPoiable()) {
+				this.perstManager = PersistenceManagerFactory
+						.getPerstPersistenceManager(getBaseBundlePath() + File.separator
+								+ getCurrentMapBundle().getPoiFile().getRelativePath());
+			}
+		}
+		return this.perstManager;
+	}
+
+	public ArrayList<PointOfInterest> getCurrentPois() {
+		if (this.currentPois == null) {
+			this.currentPois = new ArrayList<PointOfInterest>();
+		}
+		return this.currentPois;
 	}
 }
