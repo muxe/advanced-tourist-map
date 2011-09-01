@@ -16,16 +16,18 @@ import org.mapsforge.core.Vertex;
 import org.mapsforge.poi.PointOfInterest;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
-import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 /**
  * Activity to display infos about a geo-position, like coordinates, nearby streets/junctions
@@ -33,6 +35,8 @@ import android.widget.TextView;
  */
 public class PositionInfo extends BaseActivity {
 
+	public static final String LONGITUDE_EXTRA = "LONGITUDE";
+	public static final String LATITUDE_EXTRA = "LATITUDE";
 	private static final String IMAGEKEY = "image";
 	private static final String NAMEKEY = "name";
 	private static final String INFOKEY = "info";
@@ -42,9 +46,10 @@ public class PositionInfo extends BaseActivity {
 
 	private TextView positionInfoLatitude;
 	private TextView positionInfoLongitude;
-	// private Button showOnMapButton;
-	private Button calculateRouteButton;
-	private Button findPoiButton;
+	private ImageButton showOnMapButton;
+	private ImageButton calculateRouteButton;
+	private ImageButton findPoiButton;
+	private ImageButton savePositionButton;
 	TextView nearestJunktionText;
 	ListView poiListView;
 	private TextView nearestJunktionHeadline;
@@ -147,8 +152,10 @@ public class PositionInfo extends BaseActivity {
 		this.positionInfoLongitude = (TextView) findViewById(R.id.position_info_longitude);
 		this.nearestJunktionText = (TextView) findViewById(R.id.position_info_text_nearest_junktion);
 		this.nearestJunktionHeadline = (TextView) findViewById(R.id.position_info_nearest_junktion);
-		this.calculateRouteButton = (Button) findViewById(R.id.position_info_button_route);
-		this.findPoiButton = (Button) findViewById(R.id.position_info_button_find_pois);
+		this.calculateRouteButton = (ImageButton) findViewById(R.id.position_info_button_route);
+		this.findPoiButton = (ImageButton) findViewById(R.id.position_info_button_find_pois);
+		this.showOnMapButton = (ImageButton) findViewById(R.id.position_info_button_show_on_map);
+		this.savePositionButton = (ImageButton) findViewById(R.id.position_info_save_position);
 		this.poiListView = (ListView) findViewById(R.id.position_info_poi_list_view);
 		this.poiListView.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -162,8 +169,8 @@ public class PositionInfo extends BaseActivity {
 		});
 
 		Intent intent = getIntent();
-		this.latitude = intent.getDoubleExtra("LATITUDE", 0.0);
-		this.longitude = intent.getDoubleExtra("LONGITUDE", 0.0);
+		this.latitude = intent.getDoubleExtra(LATITUDE_EXTRA, 0.0);
+		this.longitude = intent.getDoubleExtra(LONGITUDE_EXTRA, 0.0);
 
 		this.positionInfoLatitude.setText(String.valueOf(this.latitude));
 		this.positionInfoLongitude.setText(String.valueOf(this.longitude));
@@ -185,6 +192,27 @@ public class PositionInfo extends BaseActivity {
 						PositionInfo.this.longitude));
 			}
 		});
+
+		this.showOnMapButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("geo:"
+						+ PositionInfo.this.latitude + "," + PositionInfo.this.longitude)));
+				// startActivity(new Intent(Intent.ACTION_VIEW,
+				// Uri.parse("google.navigation:ll="
+				// + PositionInfo.this.latitude + "," + PositionInfo.this.longitude)));
+				Toast.makeText(PositionInfo.this, "Not implemented yet", Toast.LENGTH_SHORT)
+						.show();
+			}
+		});
+
+		this.savePositionButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Toast.makeText(PositionInfo.this, "Not implemented yet", Toast.LENGTH_SHORT)
+						.show();
+			}
+		});
 	}
 
 	@Override
@@ -199,7 +227,9 @@ public class PositionInfo extends BaseActivity {
 			new SetNearestJunctionInfo().execute();
 		}
 
-		if (this.advancedMapViewer.getCurrentMapBundle().isPoiable()) {
+		if (!this.advancedMapViewer.getCurrentMapBundle().isPoiable()) {
+			this.findPoiButton.setVisibility(View.GONE);
+		} else {
 			new SetNearestPoisAsync().execute();
 		}
 	}

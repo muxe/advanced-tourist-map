@@ -3,12 +3,14 @@ package org.mapsforge.applications.android.advancedmapviewer;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Locale;
 
 import org.mapsforge.android.mobileHighwayHierarchies.HHRouter;
 import org.mapsforge.applications.android.advancedmapviewer.routing.Route;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileManager;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.MapBundle;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.RoutingFile;
+import org.mapsforge.applications.android.advancedmapviewer.wikipedia.WikiArticleInterface;
 import org.mapsforge.core.Router;
 import org.mapsforge.poi.PointOfInterest;
 import org.mapsforge.poi.persistence.IPersistenceManager;
@@ -27,13 +29,12 @@ import android.util.TimingLogger;
 public class AdvancedMapViewerApplication extends Application {
 
 	static final int ROUTING_MAIN_MEMORY_CACHE_SIZE = 1024 * 2048;
-	static final String ROUTING_BINARY_FILE = "/sdcard/tourist-map/berlin/berlin.mobileHH";
-	// static final String ROUTING_BINARY_FILE = "/sdcard/berlin.mobileHH";
 	private Router router;
 	public Route currentRoute;
 
 	/** The currently displayed pois on map */
 	private ArrayList<PointOfInterest> currentPois;
+	private ArrayList<WikiArticleInterface> currentWikiArticles;
 	private FileManager fileManager;
 	private String baseBundlePath;
 	private String currentUsedBundlePath;
@@ -41,8 +42,6 @@ public class AdvancedMapViewerApplication extends Application {
 	private String currentRoutingFile;
 	public SharedPreferences prefs;
 	private IPersistenceManager perstManager;
-
-	// MapView mapView;
 
 	@Override
 	public void onCreate() {
@@ -138,12 +137,6 @@ public class AdvancedMapViewerApplication extends Application {
 				return this.getRouter(path);
 			}
 		}
-
-		// Log.d("Application",
-		// this.router.getBoundingBox().maxLatitudeE6 + ", "
-		// + this.router.getBoundingBox().maxLongitudeE6 + " / "
-		// + this.router.getBoundingBox().minLatitudeE6 + ", "
-		// + this.router.getBoundingBox().minLongitudeE6);
 		return this.router;
 	}
 
@@ -161,7 +154,7 @@ public class AdvancedMapViewerApplication extends Application {
 
 	public void resetBaseBundlePath() {
 		this.baseBundlePath = null;
-		// if the abse path is changed, the current bundles are useless
+		// if the base path is changed, the current bundles are useless
 		this.resetCurrentMapBundle();
 	}
 
@@ -181,5 +174,21 @@ public class AdvancedMapViewerApplication extends Application {
 			this.currentPois = new ArrayList<PointOfInterest>();
 		}
 		return this.currentPois;
+	}
+
+	public ArrayList<WikiArticleInterface> getCurrentWikiArticles() {
+		if (this.currentWikiArticles == null) {
+			this.currentWikiArticles = new ArrayList<WikiArticleInterface>();
+		}
+		return this.currentWikiArticles;
+	}
+
+	public String getWikiLocale() {
+		String savedLocale = this.prefs.getString("wikiLang", "default");
+		if (savedLocale.equals("default")) {
+			savedLocale = Locale.getDefault().getLanguage();
+		}
+		// TODO: check if wikipedia avaiable in this locale oO
+		return savedLocale;
 	}
 }

@@ -17,6 +17,13 @@
 		<item>1.6</item>
 	</string-array>
 	
+	<string-array name="preferences_wikipedia_language_keys">
+		<item>default</item>
+		<item>en</item>
+		<item>de</item>
+		<item>fi</item>
+	</string-array>
+	
 	<string-array name="routing_point_picker_keys">
 		<item>ADDRESS</item>
 		<item>POSITION</item>

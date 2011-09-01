@@ -5,6 +5,7 @@ import java.io.File;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.applications.android.advancedmapviewer.BaseActivity;
 import org.mapsforge.applications.android.advancedmapviewer.LocationPicker;
+import org.mapsforge.applications.android.advancedmapviewer.PositionInfo;
 import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.applications.android.advancedmapviewer.Search;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.RoutingFile;
@@ -214,12 +215,14 @@ public class RouteCalculator extends BaseActivity {
 		}
 
 		if (this.startPoint != null) {
-			this.startEditText.setText(this.startPoint.getLatitude() + " "
-					+ this.startPoint.getLongitude());
+			changeStartStop(START_FIELD, this.startPoint);
+			// this.startEditText.setText(this.startPoint.getLatitude() + " "
+			// + this.startPoint.getLongitude());
 		}
 		if (this.destPoint != null) {
-			this.destEditText.setText(this.destPoint.getLatitude() + " "
-					+ this.destPoint.getLongitude());
+			changeStartStop(DEST_FIELD, this.destPoint);
+			// this.destEditText.setText(this.destPoint.getLatitude() + " "
+			// + this.destPoint.getLongitude());
 		}
 
 		RoutingFile[] routingFiles = this.advancedMapViewer.getCurrentMapBundle()
@@ -385,14 +388,27 @@ public class RouteCalculator extends BaseActivity {
 	}
 
 	void changeStartStop(int field, GeoPoint point) {
+		String infoText = point.getLatitude() + " " + point.getLongitude();
+		if (this.advancedMapViewer.getCurrentMapBundle().isRoutable()) {
+			Router router = this.advancedMapViewer.getRouter();
+			if (router != null) {
+				Vertex nearestVertex = router.getNearestVertex(new GeoCoordinate(point
+						.getLatitude(), point.getLongitude()));
+				if (nearestVertex != null) {
+					infoText = PositionInfo.edgesToStringInfo(nearestVertex.getOutboundEdges());
+					if (infoText.equals("")) {
+						infoText = getString(R.string.positioninfo_unknown_road);
+					}
+				}
+			}
+		}
+
 		if (field == RouteCalculator.START_FIELD) {
 			this.startPoint = point;
-			this.startEditText.setText(this.startPoint.getLatitude() + " "
-					+ this.startPoint.getLongitude());
+			this.startEditText.setText(infoText);
 		} else if (field == RouteCalculator.DEST_FIELD) {
 			this.destPoint = point;
-			this.destEditText.setText(this.destPoint.getLatitude() + " "
-					+ this.destPoint.getLongitude());
+			this.destEditText.setText(infoText);
 		}
 	}
 
@@ -430,6 +446,10 @@ public class RouteCalculator extends BaseActivity {
 			Vertex dest = router.getNearestVertex(new GeoCoordinate(
 					RouteCalculator.this.destPoint.getLatitude(),
 					RouteCalculator.this.destPoint.getLongitude()));
+
+			if (start == null || dest == null) {
+				return null;
+			}
 
 			Edge[] edges = router.getShortestPath(start.getId(), dest.getId());
 

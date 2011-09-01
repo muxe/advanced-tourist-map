@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 	<item android:id="@+id/menu_poi" android:title="@string/menu_poi" android:icon="@drawable/ic_menu_myplaces" />
+	<item android:id="@+id/menu_wiki" android:title="@string/menu_wiki" android:icon="@drawable/ic_menu_myplaces" />
 	<item android:id="@+id/menu_route" android:title="@string/menu_route" android:icon="@drawable/ic_menu_directions">
 		<menu>
 			<item android:id="@+id/menu_route_new" android:title="@string/menu_route_new" />
@@ -19,6 +20,8 @@
 		</menu>
 	</item>
 	
+	<item android:id="@+id/menu_clear_map" android:title="@string/menu_clear_map"
+		android:icon="@drawable/ic_menu_close_clear_cancel" />
 	<item android:id="@+id/menu_preferences" android:title="@string/menu_preferences"
 		android:icon="@drawable/ic_menu_preferences" />
 	<item android:id="@+id/menu_mapfile" android:title="@string/menu_mapfile"

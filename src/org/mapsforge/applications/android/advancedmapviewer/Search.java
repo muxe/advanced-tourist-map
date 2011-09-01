@@ -133,7 +133,7 @@ public class Search extends BaseActivity {
 		// .openDatabase(this.filename, null, SQLiteDatabase.OPEN_READONLY);
 		if (this.db == null) {
 			this.db = SQLiteDatabase.openDatabase(this.filename, null,
-					SQLiteDatabase.OPEN_READONLY);
+					SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 		}
 
 		setContentView(R.layout.search_main);

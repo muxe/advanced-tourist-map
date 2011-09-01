@@ -16,6 +16,13 @@
 		<item>huge</item>
 	</string-array>
 	
+	<string-array name="preferences_wikipedia_language_values">
+		<item>default</item>
+		<item>english</item>
+		<item>german</item>
+		<item>finnish</item>
+	</string-array>
+	
 	<string-array name="routing_point_picker_values">
 		<item>Find by address</item>
 		<item>My current position</item>
@@ -40,6 +47,7 @@
 	<string name="info_map_file_start">Start position</string>
 	<string name="latitude">Latitude</string>
 	<string name="longitude">Longitude</string>
+	<string name="latlon">Lat/Lon</string>
 	<string name="menu_info">Info</string>
 	<string name="menu_info_map_file">Map file properties</string>
 	<string name="menu_info_about">About this software</string>
@@ -59,6 +67,8 @@
 	<string name="menu_route_clear">Clear route</string>
 	<string name="menu_poi">Find POIs</string>
 	<string name="menu_poi_show_on_map">Show POIs on map</string>
+	<string name="menu_clear_map">Clear map</string>
+	<string name="menu_wiki">Wikipedia</string>
 	<string name="ok">OK</string>
 	<string name="preferences_debug">Debug settings</string>
 	<string name="preferences_general">General settings</string>
@@ -87,6 +97,8 @@
 	<string name="preferences_show_water_tiles_desc">Highlight tiles which have the water flag set</string>
 	<string name="preferences_text_scale">Font size</string>
 	<string name="preferences_text_scale_desc">Select the text size of map labels</string>
+	<string name="preferences_wikipedia_language">Wikipedia Language</string>
+	<string name="preferences_wikipedia_language_desc">Wikipedia articles will be loaded in this language</string>
 	<string name="preferences_wake_lock">Stay awake</string>
 	<string name="preferences_wake_lock_desc">Stop the screen from dimming</string>
 	<string name="preferences_no_path_selected">no path selected</string>
@@ -105,7 +117,7 @@
 	<string name="routing_start_point">Start</string>
 	<string name="routing_destination_point">Destination</string>
 	<string name="routing_select_start">Select Start</string>
-	<string name="routing_select_destination">Select Destination</string>
+	<string name="routing_select_destination">Select Destination dsvsv esfgsv es</string>
 	<string name="routing_btn_calculate_route">Find Route</string>
 	<string name="routing_file">Routing File</string>
 	<string name="routing_installed_files">Installed Routing Files</string>

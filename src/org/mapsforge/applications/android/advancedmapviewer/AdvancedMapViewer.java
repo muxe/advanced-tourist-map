@@ -20,10 +20,12 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 
 import org.mapsforge.android.maps.ArrayCircleOverlay;
 import org.mapsforge.android.maps.ArrayItemizedOverlay;
 import org.mapsforge.android.maps.ArrayWayOverlay;
+import org.mapsforge.android.maps.CircleOverlay;
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.android.maps.ItemizedOverlay;
 import org.mapsforge.android.maps.MapActivity;
@@ -32,6 +34,7 @@ import org.mapsforge.android.maps.MapDatabase;
 import org.mapsforge.android.maps.MapView;
 import org.mapsforge.android.maps.MapView.TextField;
 import org.mapsforge.android.maps.MapViewMode;
+import org.mapsforge.android.maps.Overlay;
 import org.mapsforge.android.maps.OverlayCircle;
 import org.mapsforge.android.maps.OverlayItem;
 import org.mapsforge.applications.android.advancedmapviewer.poi.PoiBrowserActivity;
@@ -41,6 +44,9 @@ import org.mapsforge.applications.android.advancedmapviewer.routing.RouteCalcula
 import org.mapsforge.applications.android.advancedmapviewer.routing.RouteList;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.FileManagerActivity;
 import org.mapsforge.applications.android.advancedmapviewer.sourcefiles.MapBundle;
+import org.mapsforge.applications.android.advancedmapviewer.wikipedia.ArticleRetriever;
+import org.mapsforge.applications.android.advancedmapviewer.wikipedia.ArticleRetrieverFactory;
+import org.mapsforge.applications.android.advancedmapviewer.wikipedia.WikiArticleInterface;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Vertex;
 import org.mapsforge.poi.PointOfInterest;
@@ -83,10 +89,14 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -131,12 +141,13 @@ public class AdvancedMapViewer extends MapActivity {
 
 	private InfoSetterAsync infoSetter;
 
-	ArrayCircleOverlay circleOverlay;
+	ArrayCircleOverlay positionOverlay;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
 	private ArrayWayOverlay routeOverlay;
 	private DecisionOverlay decisionPointOverlay;
 	private PoiOverlay poiOverlay;
+	private WikiOverlay wikiOverlay;
 	SelectionOverlay selectionOverlay;
 	// Drawable selectionDrawable;
 	OverlayItem selectionOverlayItem;
@@ -166,6 +177,7 @@ public class AdvancedMapViewer extends MapActivity {
 	boolean locationPickerMode;
 
 	private GestureDetector mGestureDetector;
+	private Paint fillPaint;
 
 	void setInfosAsync(GeoPoint gp) {
 		this.infoSetter = new InfoSetterAsync();
@@ -263,6 +275,13 @@ public class AdvancedMapViewer extends MapActivity {
 				startActivity(new Intent(this, PoiBrowserActivity.class).putExtra("lat",
 						this.mapView.getMapCenter().getLatitude()).putExtra("lon",
 						this.mapView.getMapCenter().getLongitude()));
+				return true;
+			case R.id.menu_clear_map:
+				this.clearAllOverlays();
+				return true;
+			case R.id.menu_wiki:
+				new WikiSetterAsync().execute(this.mapView.getMapCenter());
+				showToast("Loading Wikipedia Articles");
 				return true;
 			default:
 				return false;
@@ -384,11 +403,12 @@ public class AdvancedMapViewer extends MapActivity {
 	}
 
 	private void enableFollowGPS() {
-		this.circleOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
+		this.positionOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
 				this.circleOverlayOutline);
 		this.overlayCircle = new OverlayCircle();
-		this.circleOverlay.addCircle(this.overlayCircle);
-		this.mapView.getOverlays().add(this.circleOverlay);
+		this.positionOverlay.addCircle(this.overlayCircle);
+		// this.mapView.getOverlays().add(this.positionOverlay);
+		this.insertOverlayOrdered(this.positionOverlay);
 
 		this.followGpsEnabled = true;
 		this.centerGpsEnabled = true;
@@ -400,7 +420,7 @@ public class AdvancedMapViewer extends MapActivity {
 				if (AdvancedMapViewer.this.centerGpsEnabled) {
 					AdvancedMapViewer.this.mapController.setCenter(point);
 				} else {
-					AdvancedMapViewer.this.circleOverlay.requestRedraw();
+					AdvancedMapViewer.this.positionOverlay.requestRedraw();
 				}
 				AdvancedMapViewer.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
 				AdvancedMapViewer.this.overlayCircle.setCircleData(point,
@@ -439,7 +459,7 @@ public class AdvancedMapViewer extends MapActivity {
 		} else {
 			this.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,
 					0, this.locationListener);
-			showToast("Enable GPS for blaa");
+			showToast("Enable GPS for more accurate positioning");
 		}
 		this.gpsView.setImageResource(R.drawable.stat_sys_gps_acquiring);
 		this.gpsView.setVisibility(View.VISIBLE);
@@ -504,6 +524,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 		// just visible if title bar is visible
 		// requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+		// requestWindowFeature(Window.FEATURE_NO_TITLE);
 
 		TimingLogger timings = new TimingLogger("timing", "onCreate");
 		Log.d("lifecycle", "amv onCreate");
@@ -537,23 +558,18 @@ public class AdvancedMapViewer extends MapActivity {
 		this.circleOverlayOutline.setStrokeWidth(3);
 
 		// initialize route overlay
-		Paint fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		fillPaint.setStyle(Paint.Style.STROKE);
-		fillPaint.setColor(Color.BLUE);
-		fillPaint.setAlpha(160);
-		fillPaint.setStrokeWidth(6);
-		fillPaint.setStrokeCap(Paint.Cap.ROUND);
-		fillPaint.setStrokeJoin(Paint.Join.ROUND);
-		this.routeOverlay = new ArrayWayOverlay(fillPaint, null);
-		this.mapView.getOverlays().add(this.routeOverlay);
-
-		this.decisionPointOverlay = new DecisionOverlay(getResources().getDrawable(
-				R.drawable.jog_tab_target_gray));
-		this.mapView.getOverlays().add(this.decisionPointOverlay);
+		this.fillPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		this.fillPaint.setStyle(Paint.Style.STROKE);
+		this.fillPaint.setColor(Color.BLUE);
+		this.fillPaint.setAlpha(160);
+		this.fillPaint.setStrokeWidth(6);
+		this.fillPaint.setStrokeCap(Paint.Cap.ROUND);
+		this.fillPaint.setStrokeJoin(Paint.Join.ROUND);
 
 		// selection overlay to display labels with additional information
 		this.selectionOverlay = new SelectionOverlay(null, false);
-		this.mapView.getOverlays().add(this.selectionOverlay);
+		// this.mapView.getOverlays().add(this.selectionOverlay);
+		this.insertOverlayOrdered(this.selectionOverlay);
 
 		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
 			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
@@ -889,27 +905,9 @@ public class AdvancedMapViewer extends MapActivity {
 		timings.addSplit("set map file");
 
 		// draw the route, if there is any
-		this.decisionPointOverlay.clear();
-		this.routeOverlay.clear();
 		if (this.advancedMapViewerApplication.currentRoute != null) {
-			this.displayRoute = true;
-			this.routeOverlay.addWay(this.advancedMapViewerApplication.currentRoute
-					.getOverlayWay());
-			this.decisionPointOverlay.addItems(Arrays
-					.asList(this.advancedMapViewerApplication.currentRoute.getOverlayItems()));
-			this.setupRoutingMenu(this.advancedMapViewerApplication.currentRoute);
-			if (startingIntent.getBooleanExtra("ROUTE_OVERVIEW", false)) {
-				// TODO: better centering of the route
-				this.mapController.setCenter(this.advancedMapViewerApplication.currentRoute
-						.getGeoPoints()[0]);
-				this.mapController.setZoom(16);
-			}
-			if (startingIntent.getBooleanExtra("CENTER_DP", false)) {
-				this.mapController
-						.setCenter(this.advancedMapViewerApplication.currentRoute.currentDecisionPoint
-								.getGeoPoint());
-				// this.mapController.setZoom(16);
-			}
+			this.displayRouteOverlay(this.advancedMapViewerApplication.currentRoute,
+					startingIntent);
 		} else {
 			this.displayRoute = false;
 			this.routeMenu.setVisibility(View.GONE);
@@ -919,30 +917,153 @@ public class AdvancedMapViewer extends MapActivity {
 			this.displayPoiOverlay(this.advancedMapViewerApplication.getCurrentPois());
 		}
 
+		if (this.advancedMapViewerApplication.getCurrentWikiArticles().size() > 0) {
+			this.displayWikiOverlay(this.advancedMapViewerApplication.getCurrentWikiArticles());
+		}
+
 		timings.addSplit("set route");
 		timings.dumpToLog();
+	}
+
+	private void displayRouteOverlay(Route route, Intent startingIntent) {
+		if (this.routeOverlay == null) {
+			this.routeOverlay = new ArrayWayOverlay(this.fillPaint, null);
+			// this.mapView.getOverlays().add(this.routeOverlay);
+			this.insertOverlayOrdered(this.routeOverlay);
+		} else {
+			this.routeOverlay.clear();
+		}
+
+		if (this.decisionPointOverlay == null) {
+			this.decisionPointOverlay = new DecisionOverlay(getResources().getDrawable(
+					R.drawable.jog_tab_target_gray));
+			// this.mapView.getOverlays().add(this.decisionPointOverlay);
+			this.insertOverlayOrdered(this.decisionPointOverlay);
+		} else {
+			this.decisionPointOverlay.clear();
+		}
+
+		this.displayRoute = true;
+		this.routeOverlay.addWay(route.getOverlayWay());
+		this.decisionPointOverlay.addItems(Arrays.asList(route.getOverlayItems()));
+		this.setupRoutingMenu(route);
+		if (startingIntent.getBooleanExtra("ROUTE_OVERVIEW", false)) {
+			// TODO: better centering of the route
+			this.mapController.setCenter(route.getGeoPoints()[0]);
+			this.mapController.setZoom(16);
+		}
+		if (startingIntent.getBooleanExtra("CENTER_DP", false)) {
+			this.mapController.setCenter(route.currentDecisionPoint.getGeoPoint());
+			// this.mapController.setZoom(16);
+		}
 	}
 
 	private void displayPoiOverlay(ArrayList<PointOfInterest> pois) {
 		if (this.poiOverlay == null) {
 			this.poiOverlay = new PoiOverlay(this, getResources().getDrawable(
 					R.drawable.marker_poi), true);
-			this.mapView.getOverlays().add(0, this.poiOverlay);
+			// this.mapView.getOverlays().add(this.poiOverlay);
+			this.insertOverlayOrdered(this.poiOverlay);
+		} else {
+			this.poiOverlay.clear();
 		}
-		this.poiOverlay.clear();
 		for (PointOfInterest poi : pois) {
 			this.poiOverlay.addItem(new OverlayItem(new GeoPoint(poi.getLatitude(), poi
 					.getLongitude()), poi.getCategory().getTitle(), poi.getName()));
 		}
 	}
 
+	void displayWikiOverlay(ArrayList<WikiArticleInterface> wikiArticles) {
+		if (this.wikiOverlay == null) {
+			this.wikiOverlay = new WikiOverlay(this, getResources().getDrawable(
+					R.drawable.wikipedia_30), false);
+			// this.mapView.getOverlays().add(this.wikiOverlay);
+			this.insertOverlayOrdered(this.wikiOverlay);
+		} else {
+			this.wikiOverlay.clear();
+		}
+		for (WikiArticleInterface wikiArticle : wikiArticles) {
+			this.wikiOverlay.addItem(new OverlayItem(wikiArticle.getGeoPoint(), wikiArticle
+					.getTitle(), null));
+		}
+	}
+
+	private void clearAllOverlays() {
+		// clear route
+		this.disableShowRoute();
+		// clear pois
+		this.disableShowPois();
+		// clear info
+		this.selectionOverlay.clear();
+		// clear wikipedia
+		this.disableShowWikipedia();
+	}
+
 	private void disableShowRoute() {
 		this.advancedMapViewerApplication.currentRoute = null;
-		this.decisionPointOverlay.clear();
-		this.routeOverlay.clear();
+		this.mapView.getOverlays().remove(this.decisionPointOverlay);
+		this.mapView.getOverlays().remove(this.routeOverlay);
+		this.decisionPointOverlay = null;
+		this.routeOverlay = null;
 		this.displayRoute = false;
 		this.routeMenu.setVisibility(View.GONE);
+	}
 
+	private void disableShowPois() {
+		this.advancedMapViewerApplication.getCurrentPois().clear();
+		if (this.poiOverlay != null) {
+			this.mapView.getOverlays().remove(this.poiOverlay);
+			this.poiOverlay = null;
+		}
+	}
+
+	private void disableShowWikipedia() {
+		this.advancedMapViewerApplication.getCurrentWikiArticles().clear();
+		if (this.wikiOverlay != null) {
+			this.mapView.getOverlays().remove(this.wikiOverlay);
+			this.wikiOverlay = null;
+		}
+	}
+
+	private void insertOverlayOrdered(Overlay overlay) {
+		if (overlay instanceof CircleOverlay) {
+			// insert position overlay as first, always
+			this.mapView.getOverlays().add(0, overlay);
+		} else if (overlay instanceof SelectionOverlay) {
+			// insert selection overlay as last, always
+			this.mapView.getOverlays().add(overlay);
+		} else if (overlay instanceof ArrayWayOverlay) {
+			int positionIndex = this.mapView.getOverlays().indexOf(this.positionOverlay);
+			if (positionIndex >= 0) {
+				// positionOverlay is in, so insert this one behind
+				this.mapView.getOverlays().add(positionIndex + 1, overlay);
+			} else {
+				// no positionOverlay, so this is first
+				this.mapView.getOverlays().add(0, overlay);
+			}
+		} else if (overlay instanceof DecisionOverlay) {
+			int routeIndex = this.mapView.getOverlays().indexOf(this.routeOverlay);
+			int positionIndex = this.mapView.getOverlays().indexOf(this.positionOverlay);
+			if (routeIndex >= 0) {
+				// insert behind routeOverlay
+				this.mapView.getOverlays().add(routeIndex + 1, overlay);
+			} else if (positionIndex >= 0) {
+				// or insert behind position overlay
+				this.mapView.getOverlays().add(positionIndex + 1, overlay);
+			}
+		} else if (overlay instanceof PoiOverlay || overlay instanceof WikiOverlay) {
+			int selectionIndex = this.mapView.getOverlays().indexOf(this.selectionOverlay);
+			if (selectionIndex >= 0) {
+				// insert before selection overlay
+				this.mapView.getOverlays().add(selectionIndex, overlay);
+			} else {
+				// insert as last
+				this.mapView.getOverlays().add(overlay);
+			}
+		} else {
+			// not handled, so just insert last
+			this.mapView.getOverlays().add(overlay);
+		}
 	}
 
 	@Override
@@ -958,9 +1079,10 @@ public class AdvancedMapViewer extends MapActivity {
 	 *            if a toast message should be displayed or not.
 	 */
 	void disableFollowGPS(boolean showToastMessage) {
-		if (this.circleOverlay != null) {
-			this.mapView.getOverlays().remove(this.circleOverlay);
-			this.circleOverlay = null;
+		if (this.positionOverlay != null) {
+			this.mapView.getOverlays().remove(this.positionOverlay);
+			// this.positionOverlay.clear();
+			this.positionOverlay = null;
 		}
 		if (this.followGpsEnabled) {
 			if (this.locationListener != null) {
@@ -1048,6 +1170,9 @@ public class AdvancedMapViewer extends MapActivity {
 
 	private class InfoSetterAsync extends AsyncTask<GeoPoint, String, Void> {
 
+		/** maximum distance in meters of Pois to the location to be displayed in this overlay */
+		private static final int POI_MAX_DISTANCE = 100;
+
 		public InfoSetterAsync() {
 			super();
 		}
@@ -1059,8 +1184,13 @@ public class AdvancedMapViewer extends MapActivity {
 				return null;
 			}
 			GeoPoint geoPoint = params[0];
+			GeoCoordinate geoCoordinate = new GeoCoordinate(geoPoint.getLatitude(),
+					geoPoint.getLongitude());
 
-			publishProgress(getString(R.string.selection_this_point));
+			String streetName = "";
+			String poiName = "";
+
+			publishProgress(getString(R.string.loading_message));
 			// TODO: maybe animation while loading
 			// try {
 			// Thread.sleep(1000);
@@ -1080,13 +1210,42 @@ public class AdvancedMapViewer extends MapActivity {
 					return null;
 				}
 				Vertex vertex = AdvancedMapViewer.this.advancedMapViewerApplication.getRouter()
-						.getNearestVertex(
-								new GeoCoordinate(geoPoint.getLatitude(), geoPoint
-										.getLongitude()));
+						.getNearestVertex(geoCoordinate);
 				if (vertex != null) {
 					String info = PositionInfo.edgesToStringInfo(vertex.getOutboundEdges());
 					if (info != null && !info.equals("")) {
+						streetName = info;
 						publishProgress(info);
+					}
+				}
+			} else if (!this.isCancelled()) {
+				// mapBundle is not routable, so set default message
+				publishProgress(getString(R.string.selection_this_point));
+			}
+
+			// set info about the closest POI
+			if (!this.isCancelled()
+					&& AdvancedMapViewer.this.advancedMapViewerApplication
+							.getCurrentMapBundle().isPoiable()) {
+				Iterator<PointOfInterest> iterator = AdvancedMapViewer.this.advancedMapViewerApplication
+						.getPerstManager().neighborIterator(geoCoordinate, "Root");
+
+				// find the next *named* POI near the current point inside the given distance
+				while (iterator.hasNext()) {
+					PointOfInterest nearestPoi = iterator.next();
+					int distance = (int) nearestPoi.getGeoCoordinate().sphericalDistance(
+							geoCoordinate);
+					if (distance > POI_MAX_DISTANCE) {
+						break;
+					}
+					if (nearestPoi.getName() != null) {
+						poiName = nearestPoi.getName() + " (" + distance + " m)";
+						if (!streetName.equals("")) {
+							publishProgress(streetName + "\n" + poiName);
+						} else {
+							publishProgress(poiName);
+						}
+						break;
 					}
 				}
 			}
@@ -1130,6 +1289,36 @@ public class AdvancedMapViewer extends MapActivity {
 		protected void onPreExecute() {
 			// just visible if title bar is visible
 			// setProgressBarIndeterminateVisibility(true);
+		}
+	}
+
+	private class WikiSetterAsync extends
+			AsyncTask<GeoPoint, Void, ArrayList<WikiArticleInterface>> {
+
+		public WikiSetterAsync() {
+		}
+
+		@Override
+		protected ArrayList<WikiArticleInterface> doInBackground(GeoPoint... params) {
+			if (params.length != 1) {
+				return null;
+			}
+			GeoPoint geoPoint = params[0];
+			ArticleRetriever retriever = ArticleRetrieverFactory
+					.getGeonamesReceiver(AdvancedMapViewer.this.advancedMapViewerApplication
+							.getWikiLocale());
+			ArrayList<WikiArticleInterface> articles = retriever.getArticles(geoPoint, 20000,
+					50, 0);
+			AdvancedMapViewer.this.advancedMapViewerApplication.getCurrentWikiArticles()
+					.clear();
+			AdvancedMapViewer.this.advancedMapViewerApplication.getCurrentWikiArticles()
+					.addAll(articles);
+			return articles;
+		}
+
+		@Override
+		protected void onPostExecute(ArrayList<WikiArticleInterface> result) {
+			AdvancedMapViewer.this.displayWikiOverlay(result);
 		}
 
 	}
@@ -1217,6 +1406,8 @@ public class AdvancedMapViewer extends MapActivity {
 
 	private class PoiOverlay extends ArrayItemizedOverlay {
 
+		OverlayItem clickedItem;
+
 		private final Context context;
 
 		public PoiOverlay(Context context, Drawable defaultMarker, boolean alignMarker) {
@@ -1226,15 +1417,95 @@ public class AdvancedMapViewer extends MapActivity {
 
 		@Override
 		protected boolean onTap(int index) {
-			OverlayItem item = createItem(index);
-			if (item != null) {
+			this.clickedItem = createItem(index);
+			if (this.clickedItem != null) {
 				Builder builder = new AlertDialog.Builder(this.context);
 				builder.setIcon(android.R.drawable.ic_menu_info_details);
-				builder.setTitle(item.getTitle());
-				builder.setMessage(item.getSnippet());
+				builder.setTitle(this.clickedItem.getTitle());
+				builder.setMessage(this.clickedItem.getSnippet());
 				builder.setPositiveButton("OK", null);
+				builder.setNeutralButton("Info", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class)
+								.putExtra(PositionInfo.LATITUDE_EXTRA,
+										PoiOverlay.this.clickedItem.getPoint().getLatitude())
+								.putExtra(PositionInfo.LONGITUDE_EXTRA,
+										PoiOverlay.this.clickedItem.getPoint().getLongitude()));
+					}
+				});
 				builder.show();
 			}
+			return true;
+		}
+	}
+
+	private class WikiOverlay extends ArrayItemizedOverlay {
+
+		private final Context context;
+
+		public WikiOverlay(Context context, Drawable defaultMarker, boolean alignMarker) {
+			super(defaultMarker, alignMarker);
+			ItemizedOverlay.boundCenter(defaultMarker);
+			this.context = context;
+		}
+
+		@Override
+		protected boolean onTap(int index) {
+			// get the clicked article
+			final WikiArticleInterface article = AdvancedMapViewer.this.advancedMapViewerApplication
+					.getCurrentWikiArticles().get(index);
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+			LayoutInflater factory = LayoutInflater.from(AdvancedMapViewer.this);
+			final View dialogView = factory.inflate(R.layout.webview_dialog, null);
+			builder.setTitle(article.getTitle());
+			// a progress bar to indicate loading
+			final ProgressBar progressBar = (ProgressBar) dialogView
+					.findViewById(R.id.webview_dialog_progress);
+			WebView webView = (WebView) dialogView.findViewById(R.id.webview_dialog_webview);
+
+			// handle link clicks internally (doesn't open new browser window)
+			webView.setWebViewClient(new WebViewClient() {
+				@Override
+				public boolean shouldOverrideUrlLoading(WebView view, String url) {
+					progressBar.setVisibility(View.VISIBLE);
+					view.loadUrl(url);
+					return false;
+				}
+			});
+
+			// show loading progress
+			webView.setWebChromeClient(new WebChromeClient() {
+				@Override
+				public void onProgressChanged(WebView view, int progress) {
+					if (progress == 100) {
+						progressBar.setVisibility(View.GONE);
+					} else {
+						progressBar.setProgress(progress);
+					}
+				}
+
+			});
+
+			// let the article set what to render (load url or local data)
+			article.setWebView(webView);
+
+			builder.setView(dialogView);
+
+			builder.setPositiveButton("Info", new DialogInterface.OnClickListener() {
+
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					startActivity(new Intent(AdvancedMapViewer.this, PositionInfo.class)
+							.putExtra(PositionInfo.LATITUDE_EXTRA, article.getLat()).putExtra(
+									PositionInfo.LONGITUDE_EXTRA, article.getLng()));
+				}
+			});
+
+			builder.setNegativeButton("Close", null);
+
+			builder.show();
 			return true;
 		}
 

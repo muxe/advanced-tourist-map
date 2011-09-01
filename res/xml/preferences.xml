@@ -25,6 +25,7 @@
 		<org.mapsforge.applications.android.advancedmapviewer.MoveSpeedPreference
 			android:title="@string/preferences_move_speed" android:summary="@string/preferences_move_speed_desc" android:key="moveSpeed"/>
 		<Preference android:title="@string/preferences_bundle_path" android:key="baseBundlePath"/>
+		<ListPreference android:key="wikiLang" android:title="@string/preferences_wikipedia_language" android:summary="@string/preferences_wikipedia_language_desc" android:entryValues="@array/preferences_wikipedia_language_keys" android:entries="@array/preferences_wikipedia_language_values"/>
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/preferences_debug">

@@ -14,6 +14,19 @@
 		<item>groß</item>
 		<item>riesig</item>
 	</string-array>
+	
+	<string-array name="preferences_wikipedia_language_values">
+		<item>automatisch (System)</item>
+		<item>englisch</item>
+		<item>deutsch</item>
+		<item>finnisch</item>
+	</string-array>
+	
+	<string-array name="routing_point_picker_values">
+		<item>Adresse suchen</item>
+		<item>Aktuelle Position</item>
+		<item>Punkt auf Karte</item>
+	</string-array>
 
 	<string name="application_name">AMVTouristMap</string>
 	<string name="cancel">Abbrechen</string>
@@ -79,4 +92,5 @@
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoomstufe</string>
+	<string name="find_pois">POIs in der Nähe</string>
 </resources>
