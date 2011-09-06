@@ -532,7 +532,8 @@ public class AdvancedMapViewer extends MapActivity {
 		this.advancedMapViewerApplication = (AdvancedMapViewerApplication) getApplication();
 
 		// set up the layout views
-		setContentView(R.layout.activity_advanced_map_viewer);
+		this.advancedMapViewerApplication.setViewWithHelp(this,
+				R.layout.activity_advanced_map_viewer);
 		this.mapView = (MapView) findViewById(R.id.mapView);
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
 		this.centerView = (ImageView) findViewById(R.id.centerView);

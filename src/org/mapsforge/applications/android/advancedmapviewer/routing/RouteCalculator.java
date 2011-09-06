@@ -76,7 +76,7 @@ public class RouteCalculator extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Log.d("lifecycle", "routeCalculator onCreate");
-		setContentView(R.layout.activity_calculate_route);
+		this.advancedMapViewer.setViewWithHelp(this, R.layout.activity_calculate_route);
 
 		Intent startingIntent = getIntent();
 		if (startingIntent.hasExtra("lat") && startingIntent.hasExtra("lon")) {

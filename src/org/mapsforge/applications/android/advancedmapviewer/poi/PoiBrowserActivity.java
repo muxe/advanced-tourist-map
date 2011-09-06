@@ -41,7 +41,7 @@ public class PoiBrowserActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_poi_browser);
+		this.advancedMapViewer.setViewWithHelp(this, R.layout.activity_poi_browser);
 		this.poiListView = (ListView) findViewById(R.id.poi_browser_poi_list);
 
 		this.currentCategory = "Root";

@@ -136,7 +136,7 @@ public class Search extends BaseActivity {
 					SQLiteDatabase.OPEN_READONLY | SQLiteDatabase.NO_LOCALIZED_COLLATORS);
 		}
 
-		setContentView(R.layout.search_main);
+		this.advancedMapViewer.setViewWithHelp(this, R.layout.search_main);
 
 		// if (this.state.view == State.VIEW_INPUT) {
 		showViewInput();

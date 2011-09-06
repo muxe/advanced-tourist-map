@@ -103,6 +103,9 @@
 	<string name="preferences_wake_lock_desc">Stop the screen from dimming</string>
 	<string name="preferences_no_path_selected">no path selected</string>
 	<string name="preferences_bundle_path">Mapfile Path</string>
+	<string name="preferences_help_topics">Show all help topics again</string>
+	<string name="preferences_help_topics_summary">Help topics are only shown on first visit by default. This resets all visited help topics.</string>
+	<string name="preferences_help_toast">Will show all help topics on first visit again</string>
 	<string name="unit_symbol_kilometer">&#160;km</string>
 	<string name="unit_symbol_meter">&#160;m</string>
 	<string name="zoomlevel">Zoom level</string>
@@ -111,6 +114,7 @@
 	<string name="show_on_map">Show on map</string>
 	<string name="select_installed_routingfile">Select a routing file</string>
 	<string name="dialog_title_find_location">Find a location</string>
+	<string name="help_topic">Help Topic</string>
 	
 	<!-- routing -->
 	<string name="manage_routing_files">Manage Routing Files</string>

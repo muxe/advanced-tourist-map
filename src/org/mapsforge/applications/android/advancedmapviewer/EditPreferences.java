@@ -27,6 +27,7 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 /**
  * Activity to edit the application preferences.
@@ -45,6 +46,21 @@ public class EditPreferences extends PreferenceActivity {
 		this.appPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
 		addPreferencesFromResource(R.xml.preferences);
+
+		Preference resetHelpTopics = findPreference("resetHelpTopics");
+		resetHelpTopics.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference preference) {
+				Editor editor = getSharedPreferences(
+						AdvancedMapViewerApplication.HELP_PREFERENCES_NAME, MODE_PRIVATE)
+						.edit();
+				editor.clear();
+				editor.commit();
+				Toast.makeText(EditPreferences.this, R.string.preferences_help_toast,
+						Toast.LENGTH_SHORT).show();
+				return false;
+			}
+		});
 
 		this.fileChooser = findPreference("baseBundlePath");
 		this.fileChooser.setOnPreferenceClickListener(new OnPreferenceClickListener() {

@@ -40,7 +40,7 @@ public class RouteList extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO: check if route is null
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_route_list);
+		this.advancedMapViewer.setViewWithHelp(this, R.layout.activity_route_list);
 
 		this.routingList = (ListView) findViewById(R.id.routing_list);
 		this.viewOnMapButton = (Button) findViewById(R.id.view_on_map_button);

@@ -54,7 +54,7 @@ public class FileManagerActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_file_manager);
+		this.advancedMapViewer.setViewWithHelp(this, R.layout.activity_file_manager);
 
 		this.listView = (ListView) findViewById(R.id.file_manager_list_view);
 		this.emptyListText = (TextView) findViewById(R.id.file_manager_empty_text);

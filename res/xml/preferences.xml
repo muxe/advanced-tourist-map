@@ -14,6 +14,7 @@
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/preferences_general">
+		<Preference android:title="@string/preferences_help_topics" android:key="resetHelpTopics" android:summary="@string/preferences_help_topics_summary"/>
 		<CheckBoxPreference android:title="@string/preferences_fullscreen"
 			android:summary="@string/preferences_fullscreen_desc" android:key="fullscreen" />
 		<CheckBoxPreference android:title="@string/preferences_wake_lock"
