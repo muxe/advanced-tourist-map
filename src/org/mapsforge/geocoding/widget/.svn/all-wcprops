@@ -1,0 +1,37 @@
+END
+PlaceCompletionAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/!svn/ver/1368/branches/tourist-map/src/org/mapsforge/geocoding/widget/PlaceCompletionAdapter.java
+END
+RoadCompletionAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/1369/branches/tourist-map/src/org/mapsforge/geocoding/widget/RoadCompletionAdapter.java
+END
+State.java
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/!svn/ver/1369/branches/tourist-map/src/org/mapsforge/geocoding/widget/State.java
+END
+RoadListAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/!svn/ver/1369/branches/tourist-map/src/org/mapsforge/geocoding/widget/RoadListAdapter.java
+END
+CityCompletionAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/!svn/ver/1369/branches/tourist-map/src/org/mapsforge/geocoding/widget/CityCompletionAdapter.java
+END
+SqliteCompletionAdapter.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/!svn/ver/1369/branches/tourist-map/src/org/mapsforge/geocoding/widget/SqliteCompletionAdapter.java
+END

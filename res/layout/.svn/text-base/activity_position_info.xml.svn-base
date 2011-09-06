@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent" android:layout_height="match_parent"
+	android:orientation="vertical">
+
+	<LinearLayout android:layout_width="match_parent"
+		android:layout_height="wrap_content" android:orientation="horizontal"
+		android:layout_marginLeft="10dp" android:layout_marginRight="10dp"
+		android:layout_marginTop="10dp">
+		<TextView android:text="@string/latlon" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:textStyle="bold"
+			android:layout_marginRight="10dp" />
+		<TextView android:id="@+id/position_info_latitude"
+			android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		<TextView android:id="@+id/position_info_latitude"
+			android:text="/" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_marginLeft="5dp"
+			android:layout_marginRight="5dp" />
+		<TextView android:id="@+id/position_info_longitude"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:layout_weight="1" />
+	</LinearLayout>
+	<TextView android:text="@string/positioninfo_nearest_junction"
+		android:id="@+id/position_info_nearest_junktion" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:textStyle="bold"
+		android:layout_marginLeft="10dp" />
+	<TextView android:text="@string/loading_message"
+		android:id="@+id/position_info_text_nearest_junktion"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:layout_marginLeft="10dp" android:layout_marginBottom="10dp" />
+	<LinearLayout android:layout_width="fill_parent"
+		android:layout_height="wrap_content" android:layout_gravity="center_horizontal"
+		android:layout_marginLeft="10dp" android:layout_marginRight="10dp">
+		<ImageButton android:id="@+id/position_info_button_show_on_map"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:src="@drawable/ic_menu_mapmode" android:layout_weight="1" />
+		<ImageButton android:id="@+id/position_info_button_route"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:src="@drawable/ic_menu_directions" android:layout_weight="1" />
+		<ImageButton android:id="@+id/position_info_button_find_pois"
+			android:layout_width="wrap_content" android:layout_height="wrap_content"
+			android:src="@drawable/ic_menu_myplaces" android:layout_weight="1" />
+		<ImageButton android:id="@+id/position_info_save_position"
+			android:layout_weight="1" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:src="@drawable/ic_menu_save" />
+	</LinearLayout>
+	<ListView android:layout_height="fill_parent"
+		android:id="@+id/position_info_poi_list_view" android:layout_width="match_parent" />
+</LinearLayout>

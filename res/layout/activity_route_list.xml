@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+	<Button android:id="@+id/view_on_map_button" android:text="@string/show_on_map"
+		android:layout_width="match_parent" android:layout_height="wrap_content"
+		android:layout_alignParentBottom="true" />
+		
+	<TextView android:text="dsfg" android:layout_width="match_parent" android:id="@+id/routing_list_length"
+		android:layout_height="wrap_content" android:layout_above="@id/view_on_map_button"/>
+		
+	<ListView android:id="@+id/routing_list" android:layout_width="match_parent"
+		android:layout_height="match_parent" android:layout_above="@id/routing_list_length" />
+</RelativeLayout>

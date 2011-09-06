@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent" android:layout_height="fill_parent" android:padding="20dip">
+	<LinearLayout android:layout_width="fill_parent" android:layout_height="wrap_content"
+		android:orientation="vertical">
+		<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:text="@string/mapfile" android:textStyle="bold" android:textColor="#FFF" />
+		<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:text="installed" android:textColor="#FFF" />
+			
+		<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:text="@string/routingfiles" android:textStyle="bold" android:textColor="#FFF" />
+		<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+			<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:text="@string/routingfile_avaiability" android:layout_marginRight="6dip" />
+			<TextView android:id="@+id/installed_bundle_info_routing_avail" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		</LinearLayout>
+
+		<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:text="@string/addressfile" android:textStyle="bold" android:textColor="#FFF" />
+		<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+			<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:text="@string/addressfile_avaiability" android:layout_marginRight="6dip" />
+			<TextView android:id="@+id/installed_bundle_info_address_avail" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		</LinearLayout>
+			
+		<TextView android:layout_width="fill_parent" android:layout_height="wrap_content"
+			android:text="@string/poifile" android:textStyle="bold" android:textColor="#FFF" />
+		<LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content">
+			<TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+				android:text="@string/poifile_avaiability" android:layout_marginRight="6dip" />
+			<TextView android:id="@+id/installed_bundle_info_poi_avail" android:layout_width="wrap_content" android:layout_height="wrap_content" />
+		</LinearLayout>
+	</LinearLayout>
+</ScrollView>
