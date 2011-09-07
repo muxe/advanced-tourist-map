@@ -19,7 +19,6 @@ package org.muxe.advancedtouristmap.routing;
 import java.io.File;
 
 import org.mapsforge.android.maps.GeoPoint;
-import org.muxe.advancedtouristmap.R;
 import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Router;
@@ -27,6 +26,7 @@ import org.mapsforge.core.Vertex;
 import org.muxe.advancedtouristmap.BaseActivity;
 import org.muxe.advancedtouristmap.LocationPicker;
 import org.muxe.advancedtouristmap.PositionInfo;
+import org.muxe.advancedtouristmap.R;
 import org.muxe.advancedtouristmap.Search;
 import org.muxe.advancedtouristmap.sourcefiles.RoutingFile;
 
@@ -49,7 +49,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
+import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class RouteCalculator extends BaseActivity {
@@ -78,6 +83,10 @@ public class RouteCalculator extends BaseActivity {
 
 	private EditText startEditText;
 	private EditText destEditText;
+	
+	private RelativeLayout refiningPositionRow;
+	private TextView refiningPositionText;
+	
 	int viewToSet;
 
 	ProgressDialog progressDialog;
@@ -108,6 +117,9 @@ public class RouteCalculator extends BaseActivity {
 		this.calcRouteButton = (Button) findViewById(R.id.calculate_route_button_calculate);
 
 		this.routingFileSpinner = (Spinner) findViewById(R.id.calculate_route_spinner_routing_file);
+		
+		this.refiningPositionRow = (RelativeLayout) findViewById(R.id.routing_loading_position);
+		this.refiningPositionText = (TextView) findViewById(R.id.routing_refining_position_text);
 
 		OnClickListener startDestChooserListener = new OnClickListener() {
 			@Override
@@ -257,6 +269,9 @@ public class RouteCalculator extends BaseActivity {
 		if (this.locationListener != null) {
 			stopPositionSearch();
 		}
+		
+		//display animation
+		this.refiningPositionRow.setVisibility(View.VISIBLE);
 
 		// get cached locations first
 		Location currentLocation;
@@ -269,6 +284,7 @@ public class RouteCalculator extends BaseActivity {
 							currentLocation.getLatitude(), currentLocation.getLongitude()));
 					Log.d(TAG, "got better cached location from: " + provider + " ("
 							+ currentLocation.getAccuracy() + ")");
+					RouteCalculator.this.refiningPositionText.setText(getString(R.string.refining_position) + " (" + currentLocation.getAccuracy() + " m)");
 				} else {
 					Log.d(TAG,
 							"dismissed location from: " + provider + " ("
@@ -288,6 +304,8 @@ public class RouteCalculator extends BaseActivity {
 							+ location.getAccuracy() + ")");
 					changeStartStop(RouteCalculator.this.viewToSet,
 							new GeoPoint(location.getLatitude(), location.getLongitude()));
+					//show accuracy in loading message
+					RouteCalculator.this.refiningPositionText.setText(getString(R.string.refining_position) + " (" + location.getAccuracy() + " m)");
 				} else {
 					Log.d(TAG, "dismissed location from: " + location.getProvider() + " ("
 							+ location.getAccuracy() + ")");
@@ -400,12 +418,15 @@ public class RouteCalculator extends BaseActivity {
 		if (this.locationListener != null) {
 			this.locationManager.removeUpdates(this.locationListener);
 			this.locationListener = null;
+			
+			this.refiningPositionRow.setVisibility(View.GONE);
 		}
 	}
 
 	void changeStartStop(int field, GeoPoint point) {
 		String infoText = point.getLatitude() + " " + point.getLongitude();
 		if (this.advancedMapViewer.getCurrentMapBundle().isRoutable()) {
+			//TODO: may halt on slow phones
 			Router router = this.advancedMapViewer.getRouter();
 			if (router != null) {
 				Vertex nearestVertex = router.getNearestVertex(new GeoCoordinate(point

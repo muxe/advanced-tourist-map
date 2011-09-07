@@ -121,7 +121,7 @@
 	<string name="routing_start_point">Start</string>
 	<string name="routing_destination_point">Destination</string>
 	<string name="routing_select_start">Select Start</string>
-	<string name="routing_select_destination">Select Destination dsvsv esfgsv es</string>
+	<string name="routing_select_destination">Select Destination</string>
 	<string name="routing_btn_calculate_route">Find Route</string>
 	<string name="routing_file">Routing File</string>
 	<string name="routing_installed_files">Installed Routing Files</string>
@@ -140,6 +140,7 @@
 	<!-- Position Info -->
 	<string name="positioninfo_nearest_junction">Nearest Junction</string>
 	<string name="positioninfo_unknown_road">Unknown Road</string>
+	<string name="refining_position">refining position</string>
 	
 	<!-- Source Files -->
 	<string name="mapfile">Map-File</string>

@@ -2,6 +2,17 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:layout_width="match_parent" android:layout_height="match_parent"
 	android:orientation="vertical">
+	<RelativeLayout android:visibility="gone"
+		android:layout_width="match_parent" android:layout_height="wrap_content"
+		android:id="@+id/routing_loading_position">
+		<ProgressBar android:layout_width="wrap_content"
+			style="?android:attr/progressBarStyleSmall" android:layout_height="wrap_content"
+			android:layout_alignParentRight="true" android:layout_centerVertical="true" android:id="@+id/routing_refining_position_spinner"/>
+		<TextView android:text="@string/refining_position"
+			android:id="@+id/routing_refining_position_text" android:layout_width="wrap_content"
+			android:layout_height="wrap_content" android:layout_centerVertical="true"
+			android:layout_marginRight="5dp" android:layout_toLeftOf="@id/routing_refining_position_spinner" />
+	</RelativeLayout>
 	<TableLayout android:layout_height="wrap_content"
 		android:layout_width="match_parent">
 		<TableRow android:layout_width="match_parent"
@@ -14,7 +25,7 @@
 				android:layout_width="match_parent" android:enabled="true"
 				android:editable="false" android:ellipsize="end"
 				android:cursorVisible="false" android:lines="1"
-				android:scrollHorizontally="true" android:layout_weight="1"/>
+				android:scrollHorizontally="true" android:layout_weight="1" />
 			<ImageButton android:src="@drawable/ic_btn_round_more_normal"
 				android:id="@+id/calculate_route_button_choose_start"
 				android:layout_width="wrap_content" android:layout_height="wrap_content" />
@@ -29,7 +40,7 @@
 				android:layout_width="match_parent" android:layout_height="wrap_content"
 				android:editable="false" android:enabled="true" android:ellipsize="end"
 				android:cursorVisible="false" android:lines="1"
-				android:scrollHorizontally="true" android:layout_weight="1"/>
+				android:scrollHorizontally="true" android:layout_weight="1" />
 			<ImageButton android:src="@drawable/ic_btn_round_more_normal"
 				android:id="@+id/calculate_route_button_choose_dest"
 				android:layout_width="wrap_content" android:layout_height="wrap_content" />
@@ -40,8 +51,8 @@
 				android:layout_gravity="center" />
 			<Spinner android:id="@+id/calculate_route_spinner_routing_file"
 				android:layout_height="wrap_content" android:prompt="@string/select_installed_routingfile"
-				android:layout_width="match_parent" android:layout_span="2" android:layout_weight="1"/>
-			<!-- android:layout_span="2" -->
+				android:layout_width="match_parent" android:layout_span="2"
+				android:layout_weight="1" />
 		</TableRow>
 	</TableLayout>
 	<!-- <Button android:text="Switch" android:id="@+id/calculate_route_button_switch" 
