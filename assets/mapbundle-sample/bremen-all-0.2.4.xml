@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<mapbundle>
+	<name>Bremen</name>
+	<map>
+		<filename>bremen-0.2.4.map</filename>
+		<desc>Map of Bremen</desc>
+		<desc lang="de">Karte von Bremen</desc>
+		<path>/bremen/</path>
+<!-- 		<uri>http://ftp.mapsforge.org/europe/germany/berlin-0.2.4.map</uri> -->
+		<md5>2560b6895c878bd06bea5d2c52c6fcc9</md5>
+		<file_size>3085091</file_size>
+<!-- 		<file_version>2</file_version> -->
+		<bounding_box min_lat="53.01115" max_lat="53.23351"
+			min_lon="8.485045" max_lon="8.986372" />
+		<date_of_creation>1280324250</date_of_creation>
+	</map>
+
+	<routingfiles>
+		<routingfile>
+			<filename>bremen.mobileHH</filename>
+			<desc>Routing for Cars in Bremen</desc>
+			<desc_de>Autorouting in Bremen</desc_de>
+			<path>/bremen/</path>
+			<uri>i dunno lol</uri>
+			<md5>b7ece8d98fcfcb32363b510c0a8ee3d2</md5>
+			<file_size>822751</file_size>
+			<file_version>?</file_version>
+			<date_of_creation>1280324250</date_of_creation>
+			<algorithm>HH</algorithm>
+		</routingfile>
+	</routingfiles>
+</mapbundle>

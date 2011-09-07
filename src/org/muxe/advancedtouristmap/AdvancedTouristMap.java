@@ -1,16 +1,18 @@
 /*
  * Copyright 2010, 2011 mapsforge.org
  *
- * This program is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free Software
- * Foundation, either version 3 of the License, or (at your option) any later version.
+ *	This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY
- * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
- * PARTICULAR PURPOSE. See the GNU Lesser General Public License for more details.
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License along with
- * this program. If not, see <http://www.gnu.org/licenses/>.
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.muxe.advancedtouristmap;
 
@@ -102,10 +104,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * A map application which uses the features from the mapsforge library. The map can be centered
- * to the current GPS coordinate. A simple file browser for selecting the map file is also
- * included. Some preferences can be adjusted via the EditPreferences activity and screenshots
- * of the map may be taken in different image formats.
+ * A map application which uses the features from the mapsforge library. The map
+ * can be centered to the current GPS coordinate. A simple file browser for
+ * selecting the map file is also included. Some preferences can be adjusted via
+ * the EditPreferences activity and screenshots of the map may be taken in
+ * different image formats.
  */
 public class AdvancedTouristMap extends MapActivity {
 	private static final int DIALOG_ENTER_COORDINATES = 0;
@@ -202,89 +205,90 @@ public class AdvancedTouristMap extends MapActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-			case R.id.menu_info:
-				return true;
+		case R.id.menu_info:
+			return true;
 
-			case R.id.menu_info_map_file:
-				showDialog(DIALOG_INFO_MAP_FILE);
-				return true;
+		case R.id.menu_info_map_file:
+			showDialog(DIALOG_INFO_MAP_FILE);
+			return true;
 
-			case R.id.menu_info_about:
-				startActivity(new Intent(this, InfoView.class));
-				return true;
+		case R.id.menu_info_about:
+			startActivity(new Intent(this, InfoView.class));
+			return true;
 
-			case R.id.menu_position:
-				return true;
+		case R.id.menu_position:
+			return true;
 
-			case R.id.menu_position_gps_toggle:
-				if (this.followGpsEnabled) {
-					disableFollowGPS(true);
-				} else {
-					if (this.locationManager
-							.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
-							|| this.locationManager
-									.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-						enableFollowGPS();
-					} else {
-						showDialog(DIALOG_GPS_DISABLED);
-					}
-				}
-				return true;
-
-			case R.id.menu_position_enter_coordinates:
-				showDialog(DIALOG_ENTER_COORDINATES);
-				return true;
-
-			case R.id.menu_position_map_center:
-				// disable GPS follow mode if it is enabled
+		case R.id.menu_position_gps_toggle:
+			if (this.followGpsEnabled) {
 				disableFollowGPS(true);
-				this.mapController.setCenter(this.mapView.getMapDatabase().getMapCenter());
-				return true;
+			} else {
+				if (this.locationManager
+						.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+						|| this.locationManager
+								.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+					enableFollowGPS();
+				} else {
+					showDialog(DIALOG_GPS_DISABLED);
+				}
+			}
+			return true;
 
-			case R.id.menu_screenshot:
-				return true;
+		case R.id.menu_position_enter_coordinates:
+			showDialog(DIALOG_ENTER_COORDINATES);
+			return true;
 
-			case R.id.menu_screenshot_jpeg:
-				captureScreenshotAsync(CompressFormat.JPEG);
-				return true;
+		case R.id.menu_position_map_center:
+			// disable GPS follow mode if it is enabled
+			disableFollowGPS(true);
+			this.mapController.setCenter(this.mapView.getMapDatabase()
+					.getMapCenter());
+			return true;
 
-			case R.id.menu_screenshot_png:
-				captureScreenshotAsync(CompressFormat.PNG);
-				return true;
+		case R.id.menu_screenshot:
+			return true;
 
-			case R.id.menu_preferences:
-				startActivity(new Intent(this, EditPreferences.class));
-				return true;
+		case R.id.menu_screenshot_jpeg:
+			captureScreenshotAsync(CompressFormat.JPEG);
+			return true;
 
-				// case R.id.menu_mapfile:
-				// startFileBrowser();
-				// return true;
-			case R.id.menu_mapfile:
-				startBundleBrowser();
-				return true;
-			case R.id.menu_route_clear:
-				disableShowRoute();
-				return true;
-			case R.id.menu_route_new:
-				startActivity(new Intent(this, RouteCalculator.class));
-				return true;
-			case R.id.menu_route_list:
-				startActivity(new Intent(this, RouteList.class));
-				return true;
-			case R.id.menu_poi:
-				startActivity(new Intent(this, PoiBrowserActivity.class).putExtra("lat",
-						this.mapView.getMapCenter().getLatitude()).putExtra("lon",
-						this.mapView.getMapCenter().getLongitude()));
-				return true;
-			case R.id.menu_clear_map:
-				this.clearAllOverlays();
-				return true;
-			case R.id.menu_wiki:
-				new WikiSetterAsync().execute(this.mapView.getMapCenter());
-				showToast("Loading Wikipedia Articles");
-				return true;
-			default:
-				return false;
+		case R.id.menu_screenshot_png:
+			captureScreenshotAsync(CompressFormat.PNG);
+			return true;
+
+		case R.id.menu_preferences:
+			startActivity(new Intent(this, EditPreferences.class));
+			return true;
+
+			// case R.id.menu_mapfile:
+			// startFileBrowser();
+			// return true;
+		case R.id.menu_mapfile:
+			startBundleBrowser();
+			return true;
+		case R.id.menu_route_clear:
+			disableShowRoute();
+			return true;
+		case R.id.menu_route_new:
+			startActivity(new Intent(this, RouteCalculator.class));
+			return true;
+		case R.id.menu_route_list:
+			startActivity(new Intent(this, RouteList.class));
+			return true;
+		case R.id.menu_poi:
+			startActivity(new Intent(this, PoiBrowserActivity.class).putExtra(
+					"lat", this.mapView.getMapCenter().getLatitude()).putExtra(
+					"lon", this.mapView.getMapCenter().getLongitude()));
+			return true;
+		case R.id.menu_clear_map:
+			this.clearAllOverlays();
+			return true;
+		case R.id.menu_wiki:
+			new WikiSetterAsync().execute(this.mapView.getMapCenter());
+			showToast("Loading Wikipedia Articles");
+			return true;
+		default:
+			return false;
 		}
 	}
 
@@ -311,7 +315,8 @@ public class AdvancedTouristMap extends MapActivity {
 			menu.findItem(R.id.menu_position_map_center).setEnabled(true);
 		}
 
-		if (this.advancedMapViewerApplication.getCurrentMapBundle().isRoutable()) {
+		if (this.advancedMapViewerApplication.getCurrentMapBundle()
+				.isRoutable()) {
 			menu.findItem(R.id.menu_route).setEnabled(true);
 			menu.findItem(R.id.menu_route).setVisible(true);
 		} else {
@@ -331,10 +336,13 @@ public class AdvancedTouristMap extends MapActivity {
 		SubMenu routingSubmenu = menu.findItem(R.id.menu_route).getSubMenu();
 		if (!this.displayRoute) {
 			Log.d("Application", "set group invisible");
-			// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, false);
-			routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, false);
+			// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible,
+			// false);
+			routingSubmenu
+					.setGroupEnabled(R.id.menu_route_group_visible, false);
 		} else {
-			// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible, true);
+			// routingSubmenu.setGroupVisible(R.id.menu_route_group_visible,
+			// true);
 			routingSubmenu.setGroupEnabled(R.id.menu_route_group_visible, true);
 		}
 
@@ -352,7 +360,8 @@ public class AdvancedTouristMap extends MapActivity {
 			@Override
 			public void run() {
 				try {
-					File path = new File(Environment.getExternalStorageDirectory(),
+					File path = new File(
+							Environment.getExternalStorageDirectory(),
 							SCREENSHOT_DIRECTORY);
 					// make sure the Pictures directory exists
 					if (!path.exists() && !path.mkdirs()) {
@@ -361,8 +370,9 @@ public class AdvancedTouristMap extends MapActivity {
 					}
 
 					// assemble the complete name for the screenshot file
-					String fileName = path.getAbsolutePath() + File.separatorChar
-							+ SCREENSHOT_FILE_NAME + "." + format.name().toLowerCase();
+					String fileName = path.getAbsolutePath()
+							+ File.separatorChar + SCREENSHOT_FILE_NAME + "."
+							+ format.name().toLowerCase();
 
 					if (AdvancedTouristMap.this.mapView.makeScreenshot(format,
 							SCREENSHOT_QUALITY, fileName)) {
@@ -395,8 +405,10 @@ public class AdvancedTouristMap extends MapActivity {
 		this.mapView.setFocusable(true);
 
 		// set the localized text fields
-		this.mapView.setText(TextField.KILOMETER, getString(R.string.unit_symbol_kilometer));
-		this.mapView.setText(TextField.METER, getString(R.string.unit_symbol_meter));
+		this.mapView.setText(TextField.KILOMETER,
+				getString(R.string.unit_symbol_kilometer));
+		this.mapView.setText(TextField.METER,
+				getString(R.string.unit_symbol_meter));
 
 		// get the map controller for this MapView
 		this.mapController = this.mapView.getController();
@@ -415,14 +427,16 @@ public class AdvancedTouristMap extends MapActivity {
 		this.locationListener = new LocationListener() {
 			@Override
 			public void onLocationChanged(Location location) {
-				GeoPoint point = new GeoPoint(location.getLatitude(), location.getLongitude());
+				GeoPoint point = new GeoPoint(location.getLatitude(),
+						location.getLongitude());
 				AdvancedTouristMap.this.lastPosition = point;
 				if (AdvancedTouristMap.this.centerGpsEnabled) {
 					AdvancedTouristMap.this.mapController.setCenter(point);
 				} else {
 					AdvancedTouristMap.this.positionOverlay.requestRedraw();
 				}
-				AdvancedTouristMap.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
+				AdvancedTouristMap.this.gpsView
+						.setImageResource(R.drawable.stat_sys_gps_on);
 				AdvancedTouristMap.this.overlayCircle.setCircleData(point,
 						location.getAccuracy());
 			}
@@ -439,26 +453,33 @@ public class AdvancedTouristMap extends MapActivity {
 			}
 
 			@Override
-			public void onStatusChanged(String provider, int status, Bundle extras) {
+			public void onStatusChanged(String provider, int status,
+					Bundle extras) {
 				if (status == LocationProvider.AVAILABLE) {
-					AdvancedTouristMap.this.gpsView.setImageResource(R.drawable.stat_sys_gps_on);
+					AdvancedTouristMap.this.gpsView
+							.setImageResource(R.drawable.stat_sys_gps_on);
 				} else if (status == LocationProvider.OUT_OF_SERVICE) {
 					AdvancedTouristMap.this.gpsView
 							.setImageResource(R.drawable.stat_sys_gps_acquiring);
 				} else {
 					// must be TEMPORARILY_UNAVAILABLE
-					AdvancedTouristMap.this.gpsView.setImageResource(R.anim.gps_animation);
-					((AnimationDrawable) AdvancedTouristMap.this.gpsView.getDrawable()).start();
+					AdvancedTouristMap.this.gpsView
+							.setImageResource(R.anim.gps_animation);
+					((AnimationDrawable) AdvancedTouristMap.this.gpsView
+							.getDrawable()).start();
 				}
 			}
 		};
 
-		if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			this.locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0,
+		if (this.locationManager
+				.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+			this.locationManager.requestLocationUpdates(
+					LocationManager.GPS_PROVIDER, 1000, 0,
 					this.locationListener);
 		} else {
-			this.locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000,
-					0, this.locationListener);
+			this.locationManager.requestLocationUpdates(
+					LocationManager.NETWORK_PROVIDER, 1000, 0,
+					this.locationListener);
 			showToast("Enable GPS for more accurate positioning");
 		}
 		this.gpsView.setImageResource(R.drawable.stat_sys_gps_acquiring);
@@ -497,16 +518,19 @@ public class AdvancedTouristMap extends MapActivity {
 			if (resultCode == RESULT_OK) {
 				disableFollowGPS(true);
 				if (data != null && data.getStringExtra("selectedFile") != null) {
-					this.mapView.setMapFile(data.getStringExtra("selectedFile"));
+					this.mapView
+							.setMapFile(data.getStringExtra("selectedFile"));
 				}
 			} else if (resultCode == RESULT_CANCELED
-					&& !this.mapView.getMapViewMode().requiresInternetConnection()
+					&& !this.mapView.getMapViewMode()
+							.requiresInternetConnection()
 					&& !this.mapView.hasValidMapFile()) {
 				finish();
 			}
 		} else if (requestCode == INTENT_SEARCH) {
 			if (resultCode == RESULT_OK) {
-				if (data != null && data.hasExtra("lon") && data.hasExtra("lat")) {
+				if (data != null && data.hasExtra("lon")
+						&& data.hasExtra("lat")) {
 					double lon = data.getDoubleExtra("lon", 0.0);
 					double lat = data.getDoubleExtra("lat", 0.0);
 					GeoPoint point = new GeoPoint(lat, lon);
@@ -544,7 +568,8 @@ public class AdvancedTouristMap extends MapActivity {
 		// get the pointers to different system services
 		this.locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		this.powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-		this.wakeLock = this.powerManager.newWakeLock(PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
+		this.wakeLock = this.powerManager.newWakeLock(
+				PowerManager.SCREEN_DIM_WAKE_LOCK, "AMV");
 
 		// set up the paint objects for the location overlay
 		this.circleOverlayFill = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -572,8 +597,10 @@ public class AdvancedTouristMap extends MapActivity {
 		// this.mapView.getOverlays().add(this.selectionOverlay);
 		this.insertOverlayOrdered(this.selectionOverlay);
 
-		if (savedInstanceState != null && savedInstanceState.getBoolean("locationListener")) {
-			if (this.locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+		if (savedInstanceState != null
+				&& savedInstanceState.getBoolean("locationListener")) {
+			if (this.locationManager
+					.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
 				enableFollowGPS();
 			} else {
 				showDialog(DIALOG_GPS_DISABLED);
@@ -591,13 +618,16 @@ public class AdvancedTouristMap extends MapActivity {
 		// .getPerstPersistenceManager("/sdcard/perstPoi.dbs");
 		// PoiCategory restCat = new CategoryBuilder("Restaurant").build();
 		// long id = 1337;
-		// PointOfInterest poi = new PoiBuilder(id, 52.455667, 13.298357, "My Test", "",
+		// PointOfInterest poi = new PoiBuilder(id, 52.455667, 13.298357,
+		// "My Test", "",
 		// restCat)
 		// .build();
 		// perstManager.insertPointOfInterest(poi);
 		// TODO: isnt permanent
-		// LinkedList<PointOfInterest> restaurants = new LinkedList<PointOfInterest>(
-		// perstManager.findNearPosition(new GeoCoordinate(52.4561009222, 13.297641277),
+		// LinkedList<PointOfInterest> restaurants = new
+		// LinkedList<PointOfInterest>(
+		// perstManager.findNearPosition(new GeoCoordinate(52.4561009222,
+		// 13.297641277),
 		// 1000, "Restaurant", 50));
 		// perstManager.close();
 		//
@@ -614,15 +644,18 @@ public class AdvancedTouristMap extends MapActivity {
 		// circleDefaultPaintOutline.setStrokeWidth(3);
 		//
 		// // create the CircleOverlay and add the circles
-		// ArrayCircleOverlay circleOverlay2 = new ArrayCircleOverlay(circleDefaultPaintFill,
+		// ArrayCircleOverlay circleOverlay2 = new
+		// ArrayCircleOverlay(circleDefaultPaintFill,
 		// circleDefaultPaintOutline, this);
-		// // OverlayCircle circle1 = new OverlayCircle(restaurants.get(0).getGeoPoint(), 10,
+		// // OverlayCircle circle1 = new
+		// OverlayCircle(restaurants.get(0).getGeoPoint(), 10,
 		// // restaurants.get(0).getName());
 		// // circleOverlay2.addCircle(circle1);
 		//
 		// for (int i = 0; i < restaurants.size(); i++) {
 		// Log.d("Restaurant", restaurants.get(i).getName());
-		// circleOverlay2.addCircle(new OverlayCircle(restaurants.get(i).getGeoPoint(), 50,
+		// circleOverlay2.addCircle(new
+		// OverlayCircle(restaurants.get(i).getGeoPoint(), 50,
 		// restaurants.get(i).getName()));
 		// }
 		//
@@ -631,12 +664,13 @@ public class AdvancedTouristMap extends MapActivity {
 	}
 
 	/**
-	 * This Listener checks if the map gets moved/scrolled a given distance and if so, disables
-	 * the auto following of the position.
+	 * This Listener checks if the map gets moved/scrolled a given distance and
+	 * if so, disables the auto following of the position.
 	 */
 	class ScrollListener extends GestureDetector.SimpleOnGestureListener {
 		@Override
-		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+		public boolean onScroll(MotionEvent e1, MotionEvent e2,
+				float distanceX, float distanceY) {
 			double delta = Math.sqrt(Math.pow((e1.getX() - e2.getX()), 2)
 					+ Math.pow((e1.getY() - e2.getY()), 2));
 			// only disable, if scrolled for a certain distance
@@ -656,7 +690,8 @@ public class AdvancedTouristMap extends MapActivity {
 			builder.setIcon(android.R.drawable.ic_menu_mylocation);
 			builder.setTitle(R.string.menu_position_enter_coordinates);
 			LayoutInflater factory = LayoutInflater.from(this);
-			final View view = factory.inflate(R.layout.dialog_enter_coordinates, null);
+			final View view = factory.inflate(
+					R.layout.dialog_enter_coordinates, null);
 			builder.setView(view);
 			builder.setPositiveButton(R.string.go_to_position,
 					new DialogInterface.OnClickListener() {
@@ -666,13 +701,17 @@ public class AdvancedTouristMap extends MapActivity {
 							disableFollowGPS(true);
 
 							// set the map center and zoom level
-							AdvancedTouristMap.this.mapController.setCenter(new GeoPoint(Double
-									.parseDouble(((EditText) view.findViewById(R.id.latitude))
-											.getText().toString()), Double
-									.parseDouble(((EditText) view.findViewById(R.id.longitude))
+							AdvancedTouristMap.this.mapController.setCenter(new GeoPoint(
+									Double.parseDouble(((EditText) view
+											.findViewById(R.id.latitude))
+											.getText().toString()),
+									Double.parseDouble(((EditText) view
+											.findViewById(R.id.longitude))
 											.getText().toString())));
-							AdvancedTouristMap.this.mapController.setZoom(((SeekBar) view
-									.findViewById(R.id.zoomlevel)).getProgress());
+							AdvancedTouristMap.this.mapController
+									.setZoom(((SeekBar) view
+											.findViewById(R.id.zoomlevel))
+											.getProgress());
 						}
 					});
 			builder.setNegativeButton(R.string.cancel, null);
@@ -687,7 +726,8 @@ public class AdvancedTouristMap extends MapActivity {
 			builder.setIcon(android.R.drawable.ic_menu_info_details);
 			builder.setTitle(R.string.menu_info_map_file);
 			LayoutInflater factory = LayoutInflater.from(this);
-			builder.setView(factory.inflate(R.layout.dialog_info_map_file, null));
+			builder.setView(factory
+					.inflate(R.layout.dialog_info_map_file, null));
 			builder.setPositiveButton(R.string.ok, null);
 			return builder.create();
 		} else {
@@ -748,31 +788,36 @@ public class AdvancedTouristMap extends MapActivity {
 			zoomlevel.setProgress(this.mapView.getZoomLevel());
 
 			// zoom level value
-			final TextView textView = (TextView) dialog.findViewById(R.id.zoomlevelValue);
+			final TextView textView = (TextView) dialog
+					.findViewById(R.id.zoomlevelValue);
 			textView.setText(String.valueOf(zoomlevel.getProgress()));
-			zoomlevel.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-				@Override
-				public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-					textView.setText(String.valueOf(progress));
-				}
+			zoomlevel
+					.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+						@Override
+						public void onProgressChanged(SeekBar seekBar,
+								int progress, boolean fromUser) {
+							textView.setText(String.valueOf(progress));
+						}
 
-				@Override
-				public void onStartTrackingTouch(SeekBar seekBar) {
-					// do nothing
-				}
+						@Override
+						public void onStartTrackingTouch(SeekBar seekBar) {
+							// do nothing
+						}
 
-				@Override
-				public void onStopTrackingTouch(SeekBar seekBar) {
-					// do nothing
-				}
-			});
+						@Override
+						public void onStopTrackingTouch(SeekBar seekBar) {
+							// do nothing
+						}
+					});
 		} else if (id == DIALOG_INFO_MAP_FILE) {
 			// map file name
-			TextView textView = (TextView) dialog.findViewById(R.id.infoMapFileViewName);
+			TextView textView = (TextView) dialog
+					.findViewById(R.id.infoMapFileViewName);
 			textView.setText(this.mapView.getMapFile());
 
 			// map file name
-			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewDebug);
+			textView = (TextView) dialog
+					.findViewById(R.id.infoMapFileViewDebug);
 			MapDatabase mapDatabase = this.mapView.getMapDatabase();
 			if (mapDatabase.isDebugFile()) {
 				textView.setText(R.string.info_map_file_debug_yes);
@@ -788,11 +833,13 @@ public class AdvancedTouristMap extends MapActivity {
 			// map file area
 			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewArea);
 			Rect mapArea = mapDatabase.getMapBoundary();
-			textView.setText(mapArea.top / 1000000d + ", " + mapArea.left / 1000000d + " – \n"
-					+ mapArea.bottom / 1000000d + ", " + mapArea.right / 1000000d);
+			textView.setText(mapArea.top / 1000000d + ", " + mapArea.left
+					/ 1000000d + " – \n" + mapArea.bottom / 1000000d + ", "
+					+ mapArea.right / 1000000d);
 
 			// map file start position
-			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewStart);
+			textView = (TextView) dialog
+					.findViewById(R.id.infoMapFileViewStart);
 			GeoPoint startPosition = mapDatabase.getStartPosition();
 			if (startPosition == null) {
 				textView.setText(null);
@@ -802,7 +849,8 @@ public class AdvancedTouristMap extends MapActivity {
 			}
 
 			// map file comment text
-			textView = (TextView) dialog.findViewById(R.id.infoMapFileViewComment);
+			textView = (TextView) dialog
+					.findViewById(R.id.infoMapFileViewComment);
 			String commentText = mapDatabase.getCommentText();
 			if (commentText == null) {
 				textView.setText(null);
@@ -823,24 +871,28 @@ public class AdvancedTouristMap extends MapActivity {
 		// check if mapview was started, just to return a position
 		Intent startingIntent = getIntent();
 		if (startingIntent.hasExtra("mode")
-				&& startingIntent.getStringExtra("mode").equals("LOCATION_PICKER")) {
+				&& startingIntent.getStringExtra("mode").equals(
+						"LOCATION_PICKER")) {
 			this.locationPickerMode = true;
 		}
 		// TODO: use the one from application?
 		// Read the default shared preferences
-		// this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		// this.preferences =
+		// PreferenceManager.getDefaultSharedPreferences(this);
 		this.preferences = this.advancedMapViewerApplication.prefs;
 
 		// set the map settings
-		this.mapView.setScaleBar(this.preferences.getBoolean("showScaleBar", false));
+		this.mapView.setScaleBar(this.preferences.getBoolean("showScaleBar",
+				false));
 		if (this.preferences.contains("mapViewMode")) {
-			this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferences.getString(
-					"mapViewMode", MapView.getDefaultMapViewMode().name()));
+			this.mapViewMode = Enum.valueOf(MapViewMode.class, this.preferences
+					.getString("mapViewMode", MapView.getDefaultMapViewMode()
+							.name()));
 			this.mapView.setMapViewMode(this.mapViewMode);
 		}
 		try {
-			this.mapView.setTextScale(Float.parseFloat(this.preferences.getString("textScale",
-					"1")));
+			this.mapView.setTextScale(Float.parseFloat(this.preferences
+					.getString("textScale", "1")));
 		} catch (NumberFormatException e) {
 			this.mapView.setTextScale(1);
 		}
@@ -849,10 +901,12 @@ public class AdvancedTouristMap extends MapActivity {
 		// set the general settings
 		if (this.preferences.getBoolean("fullscreen", false)) {
 			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+			getWindow().clearFlags(
+					WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		} else {
 			getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+			getWindow().addFlags(
+					WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
 		}
 		if (this.preferences.getBoolean("wakeLock", false)) {
 			if (!this.wakeLock.isHeld()) {
@@ -861,20 +915,22 @@ public class AdvancedTouristMap extends MapActivity {
 		}
 		this.mapView.setMemoryCardCachePersistence(this.preferences.getBoolean(
 				"cachePersistence", false));
-		this.mapView.setMemoryCardCacheSize(Math.min(
-				this.preferences.getInt("cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT),
+		this.mapView.setMemoryCardCacheSize(Math.min(this.preferences.getInt(
+				"cacheSize", MEMORY_CARD_CACHE_SIZE_DEFAULT),
 				MEMORY_CARD_CACHE_SIZE_MAX));
-		this.mapView
-				.setMoveSpeed(Math.min(
-						this.preferences.getInt("moveSpeed", MOVE_SPEED_DEFAULT),
-						MOVE_SPEED_MAX) / 10f);
+		this.mapView.setMoveSpeed(Math.min(
+				this.preferences.getInt("moveSpeed", MOVE_SPEED_DEFAULT),
+				MOVE_SPEED_MAX) / 10f);
 
 		// set the debug settings
-		this.mapView.setFpsCounter(this.preferences.getBoolean("showFpsCounter", false));
-		this.mapView.setTileFrames(this.preferences.getBoolean("showTileFrames", false));
-		this.mapView.setTileCoordinates(this.preferences.getBoolean("showTileCoordinates",
-				false));
-		this.mapView.setWaterTiles(this.preferences.getBoolean("showWaterTiles", false));
+		this.mapView.setFpsCounter(this.preferences.getBoolean(
+				"showFpsCounter", false));
+		this.mapView.setTileFrames(this.preferences.getBoolean(
+				"showTileFrames", false));
+		this.mapView.setTileCoordinates(this.preferences.getBoolean(
+				"showTileCoordinates", false));
+		this.mapView.setWaterTiles(this.preferences.getBoolean(
+				"showWaterTiles", false));
 
 		timings.addSplit("set general settings");
 		// check if the file browser needs to be displayed
@@ -884,22 +940,26 @@ public class AdvancedTouristMap extends MapActivity {
 		// }
 
 		// check for valid map bundle and start bundle browser, if not present
-		MapBundle mapBundle = this.advancedMapViewerApplication.getCurrentMapBundle();
+		MapBundle mapBundle = this.advancedMapViewerApplication
+				.getCurrentMapBundle();
 		if (mapBundle == null) {
 			showToast(getString(R.string.select_a_valid_mapfile));
 			this.startBundleBrowser();
 		} else {
 
 			// String mapBinary = this.preferences.getString("mapBinary", null);
-			String mapBinary = this.advancedMapViewerApplication.getBaseBundlePath()
-					+ File.separator + mapBundle.getMapFile().getRelativePath();
+			String mapBinary = this.advancedMapViewerApplication
+					.getBaseBundlePath()
+					+ File.separator
+					+ mapBundle.getMapFile().getRelativePath();
 			Log.d("Application", mapBinary);
-			// if offlinemap AND (map isnt set yet OR current set map differs from map to set)
+			// if offlinemap AND (map isnt set yet OR current set map differs
+			// from map to set)
 			if (!this.mapView.getMapViewMode().requiresInternetConnection()
-					&& (this.mapView.getMapFile() == null || !this.mapView.getMapFile().equals(
-							mapBinary))) {
-				Log.d("Application", "Had to reset mapfile! old: " + this.mapView.getMapFile()
-						+ ", new: " + mapBinary);
+					&& (this.mapView.getMapFile() == null || !this.mapView
+							.getMapFile().equals(mapBinary))) {
+				Log.d("Application", "Had to reset mapfile! old: "
+						+ this.mapView.getMapFile() + ", new: " + mapBinary);
 				this.mapView.setMapFile(mapBinary);
 			}
 		}
@@ -907,7 +967,8 @@ public class AdvancedTouristMap extends MapActivity {
 
 		// draw the route, if there is any
 		if (this.advancedMapViewerApplication.currentRoute != null) {
-			this.displayRouteOverlay(this.advancedMapViewerApplication.currentRoute,
+			this.displayRouteOverlay(
+					this.advancedMapViewerApplication.currentRoute,
 					startingIntent);
 		} else {
 			this.displayRoute = false;
@@ -915,11 +976,13 @@ public class AdvancedTouristMap extends MapActivity {
 		}
 
 		if (this.advancedMapViewerApplication.getCurrentPois().size() > 0) {
-			this.displayPoiOverlay(this.advancedMapViewerApplication.getCurrentPois());
+			this.displayPoiOverlay(this.advancedMapViewerApplication
+					.getCurrentPois());
 		}
 
 		if (this.advancedMapViewerApplication.getCurrentWikiArticles().size() > 0) {
-			this.displayWikiOverlay(this.advancedMapViewerApplication.getCurrentWikiArticles());
+			this.displayWikiOverlay(this.advancedMapViewerApplication
+					.getCurrentWikiArticles());
 		}
 
 		timings.addSplit("set route");
@@ -936,8 +999,8 @@ public class AdvancedTouristMap extends MapActivity {
 		}
 
 		if (this.decisionPointOverlay == null) {
-			this.decisionPointOverlay = new DecisionOverlay(getResources().getDrawable(
-					R.drawable.jog_tab_target_gray));
+			this.decisionPointOverlay = new DecisionOverlay(getResources()
+					.getDrawable(R.drawable.jog_tab_target_gray));
 			// this.mapView.getOverlays().add(this.decisionPointOverlay);
 			this.insertOverlayOrdered(this.decisionPointOverlay);
 		} else {
@@ -946,7 +1009,8 @@ public class AdvancedTouristMap extends MapActivity {
 
 		this.displayRoute = true;
 		this.routeOverlay.addWay(route.getOverlayWay());
-		this.decisionPointOverlay.addItems(Arrays.asList(route.getOverlayItems()));
+		this.decisionPointOverlay.addItems(Arrays.asList(route
+				.getOverlayItems()));
 		this.setupRoutingMenu(route);
 		if (startingIntent.getBooleanExtra("ROUTE_OVERVIEW", false)) {
 			// TODO: better centering of the route
@@ -954,7 +1018,8 @@ public class AdvancedTouristMap extends MapActivity {
 			this.mapController.setZoom(16);
 		}
 		if (startingIntent.getBooleanExtra("CENTER_DP", false)) {
-			this.mapController.setCenter(route.currentDecisionPoint.getGeoPoint());
+			this.mapController.setCenter(route.currentDecisionPoint
+					.getGeoPoint());
 			// this.mapController.setZoom(16);
 		}
 	}
@@ -969,23 +1034,24 @@ public class AdvancedTouristMap extends MapActivity {
 			this.poiOverlay.clear();
 		}
 		for (PointOfInterest poi : pois) {
-			this.poiOverlay.addItem(new OverlayItem(new GeoPoint(poi.getLatitude(), poi
-					.getLongitude()), poi.getCategory().getTitle(), poi.getName()));
+			this.poiOverlay.addItem(new OverlayItem(new GeoPoint(poi
+					.getLatitude(), poi.getLongitude()), poi.getCategory()
+					.getTitle(), poi.getName()));
 		}
 	}
 
 	void displayWikiOverlay(ArrayList<WikiArticleInterface> wikiArticles) {
 		if (this.wikiOverlay == null) {
-			this.wikiOverlay = new WikiOverlay(this, getResources().getDrawable(
-					R.drawable.wikipedia_30), false);
+			this.wikiOverlay = new WikiOverlay(this, getResources()
+					.getDrawable(R.drawable.wikipedia_30), false);
 			// this.mapView.getOverlays().add(this.wikiOverlay);
 			this.insertOverlayOrdered(this.wikiOverlay);
 		} else {
 			this.wikiOverlay.clear();
 		}
 		for (WikiArticleInterface wikiArticle : wikiArticles) {
-			this.wikiOverlay.addItem(new OverlayItem(wikiArticle.getGeoPoint(), wikiArticle
-					.getTitle(), null));
+			this.wikiOverlay.addItem(new OverlayItem(wikiArticle.getGeoPoint(),
+					wikiArticle.getTitle(), null));
 		}
 	}
 
@@ -1034,7 +1100,8 @@ public class AdvancedTouristMap extends MapActivity {
 			// insert selection overlay as last, always
 			this.mapView.getOverlays().add(overlay);
 		} else if (overlay instanceof ArrayWayOverlay) {
-			int positionIndex = this.mapView.getOverlays().indexOf(this.positionOverlay);
+			int positionIndex = this.mapView.getOverlays().indexOf(
+					this.positionOverlay);
 			if (positionIndex >= 0) {
 				// positionOverlay is in, so insert this one behind
 				this.mapView.getOverlays().add(positionIndex + 1, overlay);
@@ -1043,8 +1110,10 @@ public class AdvancedTouristMap extends MapActivity {
 				this.mapView.getOverlays().add(0, overlay);
 			}
 		} else if (overlay instanceof DecisionOverlay) {
-			int routeIndex = this.mapView.getOverlays().indexOf(this.routeOverlay);
-			int positionIndex = this.mapView.getOverlays().indexOf(this.positionOverlay);
+			int routeIndex = this.mapView.getOverlays().indexOf(
+					this.routeOverlay);
+			int positionIndex = this.mapView.getOverlays().indexOf(
+					this.positionOverlay);
 			if (routeIndex >= 0) {
 				// insert behind routeOverlay
 				this.mapView.getOverlays().add(routeIndex + 1, overlay);
@@ -1052,8 +1121,10 @@ public class AdvancedTouristMap extends MapActivity {
 				// or insert behind position overlay
 				this.mapView.getOverlays().add(positionIndex + 1, overlay);
 			}
-		} else if (overlay instanceof PoiOverlay || overlay instanceof WikiOverlay) {
-			int selectionIndex = this.mapView.getOverlays().indexOf(this.selectionOverlay);
+		} else if (overlay instanceof PoiOverlay
+				|| overlay instanceof WikiOverlay) {
+			int selectionIndex = this.mapView.getOverlays().indexOf(
+					this.selectionOverlay);
 			if (selectionIndex >= 0) {
 				// insert before selection overlay
 				this.mapView.getOverlays().add(selectionIndex, overlay);
@@ -1114,16 +1185,18 @@ public class AdvancedTouristMap extends MapActivity {
 	 * Show the search activity.
 	 */
 	private void startSearch() {
-		if (!this.advancedMapViewerApplication.getCurrentMapBundle().isSearchable()) {
+		if (!this.advancedMapViewerApplication.getCurrentMapBundle()
+				.isSearchable()) {
 			showToast(getString(R.string.addressfile_not_avaiable));
 		} else {
-			startActivityForResult(new Intent(this, Search.class), INTENT_SEARCH);
+			startActivityForResult(new Intent(this, Search.class),
+					INTENT_SEARCH);
 		}
 	}
 
 	/**
-	 * Displays a text message via the toast notification system. If a previous message is still
-	 * visible, the previous message is first removed.
+	 * Displays a text message via the toast notification system. If a previous
+	 * message is still visible, the previous message is first removed.
 	 * 
 	 * @param text
 	 *            the text message to display
@@ -1139,9 +1212,9 @@ public class AdvancedTouristMap extends MapActivity {
 	}
 
 	/**
-	 * Sets up the Routing menu for a given Route and makes it visible. Has a button to display
-	 * the decision point list and two buttons to jump to the next/previous decision point in
-	 * list
+	 * Sets up the Routing menu for a given Route and makes it visible. Has a
+	 * button to display the decision point list and two buttons to jump to the
+	 * next/previous decision point in list
 	 * 
 	 * @param route
 	 *            the route to set the menu for
@@ -1156,22 +1229,27 @@ public class AdvancedTouristMap extends MapActivity {
 		this.nextDecisionPointButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AdvancedTouristMap.this.mapController.setCenter(route.getNextDP().getGeoPoint());
+				AdvancedTouristMap.this.mapController.setCenter(route
+						.getNextDP().getGeoPoint());
 			}
 		});
-		this.previousDecisionPointButton.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				AdvancedTouristMap.this.mapController.setCenter(route.getPreviousDP()
-						.getGeoPoint());
-			}
-		});
+		this.previousDecisionPointButton
+				.setOnClickListener(new OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						AdvancedTouristMap.this.mapController.setCenter(route
+								.getPreviousDP().getGeoPoint());
+					}
+				});
 		this.routeMenu.setVisibility(View.VISIBLE);
 	}
 
 	private class InfoSetterAsync extends AsyncTask<GeoPoint, String, Void> {
 
-		/** maximum distance in meters of Pois to the location to be displayed in this overlay */
+		/**
+		 * maximum distance in meters of Pois to the location to be displayed in
+		 * this overlay
+		 */
 		private static final int POI_MAX_DISTANCE = 100;
 
 		public InfoSetterAsync() {
@@ -1185,8 +1263,8 @@ public class AdvancedTouristMap extends MapActivity {
 				return null;
 			}
 			GeoPoint geoPoint = params[0];
-			GeoCoordinate geoCoordinate = new GeoCoordinate(geoPoint.getLatitude(),
-					geoPoint.getLongitude());
+			GeoCoordinate geoCoordinate = new GeoCoordinate(
+					geoPoint.getLatitude(), geoPoint.getLongitude());
 
 			String streetName = "";
 			String poiName = "";
@@ -1204,16 +1282,19 @@ public class AdvancedTouristMap extends MapActivity {
 					&& AdvancedTouristMap.this.advancedMapViewerApplication
 							.getCurrentMapBundle().isRoutable()) {
 				// TODO: not very nice yet
-				if (!AdvancedTouristMap.this.advancedMapViewerApplication.getRouter()
+				if (!AdvancedTouristMap.this.advancedMapViewerApplication
+						.getRouter()
 						.getBoundingBox()
-						.includes(geoPoint.getLatitudeE6(), geoPoint.getLongitudeE6())) {
+						.includes(geoPoint.getLatitudeE6(),
+								geoPoint.getLongitudeE6())) {
 					publishProgress("out of box");
 					return null;
 				}
-				Vertex vertex = AdvancedTouristMap.this.advancedMapViewerApplication.getRouter()
-						.getNearestVertex(geoCoordinate);
+				Vertex vertex = AdvancedTouristMap.this.advancedMapViewerApplication
+						.getRouter().getNearestVertex(geoCoordinate);
 				if (vertex != null) {
-					String info = PositionInfo.edgesToStringInfo(vertex.getOutboundEdges());
+					String info = PositionInfo.edgesToStringInfo(vertex
+							.getOutboundEdges());
 					if (info != null && !info.equals("")) {
 						streetName = info;
 						publishProgress(info);
@@ -1229,18 +1310,21 @@ public class AdvancedTouristMap extends MapActivity {
 					&& AdvancedTouristMap.this.advancedMapViewerApplication
 							.getCurrentMapBundle().isPoiable()) {
 				Iterator<PointOfInterest> iterator = AdvancedTouristMap.this.advancedMapViewerApplication
-						.getPerstManager().neighborIterator(geoCoordinate, "Root");
+						.getPerstManager().neighborIterator(geoCoordinate,
+								"Root");
 
-				// find the next *named* POI near the current point inside the given distance
+				// find the next *named* POI near the current point inside the
+				// given distance
 				while (iterator.hasNext()) {
 					PointOfInterest nearestPoi = iterator.next();
-					int distance = (int) nearestPoi.getGeoCoordinate().sphericalDistance(
-							geoCoordinate);
+					int distance = (int) nearestPoi.getGeoCoordinate()
+							.sphericalDistance(geoCoordinate);
 					if (distance > POI_MAX_DISTANCE) {
 						break;
 					}
 					if (nearestPoi.getName() != null) {
-						poiName = nearestPoi.getName() + " (" + distance + " m)";
+						poiName = nearestPoi.getName() + " (" + distance
+								+ " m)";
 						if (!streetName.equals("")) {
 							publishProgress(streetName + "\n" + poiName);
 						} else {
@@ -1257,17 +1341,20 @@ public class AdvancedTouristMap extends MapActivity {
 		protected void onProgressUpdate(String... values) {
 			// build the bubbleView
 			TextView bubbleView = new TextView(AdvancedTouristMap.this);
-			bubbleView.setBackgroundDrawable(getResources().getDrawable(R.drawable.map_label));
+			bubbleView.setBackgroundDrawable(getResources().getDrawable(
+					R.drawable.map_label));
 			bubbleView.setGravity(Gravity.CENTER);
 			bubbleView.setMaxEms(20);
 			// bubbleView
-			// .setMaxWidth((int) (AdvancedMapViewer.this.mapView.getWidth() * (4.0 / 5.0)));
+			// .setMaxWidth((int) (AdvancedMapViewer.this.mapView.getWidth() *
+			// (4.0 / 5.0)));
 
 			// set text size according to textScale setting
 			float textSize = 15;
 			try {
-				textSize *= Float.parseFloat(AdvancedTouristMap.this.preferences.getString(
-						"textScale", "1"));
+				textSize *= Float
+						.parseFloat(AdvancedTouristMap.this.preferences
+								.getString("textScale", "1"));
 			} catch (NumberFormatException e) {
 				e.printStackTrace();
 			}
@@ -1281,7 +1368,8 @@ public class AdvancedTouristMap extends MapActivity {
 				bubbleView.setText(values[0]);
 			}
 			// build the drawable from the bubbleView
-			Drawable drawable = ItemizedOverlay.boundCenterBottom(viewToDrawable(bubbleView));
+			Drawable drawable = ItemizedOverlay
+					.boundCenterBottom(viewToDrawable(bubbleView));
 			AdvancedTouristMap.this.selectionOverlayItem.setMarker(drawable);
 			AdvancedTouristMap.this.selectionOverlay.requestRedraw();
 		}
@@ -1300,7 +1388,8 @@ public class AdvancedTouristMap extends MapActivity {
 		}
 
 		@Override
-		protected ArrayList<WikiArticleInterface> doInBackground(GeoPoint... params) {
+		protected ArrayList<WikiArticleInterface> doInBackground(
+				GeoPoint... params) {
 			if (params.length != 1) {
 				return null;
 			}
@@ -1308,12 +1397,12 @@ public class AdvancedTouristMap extends MapActivity {
 			ArticleRetriever retriever = ArticleRetrieverFactory
 					.getGeonamesReceiver(AdvancedTouristMap.this.advancedMapViewerApplication
 							.getWikiLocale());
-			ArrayList<WikiArticleInterface> articles = retriever.getArticles(geoPoint, 20000,
-					50, 0);
-			AdvancedTouristMap.this.advancedMapViewerApplication.getCurrentWikiArticles()
-					.clear();
-			AdvancedTouristMap.this.advancedMapViewerApplication.getCurrentWikiArticles()
-					.addAll(articles);
+			ArrayList<WikiArticleInterface> articles = retriever.getArticles(
+					geoPoint, 20000, 50, 0);
+			AdvancedTouristMap.this.advancedMapViewerApplication
+					.getCurrentWikiArticles().clear();
+			AdvancedTouristMap.this.advancedMapViewerApplication
+					.getCurrentWikiArticles().addAll(articles);
 			return articles;
 		}
 
@@ -1329,7 +1418,8 @@ public class AdvancedTouristMap extends MapActivity {
 				MeasureSpec.getSize(view.getMeasuredHeight()));
 		view.layout(0, 0, view.getMeasuredWidth(), view.getMeasuredHeight());
 		view.setDrawingCacheEnabled(true);
-		Drawable drawable = new BitmapDrawable(Bitmap.createBitmap(view.getDrawingCache()));
+		Drawable drawable = new BitmapDrawable(Bitmap.createBitmap(view
+				.getDrawingCache()));
 		view.setDrawingCacheEnabled(false);
 		return drawable;
 	}
@@ -1350,9 +1440,10 @@ public class AdvancedTouristMap extends MapActivity {
 			// clear last label
 			this.clear();
 			if (AdvancedTouristMap.this.selectionOverlayItem == null) {
-				AdvancedTouristMap.this.selectionOverlayItem = new OverlayItem(geoPoint, null,
-						null, ItemizedOverlay.boundCenterBottom(getResources().getDrawable(
-								R.drawable.map_label)));
+				AdvancedTouristMap.this.selectionOverlayItem = new OverlayItem(
+						geoPoint, null, null,
+						ItemizedOverlay.boundCenterBottom(getResources()
+								.getDrawable(R.drawable.map_label)));
 			} else {
 				AdvancedTouristMap.this.selectionOverlayItem.setPoint(geoPoint);
 			}
@@ -1381,14 +1472,17 @@ public class AdvancedTouristMap extends MapActivity {
 			if (item != null) {
 				if (AdvancedTouristMap.this.locationPickerMode) {
 					Log.d("RouteCalculator", "location picker mode on");
-					AdvancedTouristMap.this.setResult(RESULT_OK,
-							new Intent().putExtra("LONGITUDE", item.getPoint().getLongitude())
-									.putExtra("LATITUDE", item.getPoint().getLatitude()));
+					AdvancedTouristMap.this.setResult(
+							RESULT_OK,
+							new Intent().putExtra("LONGITUDE",
+									item.getPoint().getLongitude()).putExtra(
+									"LATITUDE", item.getPoint().getLatitude()));
 					AdvancedTouristMap.this.finish();
 					return true;
 				}
-				startActivity(new Intent(AdvancedTouristMap.this, PositionInfo.class).putExtra(
-						"LATITUDE", item.getPoint().getLatitude()).putExtra("LONGITUDE",
+				startActivity(new Intent(AdvancedTouristMap.this,
+						PositionInfo.class).putExtra("LATITUDE",
+						item.getPoint().getLatitude()).putExtra("LONGITUDE",
 						item.getPoint().getLongitude()));
 			}
 			return true;
@@ -1411,7 +1505,8 @@ public class AdvancedTouristMap extends MapActivity {
 
 		private final Context context;
 
-		public PoiOverlay(Context context, Drawable defaultMarker, boolean alignMarker) {
+		public PoiOverlay(Context context, Drawable defaultMarker,
+				boolean alignMarker) {
 			super(defaultMarker, alignMarker);
 			this.context = context;
 		}
@@ -1425,16 +1520,22 @@ public class AdvancedTouristMap extends MapActivity {
 				builder.setTitle(this.clickedItem.getTitle());
 				builder.setMessage(this.clickedItem.getSnippet());
 				builder.setPositiveButton("OK", null);
-				builder.setNeutralButton("Info", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						startActivity(new Intent(AdvancedTouristMap.this, PositionInfo.class)
-								.putExtra(PositionInfo.LATITUDE_EXTRA,
-										PoiOverlay.this.clickedItem.getPoint().getLatitude())
-								.putExtra(PositionInfo.LONGITUDE_EXTRA,
-										PoiOverlay.this.clickedItem.getPoint().getLongitude()));
-					}
-				});
+				builder.setNeutralButton("Info",
+						new DialogInterface.OnClickListener() {
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								startActivity(new Intent(
+										AdvancedTouristMap.this,
+										PositionInfo.class).putExtra(
+										PositionInfo.LATITUDE_EXTRA,
+										PoiOverlay.this.clickedItem.getPoint()
+												.getLatitude()).putExtra(
+										PositionInfo.LONGITUDE_EXTRA,
+										PoiOverlay.this.clickedItem.getPoint()
+												.getLongitude()));
+							}
+						});
 				builder.show();
 			}
 			return true;
@@ -1445,7 +1546,8 @@ public class AdvancedTouristMap extends MapActivity {
 
 		private final Context context;
 
-		public WikiOverlay(Context context, Drawable defaultMarker, boolean alignMarker) {
+		public WikiOverlay(Context context, Drawable defaultMarker,
+				boolean alignMarker) {
 			super(defaultMarker, alignMarker);
 			ItemizedOverlay.boundCenter(defaultMarker);
 			this.context = context;
@@ -1458,13 +1560,16 @@ public class AdvancedTouristMap extends MapActivity {
 					.getCurrentWikiArticles().get(index);
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
-			LayoutInflater factory = LayoutInflater.from(AdvancedTouristMap.this);
-			final View dialogView = factory.inflate(R.layout.webview_dialog, null);
+			LayoutInflater factory = LayoutInflater
+					.from(AdvancedTouristMap.this);
+			final View dialogView = factory.inflate(R.layout.webview_dialog,
+					null);
 			builder.setTitle(article.getTitle());
 			// a progress bar to indicate loading
 			final ProgressBar progressBar = (ProgressBar) dialogView
 					.findViewById(R.id.webview_dialog_progress);
-			WebView webView = (WebView) dialogView.findViewById(R.id.webview_dialog_webview);
+			WebView webView = (WebView) dialogView
+					.findViewById(R.id.webview_dialog_webview);
 
 			// handle link clicks internally (doesn't open new browser window)
 			webView.setWebViewClient(new WebViewClient() {
@@ -1494,15 +1599,19 @@ public class AdvancedTouristMap extends MapActivity {
 
 			builder.setView(dialogView);
 
-			builder.setPositiveButton("Info", new DialogInterface.OnClickListener() {
+			builder.setPositiveButton("Info",
+					new DialogInterface.OnClickListener() {
 
-				@Override
-				public void onClick(DialogInterface dialog, int which) {
-					startActivity(new Intent(AdvancedTouristMap.this, PositionInfo.class)
-							.putExtra(PositionInfo.LATITUDE_EXTRA, article.getLat()).putExtra(
-									PositionInfo.LONGITUDE_EXTRA, article.getLng()));
-				}
-			});
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							startActivity(new Intent(AdvancedTouristMap.this,
+									PositionInfo.class).putExtra(
+									PositionInfo.LATITUDE_EXTRA,
+									article.getLat()).putExtra(
+									PositionInfo.LONGITUDE_EXTRA,
+									article.getLng()));
+						}
+					});
 
 			builder.setNegativeButton("Close", null);
 
