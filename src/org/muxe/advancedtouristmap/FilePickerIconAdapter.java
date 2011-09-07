@@ -16,8 +16,6 @@ package org.muxe.advancedtouristmap;
 
 import java.io.File;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
-
 import android.content.Context;
 import android.view.Gravity;
 import android.view.View;

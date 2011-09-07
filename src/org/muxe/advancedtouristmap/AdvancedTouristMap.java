@@ -37,7 +37,6 @@ import org.mapsforge.android.maps.MapViewMode;
 import org.mapsforge.android.maps.Overlay;
 import org.mapsforge.android.maps.OverlayCircle;
 import org.mapsforge.android.maps.OverlayItem;
-import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Vertex;
 import org.mapsforge.poi.PointOfInterest;

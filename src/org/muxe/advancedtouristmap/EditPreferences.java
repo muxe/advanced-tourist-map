@@ -17,8 +17,6 @@ package org.muxe.advancedtouristmap;
 import java.io.File;
 import java.io.FileFilter;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;

@@ -1,7 +1,5 @@
 package org.muxe.advancedtouristmap;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;

@@ -1,0 +1,13 @@
+img {
+	padding:1px;
+	border:1px solid #021a40;
+	box-shadow: 3px 3px 10px #201C1D;
+	-webkit-box-shadow: 3px 3px 10px #201C1D;
+	-moz-box-shadow: 3px 3px 10px #201C1D;
+}
+
+img.centered {
+	display: block;
+	margin-left: auto;
+	margin-right: auto
+}

@@ -5,12 +5,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.poi.PoiCategory;
 import org.mapsforge.poi.PointOfInterest;
 import org.muxe.advancedtouristmap.AdvancedTouristMap;
 import org.muxe.advancedtouristmap.BaseActivity;
+import org.muxe.advancedtouristmap.R;
 
 import android.content.Intent;
 import android.os.Bundle;

@@ -14,8 +14,6 @@
  */
 package org.muxe.advancedtouristmap;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
-
 import android.content.Context;
 import android.util.AttributeSet;
 

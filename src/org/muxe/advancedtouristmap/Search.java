@@ -23,7 +23,6 @@ import java.util.List;
 import model.address.android.SqCity;
 import model.address.android.SqRoad;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.geocoding.widget.CityCompletionAdapter;
 import org.mapsforge.geocoding.widget.RoadCompletionAdapter;
 import org.mapsforge.geocoding.widget.RoadListAdapter;

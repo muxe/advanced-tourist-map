@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<head>
+		<title>Help: Advanced Map Viewer</title>
+		<link rel="stylesheet" type="text/css" href="file:///android_asset/help-res/style.css" />
+<!-- 		<link rel="stylesheet" type="text/css" href="/home/max/workspace/advanced-tourist-map/assets/help-res/style.css" /> -->
+		<meta http-equiv="Content-Style-Type" content="text/css" />
+	</head>
+	<body>
+		<p>
+			This is the applications main screen. On this map routes,
+			points-of-interest (POI) and wikipedia articles can be displayed.
+		</p>
+		<p>
+			<b>Long press</b> a point on the map to display a marker with additional information. <br />
+			<img class="centered" alt="selection overlay" src="file:///android_asset/help-res/selection_overlay.png" />
+<!-- 			<img class="schlagschatten" alt="selection overlay" src="/home/max/workspace/advanced-tourist-map/assets/help-res/selection_overlay.png" /> -->
+			Tap that marker to see more details about this point. 
+		</p>
+	</body>
+
+</html>

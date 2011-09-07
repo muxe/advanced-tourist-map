@@ -3,7 +3,7 @@ package org.muxe.advancedtouristmap.routing;
 import java.io.File;
 
 import org.mapsforge.android.maps.GeoPoint;
-import org.mapsforge.applications.android.advancedmapviewer.R;
+import org.muxe.advancedtouristmap.R;
 import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Router;

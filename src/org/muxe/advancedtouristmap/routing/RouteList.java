@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
+import org.muxe.advancedtouristmap.R;
 import org.muxe.advancedtouristmap.AdvancedTouristMap;
 import org.muxe.advancedtouristmap.BaseActivity;
 

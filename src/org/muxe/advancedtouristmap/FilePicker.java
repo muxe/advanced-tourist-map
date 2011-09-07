@@ -19,8 +19,6 @@ import java.io.FileFilter;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.mapsforge.applications.android.advancedmapviewer.R;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;

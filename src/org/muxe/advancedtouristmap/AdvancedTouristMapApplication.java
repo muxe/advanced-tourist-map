@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import org.mapsforge.android.mobileHighwayHierarchies.HHRouter;
-import org.mapsforge.applications.android.advancedmapviewer.R;
 import org.mapsforge.core.Router;
 import org.mapsforge.poi.PointOfInterest;
 import org.mapsforge.poi.persistence.IPersistenceManager;
