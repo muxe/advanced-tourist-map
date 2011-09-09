@@ -42,6 +42,9 @@ import org.mapsforge.android.maps.OverlayItem;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Vertex;
 import org.mapsforge.poi.PointOfInterest;
+import org.muxe.advancedtouristmap.overlay.GenericOverlay;
+import org.muxe.advancedtouristmap.overlay.PoiOverlayItem;
+import org.muxe.advancedtouristmap.overlay.WikiOverlayItem;
 import org.muxe.advancedtouristmap.poi.PoiBrowserActivity;
 import org.muxe.advancedtouristmap.routing.DecisionOverlay;
 import org.muxe.advancedtouristmap.routing.Route;
@@ -149,8 +152,7 @@ public class AdvancedTouristMap extends MapActivity {
 	private Paint circleOverlayOutline;
 	private ArrayWayOverlay routeOverlay;
 	private DecisionOverlay decisionPointOverlay;
-	private PoiOverlay poiOverlay;
-	private WikiOverlay wikiOverlay;
+	private GenericOverlay genericOverlay;
 	SelectionOverlay selectionOverlay;
 	// Drawable selectionDrawable;
 	OverlayItem selectionOverlayItem;
@@ -660,6 +662,7 @@ public class AdvancedTouristMap extends MapActivity {
 		// }
 		//
 		// this.mapView.getOverlays().add(circleOverlay2);
+		
 		timings.dumpToLog();
 	}
 
@@ -975,14 +978,8 @@ public class AdvancedTouristMap extends MapActivity {
 			this.routeMenu.setVisibility(View.GONE);
 		}
 
-		if (this.advancedMapViewerApplication.getCurrentPois().size() > 0) {
-			this.displayPoiOverlay(this.advancedMapViewerApplication
-					.getCurrentPois());
-		}
-
-		if (this.advancedMapViewerApplication.getCurrentWikiArticles().size() > 0) {
-			this.displayWikiOverlay(this.advancedMapViewerApplication
-					.getCurrentWikiArticles());
+		if (this.advancedMapViewerApplication.getCurrentPois().size() > 0 || this.advancedMapViewerApplication.getCurrentWikiArticles().size() > 0) {
+			refreshGenericOverlay();
 		}
 
 		timings.addSplit("set route");
@@ -1023,47 +1020,44 @@ public class AdvancedTouristMap extends MapActivity {
 			// this.mapController.setZoom(16);
 		}
 	}
-
-	private void displayPoiOverlay(ArrayList<PointOfInterest> pois) {
-		if (this.poiOverlay == null) {
-			this.poiOverlay = new PoiOverlay(this, getResources().getDrawable(
-					R.drawable.marker_poi), true);
-			// this.mapView.getOverlays().add(this.poiOverlay);
-			this.insertOverlayOrdered(this.poiOverlay);
+	
+	private void refreshGenericOverlay() {
+		TimingLogger timings = new TimingLogger("timing", "refreshGenericOverlay");
+		if (this.genericOverlay == null) {
+			this.genericOverlay = new GenericOverlay(this, null);
+			this.insertOverlayOrdered(this.genericOverlay);
 		} else {
-			this.poiOverlay.clear();
+			this.genericOverlay.clear();
 		}
-		for (PointOfInterest poi : pois) {
-			this.poiOverlay.addItem(new OverlayItem(new GeoPoint(poi
-					.getLatitude(), poi.getLongitude()), poi.getCategory()
-					.getTitle(), poi.getName()));
+		
+		if (this.advancedMapViewerApplication.getCurrentPois() != null) {
+			Log.d("Overlay", "inserting pois");
+			for (PointOfInterest poi : this.advancedMapViewerApplication.getCurrentPois()) {
+				this.genericOverlay.addItem(new PoiOverlayItem(poi, poi.getCategory()
+					.getTitle(), poi.getName(), ItemizedOverlay.boundCenterBottom(getResources().getDrawable(
+					R.drawable.marker_poi))));
+				//TODO BOUNDCENTER USW?
+			}
 		}
-	}
-
-	void displayWikiOverlay(ArrayList<WikiArticleInterface> wikiArticles) {
-		if (this.wikiOverlay == null) {
-			this.wikiOverlay = new WikiOverlay(this, getResources()
-					.getDrawable(R.drawable.wikipedia_30), false);
-			// this.mapView.getOverlays().add(this.wikiOverlay);
-			this.insertOverlayOrdered(this.wikiOverlay);
-		} else {
-			this.wikiOverlay.clear();
+		
+		if (this.advancedMapViewerApplication.getCurrentWikiArticles() != null) {
+			for (WikiArticleInterface wikiArticle : this.advancedMapViewerApplication.getCurrentWikiArticles()) {
+				this.genericOverlay.addItem(new WikiOverlayItem(wikiArticle, wikiArticle.getTitle(), null, ItemizedOverlay.boundCenter(getResources()
+					.getDrawable(R.drawable.wikipedia_30))));
+				//TODO BOUNDCENTER USW?
+			}
 		}
-		for (WikiArticleInterface wikiArticle : wikiArticles) {
-			this.wikiOverlay.addItem(new OverlayItem(wikiArticle.getGeoPoint(),
-					wikiArticle.getTitle(), null));
-		}
+		timings.dumpToLog();
 	}
 
 	private void clearAllOverlays() {
 		// clear route
 		this.disableShowRoute();
 		// clear pois
-		this.disableShowPois();
+		this.disableGenericOverlay();
 		// clear info
 		this.selectionOverlay.clear();
 		// clear wikipedia
-		this.disableShowWikipedia();
 	}
 
 	private void disableShowRoute() {
@@ -1076,19 +1070,12 @@ public class AdvancedTouristMap extends MapActivity {
 		this.routeMenu.setVisibility(View.GONE);
 	}
 
-	private void disableShowPois() {
+	private void disableGenericOverlay() {
 		this.advancedMapViewerApplication.getCurrentPois().clear();
-		if (this.poiOverlay != null) {
-			this.mapView.getOverlays().remove(this.poiOverlay);
-			this.poiOverlay = null;
-		}
-	}
-
-	private void disableShowWikipedia() {
 		this.advancedMapViewerApplication.getCurrentWikiArticles().clear();
-		if (this.wikiOverlay != null) {
-			this.mapView.getOverlays().remove(this.wikiOverlay);
-			this.wikiOverlay = null;
+		if (this.genericOverlay != null) {
+			this.mapView.getOverlays().remove(this.genericOverlay);
+			this.genericOverlay = null;
 		}
 	}
 
@@ -1121,8 +1108,7 @@ public class AdvancedTouristMap extends MapActivity {
 				// or insert behind position overlay
 				this.mapView.getOverlays().add(positionIndex + 1, overlay);
 			}
-		} else if (overlay instanceof PoiOverlay
-				|| overlay instanceof WikiOverlay) {
+		} else if (overlay instanceof GenericOverlay) {
 			int selectionIndex = this.mapView.getOverlays().indexOf(
 					this.selectionOverlay);
 			if (selectionIndex >= 0) {
@@ -1408,7 +1394,8 @@ public class AdvancedTouristMap extends MapActivity {
 
 		@Override
 		protected void onPostExecute(ArrayList<WikiArticleInterface> result) {
-			AdvancedTouristMap.this.displayWikiOverlay(result);
+//			AdvancedTouristMap.this.displayWikiOverlay(result);
+			refreshGenericOverlay();
 		}
 
 	}
@@ -1496,128 +1483,6 @@ public class AdvancedTouristMap extends MapActivity {
 		// }
 		// return true;
 		// }
-
-	}
-
-	private class PoiOverlay extends ArrayItemizedOverlay {
-
-		OverlayItem clickedItem;
-
-		private final Context context;
-
-		public PoiOverlay(Context context, Drawable defaultMarker,
-				boolean alignMarker) {
-			super(defaultMarker, alignMarker);
-			this.context = context;
-		}
-
-		@Override
-		protected boolean onTap(int index) {
-			this.clickedItem = createItem(index);
-			if (this.clickedItem != null) {
-				Builder builder = new AlertDialog.Builder(this.context);
-				builder.setIcon(android.R.drawable.ic_menu_info_details);
-				builder.setTitle(this.clickedItem.getTitle());
-				builder.setMessage(this.clickedItem.getSnippet());
-				builder.setPositiveButton("OK", null);
-				builder.setNeutralButton("Info",
-						new DialogInterface.OnClickListener() {
-							@Override
-							public void onClick(DialogInterface dialog,
-									int which) {
-								startActivity(new Intent(
-										AdvancedTouristMap.this,
-										PositionInfo.class).putExtra(
-										PositionInfo.LATITUDE_EXTRA,
-										PoiOverlay.this.clickedItem.getPoint()
-												.getLatitude()).putExtra(
-										PositionInfo.LONGITUDE_EXTRA,
-										PoiOverlay.this.clickedItem.getPoint()
-												.getLongitude()));
-							}
-						});
-				builder.show();
-			}
-			return true;
-		}
-	}
-
-	private class WikiOverlay extends ArrayItemizedOverlay {
-
-		private final Context context;
-
-		public WikiOverlay(Context context, Drawable defaultMarker,
-				boolean alignMarker) {
-			super(defaultMarker, alignMarker);
-			ItemizedOverlay.boundCenter(defaultMarker);
-			this.context = context;
-		}
-
-		@Override
-		protected boolean onTap(int index) {
-			// get the clicked article
-			final WikiArticleInterface article = AdvancedTouristMap.this.advancedMapViewerApplication
-					.getCurrentWikiArticles().get(index);
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
-			LayoutInflater factory = LayoutInflater
-					.from(AdvancedTouristMap.this);
-			final View dialogView = factory.inflate(R.layout.webview_dialog,
-					null);
-			builder.setTitle(article.getTitle());
-			// a progress bar to indicate loading
-			final ProgressBar progressBar = (ProgressBar) dialogView
-					.findViewById(R.id.webview_dialog_progress);
-			WebView webView = (WebView) dialogView
-					.findViewById(R.id.webview_dialog_webview);
-
-			// handle link clicks internally (doesn't open new browser window)
-			webView.setWebViewClient(new WebViewClient() {
-				@Override
-				public boolean shouldOverrideUrlLoading(WebView view, String url) {
-					progressBar.setVisibility(View.VISIBLE);
-					view.loadUrl(url);
-					return false;
-				}
-			});
-
-			// show loading progress
-			webView.setWebChromeClient(new WebChromeClient() {
-				@Override
-				public void onProgressChanged(WebView view, int progress) {
-					if (progress == 100) {
-						progressBar.setVisibility(View.GONE);
-					} else {
-						progressBar.setProgress(progress);
-					}
-				}
-
-			});
-
-			// let the article set what to render (load url or local data)
-			article.setWebView(webView);
-
-			builder.setView(dialogView);
-
-			builder.setPositiveButton("Info",
-					new DialogInterface.OnClickListener() {
-
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							startActivity(new Intent(AdvancedTouristMap.this,
-									PositionInfo.class).putExtra(
-									PositionInfo.LATITUDE_EXTRA,
-									article.getLat()).putExtra(
-									PositionInfo.LONGITUDE_EXTRA,
-									article.getLng()));
-						}
-					});
-
-			builder.setNegativeButton("Close", null);
-
-			builder.show();
-			return true;
-		}
 
 	}
 }
