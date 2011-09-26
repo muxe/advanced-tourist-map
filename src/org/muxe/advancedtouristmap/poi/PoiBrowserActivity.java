@@ -150,7 +150,7 @@ public class PoiBrowserActivity extends BaseActivity {
 					PoiBrowserActivity.this.advancedMapViewer.getCurrentPois().add(
 							poiOrCat.getPoi());
 					startActivity(new Intent(PoiBrowserActivity.this, AdvancedTouristMap.class)
-							.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+							.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("CENTER_POI", true));
 				}
 			}
 		});

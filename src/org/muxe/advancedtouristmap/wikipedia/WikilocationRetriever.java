@@ -53,7 +53,7 @@ public class WikilocationRetriever implements ArticleRetriever {
 
 	@Override
 	public ArrayList<WikiArticleInterface> getArticles(GeoPoint geoPoint, int radius,
-			int limit, int offset) {
+			int limit, int offset) throws IOException {
 		ArrayList<WikiArticleInterface> result = new ArrayList<WikiArticleInterface>();
 
 		String url = BASEURL + "/articles?locale=" + this.locale + "&format=xml";
@@ -71,7 +71,11 @@ public class WikilocationRetriever implements ArticleRetriever {
 		}
 		Log.d("PositionInfo", url);
 		try {
-			Document doc = this.dBuilder.parse(loadXml(url));
+			InputStream is = loadXml(url);
+			if (is == null) {
+				throw new IOException();
+			}
+			Document doc = this.dBuilder.parse(is);
 			doc.getDocumentElement().normalize();
 
 			NodeList articleNodes = doc.getElementsByTagName("article");

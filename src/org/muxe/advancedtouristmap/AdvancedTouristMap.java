@@ -662,7 +662,7 @@ public class AdvancedTouristMap extends MapActivity {
 		// }
 		//
 		// this.mapView.getOverlays().add(circleOverlay2);
-		
+
 		timings.dumpToLog();
 	}
 
@@ -978,8 +978,17 @@ public class AdvancedTouristMap extends MapActivity {
 			this.routeMenu.setVisibility(View.GONE);
 		}
 
-		if (this.advancedMapViewerApplication.getCurrentPois().size() > 0 || this.advancedMapViewerApplication.getCurrentWikiArticles().size() > 0) {
+		if (this.advancedMapViewerApplication.getCurrentPois().size() > 0
+				|| this.advancedMapViewerApplication.getCurrentWikiArticles()
+						.size() > 0) {
 			refreshGenericOverlay();
+			//only one poi and requested to center
+			if (this.advancedMapViewerApplication.getCurrentPois().size() == 1
+					&& startingIntent.getBooleanExtra("CENTER_POI", false)) {
+				this.mapController.setCenter(Utility.geoCoordinateToGeoPoint(this.advancedMapViewerApplication.getCurrentPois().get(0).getGeoCoordinate()));
+				//this.mapController.setZoom(16);
+				startingIntent.removeExtra("CENTER_POI");
+			}
 		}
 
 		timings.addSplit("set route");
@@ -1013,6 +1022,8 @@ public class AdvancedTouristMap extends MapActivity {
 			// TODO: better centering of the route
 			this.mapController.setCenter(route.getGeoPoints()[0]);
 			this.mapController.setZoom(16);
+			// only center on first onResume
+			startingIntent.removeExtra("ROUTE_OVERVIEW");
 		}
 		if (startingIntent.getBooleanExtra("CENTER_DP", false)) {
 			this.mapController.setCenter(route.currentDecisionPoint
@@ -1020,31 +1031,37 @@ public class AdvancedTouristMap extends MapActivity {
 			// this.mapController.setZoom(16);
 		}
 	}
-	
+
 	private void refreshGenericOverlay() {
-		TimingLogger timings = new TimingLogger("timing", "refreshGenericOverlay");
+		TimingLogger timings = new TimingLogger("timing",
+				"refreshGenericOverlay");
 		if (this.genericOverlay == null) {
 			this.genericOverlay = new GenericOverlay(this, null);
 			this.insertOverlayOrdered(this.genericOverlay);
 		} else {
 			this.genericOverlay.clear();
 		}
-		
+
 		if (this.advancedMapViewerApplication.getCurrentPois() != null) {
 			Log.d("Overlay", "inserting pois");
-			for (PointOfInterest poi : this.advancedMapViewerApplication.getCurrentPois()) {
-				this.genericOverlay.addItem(new PoiOverlayItem(poi, poi.getCategory()
-					.getTitle(), poi.getName(), ItemizedOverlay.boundCenterBottom(getResources().getDrawable(
-					R.drawable.marker_poi))));
-				//TODO BOUNDCENTER USW?
+			for (PointOfInterest poi : this.advancedMapViewerApplication
+					.getCurrentPois()) {
+				this.genericOverlay.addItem(new PoiOverlayItem(poi, poi
+						.getCategory().getTitle(), poi.getName(),
+						ItemizedOverlay.boundCenterBottom(getResources()
+								.getDrawable(R.drawable.marker_poi))));
+				// TODO BOUNDCENTER USW?
 			}
 		}
-		
+
 		if (this.advancedMapViewerApplication.getCurrentWikiArticles() != null) {
-			for (WikiArticleInterface wikiArticle : this.advancedMapViewerApplication.getCurrentWikiArticles()) {
-				this.genericOverlay.addItem(new WikiOverlayItem(wikiArticle, wikiArticle.getTitle(), null, ItemizedOverlay.boundCenter(getResources()
-					.getDrawable(R.drawable.wikipedia_30))));
-				//TODO BOUNDCENTER USW?
+			for (WikiArticleInterface wikiArticle : this.advancedMapViewerApplication
+					.getCurrentWikiArticles()) {
+				this.genericOverlay.addItem(new WikiOverlayItem(wikiArticle,
+						wikiArticle.getTitle(), null, ItemizedOverlay
+								.boundCenter(getResources().getDrawable(
+										R.drawable.wikipedia_30))));
+				// TODO BOUNDCENTER USW?
 			}
 		}
 		timings.dumpToLog();
@@ -1284,6 +1301,9 @@ public class AdvancedTouristMap extends MapActivity {
 					if (info != null && !info.equals("")) {
 						streetName = info;
 						publishProgress(info);
+					} else {
+						// no info found, show default message
+						publishProgress(getString(R.string.selection_this_point));
 					}
 				}
 			} else if (!this.isCancelled()) {
@@ -1379,23 +1399,36 @@ public class AdvancedTouristMap extends MapActivity {
 			if (params.length != 1) {
 				return null;
 			}
-			GeoPoint geoPoint = params[0];
-			ArticleRetriever retriever = ArticleRetrieverFactory
-					.getGeonamesReceiver(AdvancedTouristMap.this.advancedMapViewerApplication
-							.getWikiLocale());
-			ArrayList<WikiArticleInterface> articles = retriever.getArticles(
-					geoPoint, 20000, 50, 0);
-			AdvancedTouristMap.this.advancedMapViewerApplication
-					.getCurrentWikiArticles().clear();
-			AdvancedTouristMap.this.advancedMapViewerApplication
-					.getCurrentWikiArticles().addAll(articles);
-			return articles;
+			try {
+				GeoPoint geoPoint = params[0];
+				ArticleRetriever retriever = ArticleRetrieverFactory
+						.getGeonamesReceiver(AdvancedTouristMap.this.advancedMapViewerApplication
+								.getWikiLocale());
+				ArrayList<WikiArticleInterface> articles = retriever
+						.getArticles(geoPoint, 20000, 50, 0);
+
+				AdvancedTouristMap.this.advancedMapViewerApplication
+						.getCurrentWikiArticles().clear();
+				AdvancedTouristMap.this.advancedMapViewerApplication
+						.getCurrentWikiArticles().addAll(articles);
+				return articles;
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<WikiArticleInterface> result) {
-//			AdvancedTouristMap.this.displayWikiOverlay(result);
-			refreshGenericOverlay();
+			// AdvancedTouristMap.this.displayWikiOverlay(result);
+			if (result != null) {
+				refreshGenericOverlay();
+			} else {
+				// something went wrong, let the user know
+				Toast.makeText(AdvancedTouristMap.this,
+						getString(R.string.wikipedia_no_connection),
+						Toast.LENGTH_LONG);
+			}
 		}
 
 	}
