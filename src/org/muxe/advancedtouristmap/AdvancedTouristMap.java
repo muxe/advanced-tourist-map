@@ -601,12 +601,8 @@ public class AdvancedTouristMap extends MapActivity {
 
 		if (savedInstanceState != null
 				&& savedInstanceState.getBoolean("locationListener")) {
-			if (this.locationManager
-					.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-				enableFollowGPS();
-			} else {
-				showDialog(DIALOG_GPS_DISABLED);
-			}
+			//no checking of GPS, because other sources are used as well
+			enableFollowGPS();
 		}
 
 		this.mGestureDetector = new GestureDetector(this, new ScrollListener());

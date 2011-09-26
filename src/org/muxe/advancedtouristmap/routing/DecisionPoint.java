@@ -18,6 +18,7 @@ package org.muxe.advancedtouristmap.routing;
 
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.core.Vertex;
+import org.muxe.advancedtouristmap.Utility;
 
 /**
  * A decision point is a point on a route where the user has to change streets.
@@ -62,8 +63,7 @@ public class DecisionPoint {
 	public DecisionPoint(String name, Vertex vertex) {
 		this.name = name;
 		vertex.getCoordinate();
-		this.geoPoint = new GeoPoint(vertex.getCoordinate().getLatitude(), vertex
-				.getCoordinate().getLongitude());
+		this.geoPoint = Utility.geoCoordinateToGeoPoint(vertex.getCoordinate());
 	}
 
 	@Override

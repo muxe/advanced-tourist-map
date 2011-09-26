@@ -24,6 +24,7 @@ import org.mapsforge.android.maps.OverlayWay;
 import org.mapsforge.core.Edge;
 import org.mapsforge.core.GeoCoordinate;
 import org.mapsforge.core.Vertex;
+import org.muxe.advancedtouristmap.Utility;
 
 import android.util.Log;
 
@@ -82,13 +83,11 @@ public class Route {
 			ArrayList<GeoPoint> list = new ArrayList<GeoPoint>();
 			if (route.length > 0) {
 				GeoCoordinate src = route[0].getSource().getCoordinate();
-				list.add(new GeoPoint(src.getLatitude(), src.getLongitude()));
+				list.add(Utility.geoCoordinateToGeoPoint(src));
 				for (int i = 0; i < route.length; i++) {
 					GeoCoordinate[] coords = route[i].getAllWaypoints();
 					for (int j = 1; j < coords.length; j++) {
-						GeoPoint gp = new GeoPoint(coords[j].getLatitude(),
-								coords[j].getLongitude());
-						list.add(gp);
+						list.add(Utility.geoCoordinateToGeoPoint(coords[j]));
 					}
 				}
 			}
