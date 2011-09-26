@@ -53,6 +53,7 @@ public class AdvancedTouristMapApplication extends Application {
 	private String currentRoutingFile;
 	public SharedPreferences prefs;
 	private IPersistenceManager perstManager;
+	public boolean positioningEnabled;
 
 	@Override
 	public void onCreate() {

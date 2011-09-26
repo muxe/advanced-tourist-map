@@ -174,4 +174,8 @@
 	<string name="file_picker_this_directory">This Directory</string>
 	<string name="select_a_valid_mapfile">"Can\'t show map, please select a valid Mapfile"</string>
 	<string name="wikipedia_no_connection">Connection problem, couldn\'t load wikipedia articles</string>
+	<string name="preference_offline_mode">Offline Mode</string>
+	<string name="preference_offline_mode_summary">Forbids all online features</string>
+	<string name="preferences_location_updates">Keep location updates</string>
+	<string name="preferences_location_updates_summary">Application keeps track of your position, even when the map is not visible. This consumes more battery life.</string>
 </resources>

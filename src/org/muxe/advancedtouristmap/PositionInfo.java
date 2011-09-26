@@ -181,7 +181,7 @@ public class PositionInfo extends BaseActivity {
 				PositionInfo.this.advancedMapViewer.getCurrentPois().clear();
 				PositionInfo.this.advancedMapViewer.getCurrentPois().add(poi);
 				startActivity(new Intent(PositionInfo.this, AdvancedTouristMap.class)
-						.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP));
+						.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP).putExtra("CENTER_POI", true));
 			}
 		});
 

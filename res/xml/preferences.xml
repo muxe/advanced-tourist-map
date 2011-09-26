@@ -27,6 +27,8 @@
 			android:title="@string/preferences_move_speed" android:summary="@string/preferences_move_speed_desc" android:key="moveSpeed"/>
 		<Preference android:title="@string/preferences_bundle_path" android:key="baseBundlePath"/>
 		<ListPreference android:key="wikiLang" android:title="@string/preferences_wikipedia_language" android:summary="@string/preferences_wikipedia_language_desc" android:entryValues="@array/preferences_wikipedia_language_keys" android:entries="@array/preferences_wikipedia_language_values"/>
+		<CheckBoxPreference android:key="offline_mode" android:summary="@string/preference_offline_mode_summary" android:title="@string/preference_offline_mode"></CheckBoxPreference>
+		<CheckBoxPreference android:key="keep_location_updates" android:summary="@string/preferences_location_updates_summary" android:title="@string/preferences_location_updates"></CheckBoxPreference>
 	</PreferenceCategory>
 
 	<PreferenceCategory android:title="@string/preferences_debug">

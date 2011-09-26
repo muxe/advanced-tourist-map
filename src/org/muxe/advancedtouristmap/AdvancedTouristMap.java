@@ -57,7 +57,6 @@ import org.muxe.advancedtouristmap.wikipedia.ArticleRetrieverFactory;
 import org.muxe.advancedtouristmap.wikipedia.WikiArticleInterface;
 
 import android.app.AlertDialog;
-import android.app.AlertDialog.Builder;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -94,14 +93,10 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.WindowManager;
-import android.webkit.WebChromeClient;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -122,6 +117,7 @@ public class AdvancedTouristMap extends MapActivity {
 	private static final int SCREENSHOT_QUALITY = 90;
 	private static final int SELECT_MAP_FILE = 0;
 	private static final int INTENT_SEARCH = 1;
+	static final String TAG = AdvancedTouristMap.class.getSimpleName();
 
 	/**
 	 * The default size of the memory card cache.
@@ -164,9 +160,10 @@ public class AdvancedTouristMap extends MapActivity {
 	private ImageButton previousDecisionPointButton;
 	// private ImageButton showRoutingListButton;
 
-	private boolean followGpsEnabled;
+	// private boolean followGpsEnabled;
 	boolean centerGpsEnabled;
 	GeoPoint lastPosition;
+	Location currentBestLocation;
 	private LocationListener locationListener;
 	private LocationManager locationManager;
 	private MapViewMode mapViewMode;
@@ -192,7 +189,8 @@ public class AdvancedTouristMap extends MapActivity {
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent ev) {
 		// disable auto following position on scrolling the map
-		if (this.followGpsEnabled && this.centerGpsEnabled) {
+		if (this.advancedMapViewerApplication.positioningEnabled
+				&& this.centerGpsEnabled) {
 			this.mGestureDetector.onTouchEvent(ev);
 		}
 		return super.dispatchTouchEvent(ev);
@@ -222,7 +220,7 @@ public class AdvancedTouristMap extends MapActivity {
 			return true;
 
 		case R.id.menu_position_gps_toggle:
-			if (this.followGpsEnabled) {
+			if (this.advancedMapViewerApplication.positioningEnabled) {
 				disableFollowGPS(true);
 			} else {
 				if (this.locationManager
@@ -305,7 +303,7 @@ public class AdvancedTouristMap extends MapActivity {
 		MenuItem toggleGps = menu.findItem(R.id.menu_position_gps_toggle);
 		if (this.locationManager == null) {
 			toggleGps.setEnabled(false);
-		} else if (this.followGpsEnabled) {
+		} else if (this.advancedMapViewerApplication.positioningEnabled) {
 			toggleGps.setTitle(R.string.menu_position_gps_disable);
 		} else {
 			toggleGps.setTitle(R.string.menu_position_gps_enable);
@@ -424,29 +422,42 @@ public class AdvancedTouristMap extends MapActivity {
 		// this.mapView.getOverlays().add(this.positionOverlay);
 		this.insertOverlayOrdered(this.positionOverlay);
 
-		this.followGpsEnabled = true;
+		this.advancedMapViewerApplication.positioningEnabled = true;
 		this.centerGpsEnabled = true;
+
+		// get cached locations first
+		Location currentLocation;
+		for (String provider : this.locationManager.getProviders(true)) {
+			currentLocation = this.locationManager
+					.getLastKnownLocation(provider);
+			if (currentLocation != null) {
+				if (Utility.isBetterLocation(currentLocation,
+						this.currentBestLocation)) {
+					this.currentBestLocation = currentLocation;
+					setNewPosition(currentLocation);
+					Log.d(TAG, "got better cached location from: " + provider
+							+ " (" + currentLocation.getAccuracy() + ")");
+				} else {
+					Log.d(TAG, "dismissed location from: " + provider + " ("
+							+ currentLocation.getAccuracy() + ")");
+				}
+			}
+		}
+
 		this.locationListener = new LocationListener() {
 			@Override
 			public void onLocationChanged(Location location) {
-				GeoPoint point = new GeoPoint(location.getLatitude(),
-						location.getLongitude());
-				AdvancedTouristMap.this.lastPosition = point;
-				if (AdvancedTouristMap.this.centerGpsEnabled) {
-					AdvancedTouristMap.this.mapController.setCenter(point);
-				} else {
-					AdvancedTouristMap.this.positionOverlay.requestRedraw();
+				if (Utility.isBetterLocation(location,
+						AdvancedTouristMap.this.currentBestLocation)) {
+					setNewPosition(location);
 				}
-				AdvancedTouristMap.this.gpsView
-						.setImageResource(R.drawable.stat_sys_gps_on);
-				AdvancedTouristMap.this.overlayCircle.setCircleData(point,
-						location.getAccuracy());
 			}
 
 			@Override
 			public void onProviderDisabled(String provider) {
-				disableFollowGPS(false);
-				showDialog(DIALOG_GPS_DISABLED);
+				// we can have multiple location sources
+				// disableFollowGPS(false);
+				// showDialog(DIALOG_GPS_DISABLED);
 			}
 
 			@Override
@@ -473,17 +484,23 @@ public class AdvancedTouristMap extends MapActivity {
 			}
 		};
 
-		if (this.locationManager
-				.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-			this.locationManager.requestLocationUpdates(
-					LocationManager.GPS_PROVIDER, 1000, 0,
-					this.locationListener);
-		} else {
-			this.locationManager.requestLocationUpdates(
-					LocationManager.NETWORK_PROVIDER, 1000, 0,
-					this.locationListener);
-			showToast("Enable GPS for more accurate positioning");
-		}
+		this.locationManager.requestLocationUpdates(
+				LocationManager.GPS_PROVIDER, 1000, 0, this.locationListener);
+		this.locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 1000, 0,
+				this.locationListener);
+
+		// if (this.locationManager
+		// .isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+		// this.locationManager.requestLocationUpdates(
+		// LocationManager.GPS_PROVIDER, 1000, 0,
+		// this.locationListener);
+		// } else {
+		// this.locationManager.requestLocationUpdates(
+		// LocationManager.NETWORK_PROVIDER, 1000, 0,
+		// this.locationListener);
+		// }
+
 		this.gpsView.setImageResource(R.drawable.stat_sys_gps_acquiring);
 		this.gpsView.setVisibility(View.VISIBLE);
 		this.gpsView.setOnClickListener(new OnClickListener() {
@@ -508,6 +525,18 @@ public class AdvancedTouristMap extends MapActivity {
 				}
 			}
 		});
+	}
+
+	private void setNewPosition(Location location) {
+		GeoPoint point = new GeoPoint(location.getLatitude(),
+				location.getLongitude());
+		this.lastPosition = point;
+		if (this.centerGpsEnabled) {
+			this.mapController.setCenter(point);
+		} else {
+			this.positionOverlay.requestRedraw();
+		}
+		this.overlayCircle.setCircleData(point, location.getAccuracy());
 	}
 
 	private void startBundleBrowser() {
@@ -599,9 +628,9 @@ public class AdvancedTouristMap extends MapActivity {
 		// this.mapView.getOverlays().add(this.selectionOverlay);
 		this.insertOverlayOrdered(this.selectionOverlay);
 
-		if (savedInstanceState != null
-				&& savedInstanceState.getBoolean("locationListener")) {
-			//no checking of GPS, because other sources are used as well
+		if (this.advancedMapViewerApplication.positioningEnabled
+				|| (savedInstanceState != null && savedInstanceState
+						.getBoolean("locationListener"))) {
 			enableFollowGPS();
 		}
 
@@ -764,8 +793,13 @@ public class AdvancedTouristMap extends MapActivity {
 		if (this.wakeLock.isHeld()) {
 			this.wakeLock.release();
 		}
+		// disable info setter thread
 		if (this.infoSetter != null) {
 			this.infoSetter.cancel(false);
+		}
+		// disable (pause) location updates
+		if (!this.preferences.getBoolean("keep_location_updates", false)) {
+			pauseFollowGps();
 		}
 	}
 
@@ -964,6 +998,12 @@ public class AdvancedTouristMap extends MapActivity {
 		}
 		timings.addSplit("set map file");
 
+		// check if positioning is requested but was paused
+		if (this.locationListener == null
+				&& this.advancedMapViewerApplication.positioningEnabled) {
+			enableFollowGPS();
+		}
+
 		// draw the route, if there is any
 		if (this.advancedMapViewerApplication.currentRoute != null) {
 			this.displayRouteOverlay(
@@ -978,11 +1018,15 @@ public class AdvancedTouristMap extends MapActivity {
 				|| this.advancedMapViewerApplication.getCurrentWikiArticles()
 						.size() > 0) {
 			refreshGenericOverlay();
-			//only one poi and requested to center
+			// only one poi and requested to center
 			if (this.advancedMapViewerApplication.getCurrentPois().size() == 1
 					&& startingIntent.getBooleanExtra("CENTER_POI", false)) {
-				this.mapController.setCenter(Utility.geoCoordinateToGeoPoint(this.advancedMapViewerApplication.getCurrentPois().get(0).getGeoCoordinate()));
-				//this.mapController.setZoom(16);
+				this.mapController
+						.setCenter(Utility
+								.geoCoordinateToGeoPoint(this.advancedMapViewerApplication
+										.getCurrentPois().get(0)
+										.getGeoCoordinate()));
+				// this.mapController.setZoom(16);
 				startingIntent.removeExtra("CENTER_POI");
 			}
 		}
@@ -1140,6 +1184,7 @@ public class AdvancedTouristMap extends MapActivity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		Log.d("lifecycle", "amv onSaveInstanceState");
 		outState.putBoolean("locationListener", this.locationListener != null);
 	}
 
@@ -1155,7 +1200,7 @@ public class AdvancedTouristMap extends MapActivity {
 			// this.positionOverlay.clear();
 			this.positionOverlay = null;
 		}
-		if (this.followGpsEnabled) {
+		if (this.advancedMapViewerApplication.positioningEnabled) {
 			if (this.locationListener != null) {
 				this.locationManager.removeUpdates(this.locationListener);
 				this.locationListener = null;
@@ -1166,7 +1211,18 @@ public class AdvancedTouristMap extends MapActivity {
 			if (showToastMessage) {
 				showToast(getString(R.string.follow_gps_disabled));
 			}
-			this.followGpsEnabled = false;
+			this.advancedMapViewerApplication.positioningEnabled = false;
+		}
+	}
+
+	/**
+	 * Removes updates on the locationListener but keeps an info that the app
+	 * still wants location updates, when it gets resumed
+	 */
+	void pauseFollowGps() {
+		if (this.locationListener != null) {
+			this.locationManager.removeUpdates(this.locationListener);
+			this.locationListener = null;
 		}
 	}
 
