@@ -44,6 +44,7 @@ import org.mapsforge.core.Vertex;
 import org.mapsforge.poi.PointOfInterest;
 import org.muxe.advancedtouristmap.overlay.GenericOverlay;
 import org.muxe.advancedtouristmap.overlay.PoiOverlayItem;
+import org.muxe.advancedtouristmap.overlay.PositionOverlayItem;
 import org.muxe.advancedtouristmap.overlay.WikiOverlayItem;
 import org.muxe.advancedtouristmap.poi.PoiBrowserActivity;
 import org.muxe.advancedtouristmap.routing.DecisionOverlay;
@@ -143,7 +144,7 @@ public class AdvancedTouristMap extends MapActivity {
 
 	private InfoSetterAsync infoSetter;
 
-	ArrayCircleOverlay positionOverlay;
+	ArrayCircleOverlay positionCircleOverlay;
 	private Paint circleOverlayFill;
 	private Paint circleOverlayOutline;
 	private ArrayWayOverlay routeOverlay;
@@ -153,6 +154,7 @@ public class AdvancedTouristMap extends MapActivity {
 	// Drawable selectionDrawable;
 	OverlayItem selectionOverlayItem;
 	private boolean displayRoute;
+	private PositionOverlayItem positionOverlayItem;
 
 	// routing menu
 	LinearLayout routeMenu;
@@ -415,12 +417,17 @@ public class AdvancedTouristMap extends MapActivity {
 	}
 
 	private void enableFollowGPS() {
-		this.positionOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
+		this.positionCircleOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
 				this.circleOverlayOutline);
 		this.overlayCircle = new OverlayCircle();
-		this.positionOverlay.addCircle(this.overlayCircle);
+		this.positionCircleOverlay.addCircle(this.overlayCircle);
 		// this.mapView.getOverlays().add(this.positionOverlay);
-		this.insertOverlayOrdered(this.positionOverlay);
+		this.insertOverlayOrdered(this.positionCircleOverlay);
+		this.positionOverlayItem = new PositionOverlayItem();
+		this.positionOverlayItem.setMarker(ItemizedOverlay
+				.boundCenter(getResources().getDrawable(
+						R.drawable.ic_maps_indicator_current_position)));
+		refreshGenericOverlay();
 
 		this.advancedMapViewerApplication.positioningEnabled = true;
 		this.centerGpsEnabled = true;
@@ -531,12 +538,16 @@ public class AdvancedTouristMap extends MapActivity {
 		GeoPoint point = new GeoPoint(location.getLatitude(),
 				location.getLongitude());
 		this.lastPosition = point;
+		this.overlayCircle.setCircleData(point, location.getAccuracy());
+		this.positionOverlayItem.setPoint(point);
 		if (this.centerGpsEnabled) {
 			this.mapController.setCenter(point);
 		} else {
-			this.positionOverlay.requestRedraw();
+			//refresh position "circle"
+			this.positionCircleOverlay.requestRedraw();
+			//refresh position "point"
+			this.genericOverlay.requestRedraw();
 		}
-		this.overlayCircle.setCircleData(point, location.getAccuracy());
 	}
 
 	private void startBundleBrowser() {
@@ -1104,17 +1115,30 @@ public class AdvancedTouristMap extends MapActivity {
 				// TODO BOUNDCENTER USW?
 			}
 		}
+
+		if (this.positionOverlayItem != null) {
+			this.genericOverlay.addItem(this.positionOverlayItem);
+		}
 		timings.dumpToLog();
 	}
 
 	private void clearAllOverlays() {
 		// clear route
 		this.disableShowRoute();
-		// clear pois
-		this.disableGenericOverlay();
+		//if position is shown, generic overlay is still needed
+		if (this.positionOverlayItem != null) {
+			// clear pois
+			this.disablePoiOverlay();
+			// clear wikipedia
+			this.disableWikipediaOverlay();
+			//and refresh the overlay
+			this.refreshGenericOverlay();
+		} else {
+			//no position, so remove the whole generic overlay
+			this.disableGenericOverlay();			
+		}
 		// clear info
 		this.selectionOverlay.clear();
-		// clear wikipedia
 	}
 
 	private void disableShowRoute() {
@@ -1126,10 +1150,18 @@ public class AdvancedTouristMap extends MapActivity {
 		this.displayRoute = false;
 		this.routeMenu.setVisibility(View.GONE);
 	}
+	
+	private void disableWikipediaOverlay() {
+		this.advancedMapViewerApplication.getCurrentWikiArticles().clear();
+	}
+	
+	private void disablePoiOverlay() {
+		this.advancedMapViewerApplication.getCurrentPois().clear();
+	}
 
 	private void disableGenericOverlay() {
-		this.advancedMapViewerApplication.getCurrentPois().clear();
-		this.advancedMapViewerApplication.getCurrentWikiArticles().clear();
+		this.disableWikipediaOverlay();
+		this.disablePoiOverlay();
 		if (this.genericOverlay != null) {
 			this.mapView.getOverlays().remove(this.genericOverlay);
 			this.genericOverlay = null;
@@ -1145,7 +1177,7 @@ public class AdvancedTouristMap extends MapActivity {
 			this.mapView.getOverlays().add(overlay);
 		} else if (overlay instanceof ArrayWayOverlay) {
 			int positionIndex = this.mapView.getOverlays().indexOf(
-					this.positionOverlay);
+					this.positionCircleOverlay);
 			if (positionIndex >= 0) {
 				// positionOverlay is in, so insert this one behind
 				this.mapView.getOverlays().add(positionIndex + 1, overlay);
@@ -1157,7 +1189,7 @@ public class AdvancedTouristMap extends MapActivity {
 			int routeIndex = this.mapView.getOverlays().indexOf(
 					this.routeOverlay);
 			int positionIndex = this.mapView.getOverlays().indexOf(
-					this.positionOverlay);
+					this.positionCircleOverlay);
 			if (routeIndex >= 0) {
 				// insert behind routeOverlay
 				this.mapView.getOverlays().add(routeIndex + 1, overlay);
@@ -1195,10 +1227,17 @@ public class AdvancedTouristMap extends MapActivity {
 	 *            if a toast message should be displayed or not.
 	 */
 	void disableFollowGPS(boolean showToastMessage) {
-		if (this.positionOverlay != null) {
-			this.mapView.getOverlays().remove(this.positionOverlay);
+		//remove the position "circle"
+		if (this.positionCircleOverlay != null) {
+			this.mapView.getOverlays().remove(this.positionCircleOverlay);
 			// this.positionOverlay.clear();
-			this.positionOverlay = null;
+			this.positionCircleOverlay = null;
+		}
+		//remove the position "dot"
+		if (this.genericOverlay != null && this.positionOverlayItem != null) {
+			this.genericOverlay.removeItem(this.positionOverlayItem);
+			this.positionOverlayItem = null;
+			this.genericOverlay.requestRedraw();			
 		}
 		if (this.advancedMapViewerApplication.positioningEnabled) {
 			if (this.locationListener != null) {

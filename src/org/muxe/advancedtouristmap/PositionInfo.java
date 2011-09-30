@@ -35,6 +35,8 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.util.TimingLogger;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
@@ -163,8 +165,10 @@ public class PositionInfo extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		this.advancedMapViewer.setViewWithHelp(this, R.layout.activity_position_info);
-		// setContentView(R.layout.activity_position_info);
+//		 setContentView(R.layout.activity_position_info);
+		
 		this.positionInfoLatitude = (TextView) findViewById(R.id.position_info_latitude);
 		this.positionInfoLongitude = (TextView) findViewById(R.id.position_info_longitude);
 		this.nearestJunktionText = (TextView) findViewById(R.id.position_info_text_nearest_junktion);
