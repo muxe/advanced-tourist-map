@@ -166,8 +166,12 @@ public class PositionInfo extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
+//		long begin = System.currentTimeMillis();
 		this.advancedMapViewer.setViewWithHelp(this, R.layout.activity_position_info);
-//		 setContentView(R.layout.activity_position_info);
+//		setContentView(R.layout.activity_position_info);
+//		long end = System.currentTimeMillis();
+//		long took = end - begin;
+//		Log.d(TAG, "took: " + took);
 		
 		this.positionInfoLatitude = (TextView) findViewById(R.id.position_info_latitude);
 		this.positionInfoLongitude = (TextView) findViewById(R.id.position_info_longitude);

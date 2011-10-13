@@ -21,11 +21,12 @@
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:layout_gravity="center" />
 			<EditText android:id="@+id/calculate_route_edittext_start"
-				android:layout_height="wrap_content" android:text="@string/routing_select_start"
+				android:layout_height="wrap_content"
 				android:layout_width="match_parent" android:enabled="true"
 				android:editable="false" android:ellipsize="end"
 				android:cursorVisible="false" android:lines="1"
-				android:scrollHorizontally="true" android:layout_weight="1" />
+				android:scrollHorizontally="true" android:layout_weight="1" 
+				android:hint="@string/routing_select_start" />
 			<ImageButton android:src="@drawable/ic_btn_round_more_normal"
 				android:id="@+id/calculate_route_button_choose_start"
 				android:layout_width="wrap_content" android:layout_height="wrap_content" />
@@ -35,7 +36,7 @@
 			<TextView android:text="@string/routing_destination_point"
 				android:layout_width="wrap_content" android:layout_height="wrap_content"
 				android:layout_gravity="center" />
-			<EditText android:text="@string/routing_select_destination"
+			<EditText android:hint="@string/routing_select_destination"
 				android:id="@+id/calculate_route_edittext_dest"
 				android:layout_width="match_parent" android:layout_height="wrap_content"
 				android:editable="false" android:enabled="true" android:ellipsize="end"

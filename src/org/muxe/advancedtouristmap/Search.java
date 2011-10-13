@@ -235,6 +235,7 @@ public class Search extends BaseActivity {
 						newCity.getId()));
 
 				Search.this.editRoad.requestFocus();
+				Search.this.editRoad.selectAll();
 			}
 		});
 
