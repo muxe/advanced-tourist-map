@@ -23,6 +23,7 @@ import java.util.List;
 import org.muxe.advancedtouristmap.R;
 import org.muxe.advancedtouristmap.AdvancedTouristMap;
 import org.muxe.advancedtouristmap.BaseActivity;
+import org.muxe.advancedtouristmap.Utility;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -66,13 +67,13 @@ public class RouteList extends BaseActivity {
 
 		if (route != null) {
 			this.decisionPoints = route.getDecisionPoints();
-			this.routeLengthView.setText(route.getLength() + " m");
+			this.routeLengthView.setText(Utility.meterToReadableDistance(route.getLength()));
 
 			List<HashMap<String, Object>> fillMaps = new ArrayList<HashMap<String, Object>>();
 			for (DecisionPoint dp : this.decisionPoints) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
 				map.put(NAMEKEY, dp.getName());
-				map.put(DESCKEY, dp.getDistance() + " m");
+				map.put(DESCKEY, Utility.meterToReadableDistance(dp.getDistance()));
 				double angle = dp.getAngleFromPrevious();
 				if (angle > 337 || angle < 22) {
 					map.put(IMAGEKEY, R.drawable.routing_forward);

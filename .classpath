@@ -9,5 +9,5 @@
 	<classpathentry kind="lib" path="lib/search_android.jar"/>
 	<classpathentry kind="lib" path="lib/perst-421.jar"/>
 	<classpathentry kind="lib" path="lib/mapsforge_poi.jar"/>
-	<classpathentry kind="output" path="bin"/>
+	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

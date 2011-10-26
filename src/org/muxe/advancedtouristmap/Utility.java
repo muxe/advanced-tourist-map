@@ -1,9 +1,12 @@
 package org.muxe.advancedtouristmap;
 
+import java.text.DecimalFormat;
+
 import org.mapsforge.android.maps.GeoPoint;
 import org.mapsforge.core.GeoCoordinate;
 
 import android.location.Location;
+import android.util.Log;
 
 public class Utility {
 	
@@ -83,5 +86,14 @@ public class Utility {
 			return provider2 == null;
 		}
 		return provider1.equals(provider2);
+	}
+	
+	public static String meterToReadableDistance(int meter) {
+		if (meter >= 1000) {
+			DecimalFormat df = new DecimalFormat("0.00");
+			Log.d("Utility", (float) meter + " / 1000 = " + ((float) meter / 1000));
+			return df.format((float) meter / 1000) + " km";
+		}
+		return meter + " m";
 	}
 }

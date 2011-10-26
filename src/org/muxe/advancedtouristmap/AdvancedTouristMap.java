@@ -98,6 +98,7 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -155,6 +156,7 @@ public class AdvancedTouristMap extends MapActivity {
 	OverlayItem selectionOverlayItem;
 	private boolean displayRoute;
 	private PositionOverlayItem positionOverlayItem;
+	private ProgressBar progressBar;
 
 	// routing menu
 	LinearLayout routeMenu;
@@ -604,6 +606,7 @@ public class AdvancedTouristMap extends MapActivity {
 		this.gpsView = (ImageView) findViewById(R.id.gpsView);
 		this.centerView = (ImageView) findViewById(R.id.centerView);
 		this.routeMenu = (LinearLayout) findViewById(R.id.routeMenu);
+		this.progressBar = (ProgressBar) findViewById(R.id.mapview_progress_bar);
 
 		configureMapView();
 
@@ -1520,6 +1523,20 @@ public class AdvancedTouristMap extends MapActivity {
 						getString(R.string.wikipedia_no_connection),
 						Toast.LENGTH_LONG);
 			}
+			//remove the ProgressBar
+			AdvancedTouristMap.this.progressBar.setVisibility(View.GONE);
+			
+		}
+
+		@Override
+		protected void onPreExecute() {
+			AdvancedTouristMap.this.progressBar.setVisibility(View.VISIBLE);
+		}
+
+		@Override
+		protected void onCancelled() {
+			//remove the ProgressBar
+			AdvancedTouristMap.this.progressBar.setVisibility(View.GONE);
 		}
 
 	}
