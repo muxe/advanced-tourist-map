@@ -66,11 +66,11 @@ public class RouteCalculator extends BaseActivity {
 
 	protected static final int DIALOG_CHOOSE_INPUT = 0;
 
-	private static final int TWO_MINUTES = 1000 * 60 * 2;
 	private static final String SAVE_START_LAT = "saved_start_lat";
 	private static final String SAVE_START_LON = "saved_start_lon";
 	private static final String SAVE_DEST_LAT = "saved_dest_lat";
 	private static final String SAVE_DEST_LON = "saved_dest_lon";
+	private static final String SAVE_RF_POSITION = "saved_dest_lon";
 
 	GeoPoint startPoint;
 	GeoPoint destPoint;
@@ -94,6 +94,7 @@ public class RouteCalculator extends BaseActivity {
 	Location currentBestLocation;
 
 	Spinner routingFileSpinner;
+	private int spinnerSelection;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -258,6 +259,8 @@ public class RouteCalculator extends BaseActivity {
 				android.R.layout.simple_spinner_item, routingFiles);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		this.routingFileSpinner.setAdapter(adapter);
+		Log.d(TAG, "this.spinnerSelection: " + this.spinnerSelection);
+		this.routingFileSpinner.setSelection(this.spinnerSelection);
 	}
 
 	void startPositionSearch() {
@@ -458,11 +461,16 @@ public class RouteCalculator extends BaseActivity {
 		double startLon = savedInstanceState.getDouble(SAVE_START_LON);
 		double destLat = savedInstanceState.getDouble(SAVE_DEST_LAT);
 		double destLon = savedInstanceState.getDouble(SAVE_DEST_LON);
+		int rfPosition = savedInstanceState.getInt(SAVE_RF_POSITION, -1);
+		Log.d(TAG, "rfPosition: " + rfPosition);
 		if (startLat != 0.0 && startLon != 0.0) {
 			this.startPoint = new GeoPoint(startLat, startLon);
 		}
 		if (destLat != 0.0 && destLon != 0.0) {
 			this.destPoint = new GeoPoint(destLat, destLon);
+		}
+		if (rfPosition >= 0) {
+			this.spinnerSelection = rfPosition;
 		}
 	}
 
@@ -475,6 +483,10 @@ public class RouteCalculator extends BaseActivity {
 		if (this.destPoint != null) {
 			outState.putDouble(SAVE_DEST_LAT, this.destPoint.getLatitude());
 			outState.putDouble(SAVE_DEST_LON, this.destPoint.getLongitude());
+		}
+		if (this.routingFileSpinner.getSelectedItemPosition() != Spinner.INVALID_POSITION) {
+			Log.d(TAG, "saved Position: " + this.routingFileSpinner.getSelectedItemPosition());
+			outState.putInt(SAVE_RF_POSITION, this.routingFileSpinner.getSelectedItemPosition());
 		}
 		super.onSaveInstanceState(outState);
 	}
