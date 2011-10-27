@@ -19,17 +19,22 @@ package org.muxe.advancedtouristmap.routing;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.muxe.advancedtouristmap.R;
 import org.muxe.advancedtouristmap.AdvancedTouristMap;
 import org.muxe.advancedtouristmap.BaseActivity;
+import org.muxe.advancedtouristmap.R;
 import org.muxe.advancedtouristmap.Utility;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -49,13 +54,12 @@ public class RouteList extends BaseActivity {
 
 	private ListView routingList;
 	private Button viewOnMapButton;
-	private SimpleAdapter routingAdapter;
+	private DPAdapter routingAdapter;
 	private TextView routeLengthView;
 	DecisionPoint[] decisionPoints;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO: check if route is null
 		super.onCreate(savedInstanceState);
 		this.advancedMapViewer.setViewWithHelp(this, R.layout.activity_route_list);
 
@@ -64,6 +68,10 @@ public class RouteList extends BaseActivity {
 		this.routeLengthView = (TextView) findViewById(R.id.routing_list_length);
 
 		Route route = this.advancedMapViewer.currentRoute;
+		
+		//check if dp selected from map
+		Intent startingIntent = getIntent();
+		int dpIndex = startingIntent.getIntExtra("dp_index", -1);
 
 		if (route != null) {
 			this.decisionPoints = route.getDecisionPoints();
@@ -72,7 +80,7 @@ public class RouteList extends BaseActivity {
 			List<HashMap<String, Object>> fillMaps = new ArrayList<HashMap<String, Object>>();
 			for (DecisionPoint dp : this.decisionPoints) {
 				HashMap<String, Object> map = new HashMap<String, Object>();
-				map.put(NAMEKEY, dp.getName());
+				map.put(NAMEKEY, dp.getName());	
 				map.put(DESCKEY, Utility.meterToReadableDistance(dp.getDistance()));
 				double angle = dp.getAngleFromPrevious();
 				if (angle > 337 || angle < 22) {
@@ -109,12 +117,17 @@ public class RouteList extends BaseActivity {
 			int[] to = new int[] { R.id.decision_point_row_name,
 					R.id.decision_point_row_description, R.id.decision_point_row_image };
 
-			this.routingAdapter = new SimpleAdapter(this, fillMaps,
-					R.layout.decision_point_row, from, to);
+			this.routingAdapter = new DPAdapter(this, fillMaps,
+					R.layout.decision_point_row, from, to, dpIndex);
 
 			// this.routingAdapter = new ArrayAdapter<DecisionPoint>(this,
 			// android.R.layout.simple_list_item_1, decisionPoints);
 			this.routingList.setAdapter(this.routingAdapter);
+			
+			//jump List to selected dp
+			if (dpIndex >= 0) {
+				this.routingList.setSelection(dpIndex);				
+			}
 
 			this.routingList.setOnItemClickListener(new OnItemClickListener() {
 				@Override
@@ -148,5 +161,27 @@ public class RouteList extends BaseActivity {
 	protected void onResume() {
 		super.onResume();
 	}
+	
+	private class DPAdapter extends SimpleAdapter {
+		
+		private int highlight;
 
+		public DPAdapter(Context context, List<? extends Map<String, ?>> data,
+				int resource, String[] from, int[] to, int highlight) {
+			super(context, data, resource, from, to);
+			this.highlight = highlight;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			View view = super.getView(position, convertView, parent);
+			if (position == this.highlight) {
+				view.setBackgroundColor(Color.DKGRAY);
+			} else {
+				view.setBackgroundColor(Color.BLACK);
+			}
+			return view;
+		}
+		
+	}
 }

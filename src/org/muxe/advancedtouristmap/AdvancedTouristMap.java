@@ -1059,7 +1059,7 @@ public class AdvancedTouristMap extends MapActivity {
 		}
 
 		if (this.decisionPointOverlay == null) {
-			this.decisionPointOverlay = new DecisionOverlay(getResources()
+			this.decisionPointOverlay = new DecisionOverlay(this, getResources()
 					.getDrawable(R.drawable.jog_tab_target_gray));
 			// this.mapView.getOverlays().add(this.decisionPointOverlay);
 			this.insertOverlayOrdered(this.decisionPointOverlay);

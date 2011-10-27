@@ -18,6 +18,8 @@ package org.muxe.advancedtouristmap.routing;
 
 import org.mapsforge.android.maps.ArrayItemizedOverlay;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 
@@ -26,15 +28,19 @@ import android.util.Log;
  * center of the bounding Box
  */
 public class DecisionOverlay extends ArrayItemizedOverlay {
+	
+	private final Context context;
 
-	public DecisionOverlay(Drawable defaultMarker) {
+	public DecisionOverlay(Context context, Drawable defaultMarker) {
 		super(defaultMarker, false);
+		this.context = context;
 		boundCenter(defaultMarker);
 	}
 
 	@Override
 	protected boolean onTap(int index) {
 		Log.d("RouteCalculator", "Tapped on DecisionPoint: " + index);
+		this.context.startActivity(new Intent(this.context, RouteList.class).putExtra("dp_index", index));
 		return true;
 	}
 
