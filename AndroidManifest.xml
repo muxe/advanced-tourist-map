@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android" package="org.muxe.advancedtouristmap"
 	android:versionCode="1" android:versionName="0.1" android:installLocation="auto">
-	<application android:label="@string/application_name" android:icon="@drawable/forever_at_home_icon" android:name=".AdvancedTouristMapApplication">
+	<application android:label="@string/application_name" android:icon="@drawable/yaom_logo" android:name=".AdvancedTouristMapApplication">
 		<activity android:name=".AdvancedTouristMap" android:theme="@android:style/Theme.NoTitleBar">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
