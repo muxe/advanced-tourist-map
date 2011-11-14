@@ -1080,8 +1080,9 @@ public class AdvancedTouristMap extends MapActivity {
 			startingIntent.removeExtra("ROUTE_OVERVIEW");
 		}
 		if (startingIntent.getBooleanExtra("CENTER_DP", false)) {
-			this.mapController.setCenter(route.currentDecisionPoint
-					.getGeoPoint());
+			GeoPoint currentGP = route.currentDecisionPoint.getGeoPoint();
+			this.mapController.setCenter(currentGP);
+			this.selectionOverlay.setLabel(currentGP);
 			// this.mapController.setZoom(16);
 		}
 	}
@@ -1329,16 +1330,18 @@ public class AdvancedTouristMap extends MapActivity {
 		this.nextDecisionPointButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AdvancedTouristMap.this.mapController.setCenter(route
-						.getNextDP().getGeoPoint());
+				GeoPoint nextGP = route.getNextDP().getGeoPoint();
+				AdvancedTouristMap.this.mapController.setCenter(nextGP);
+				AdvancedTouristMap.this.selectionOverlay.setLabel(nextGP);
 			}
 		});
 		this.previousDecisionPointButton
 				.setOnClickListener(new OnClickListener() {
 					@Override
 					public void onClick(View v) {
-						AdvancedTouristMap.this.mapController.setCenter(route
-								.getPreviousDP().getGeoPoint());
+						GeoPoint previousGP = route.getPreviousDP().getGeoPoint();
+						AdvancedTouristMap.this.mapController.setCenter(previousGP);
+						AdvancedTouristMap.this.selectionOverlay.setLabel(previousGP);
 					}
 				});
 		this.showRoutingListButton.setOnClickListener(new OnClickListener() {
