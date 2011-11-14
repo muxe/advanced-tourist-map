@@ -42,33 +42,34 @@
         android:orientation="vertical"
         android:visibility="gone" >
 
-        <!-- <ImageButton android:id="@+id/route_menu_list" -->
-        <!-- android:layout_height="wrap_content" -->
-        <!-- android:layout_width="wrap_content" -->
-        <!-- android:src="@android:drawable/ic_menu_directions" /> -->
+        <ImageButton
+            android:id="@+id/route_menu_list"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dp_list" />
 
         <ImageButton
             android:id="@+id/route_menu_next"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_media_next" />
+            android:src="@drawable/dp_next" />
 
         <ImageButton
             android:id="@+id/route_menu_prev"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_media_previous" />
+            android:src="@drawable/dp_prev" />
     </LinearLayout>
 
     <ProgressBar
         android:id="@+id/mapview_progress_bar"
-        android:layout_below="@id/gpsView"
-        android:layout_alignParentRight="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="5dip"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/gpsView"
         android:layout_marginBottom="5dip"
-        android:layout_marginRight="5dip" 
+        android:layout_marginRight="5dip"
+        android:layout_marginTop="5dip"
         android:visibility="gone" />
 
 </RelativeLayout>

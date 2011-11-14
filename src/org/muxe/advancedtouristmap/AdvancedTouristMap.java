@@ -162,7 +162,7 @@ public class AdvancedTouristMap extends MapActivity {
 	LinearLayout routeMenu;
 	private ImageButton nextDecisionPointButton;
 	private ImageButton previousDecisionPointButton;
-	// private ImageButton showRoutingListButton;
+	private ImageButton showRoutingListButton;
 
 	// private boolean followGpsEnabled;
 	boolean centerGpsEnabled;
@@ -419,8 +419,8 @@ public class AdvancedTouristMap extends MapActivity {
 	}
 
 	private void enableFollowGPS() {
-		this.positionCircleOverlay = new ArrayCircleOverlay(this.circleOverlayFill,
-				this.circleOverlayOutline);
+		this.positionCircleOverlay = new ArrayCircleOverlay(
+				this.circleOverlayFill, this.circleOverlayOutline);
 		this.overlayCircle = new OverlayCircle();
 		this.positionCircleOverlay.addCircle(this.overlayCircle);
 		// this.mapView.getOverlays().add(this.positionOverlay);
@@ -545,9 +545,9 @@ public class AdvancedTouristMap extends MapActivity {
 		if (this.centerGpsEnabled) {
 			this.mapController.setCenter(point);
 		} else {
-			//refresh position "circle"
+			// refresh position "circle"
 			this.positionCircleOverlay.requestRedraw();
-			//refresh position "point"
+			// refresh position "point"
 			this.genericOverlay.requestRedraw();
 		}
 	}
@@ -1059,8 +1059,8 @@ public class AdvancedTouristMap extends MapActivity {
 		}
 
 		if (this.decisionPointOverlay == null) {
-			this.decisionPointOverlay = new DecisionOverlay(this, getResources()
-					.getDrawable(R.drawable.jog_tab_target_gray));
+			this.decisionPointOverlay = new DecisionOverlay(this,
+					getResources().getDrawable(R.drawable.jog_tab_target_gray));
 			// this.mapView.getOverlays().add(this.decisionPointOverlay);
 			this.insertOverlayOrdered(this.decisionPointOverlay);
 		} else {
@@ -1128,17 +1128,17 @@ public class AdvancedTouristMap extends MapActivity {
 	private void clearAllOverlays() {
 		// clear route
 		this.disableShowRoute();
-		//if position is shown, generic overlay is still needed
+		// if position is shown, generic overlay is still needed
 		if (this.positionOverlayItem != null) {
 			// clear pois
 			this.disablePoiOverlay();
 			// clear wikipedia
 			this.disableWikipediaOverlay();
-			//and refresh the overlay
+			// and refresh the overlay
 			this.refreshGenericOverlay();
 		} else {
-			//no position, so remove the whole generic overlay
-			this.disableGenericOverlay();			
+			// no position, so remove the whole generic overlay
+			this.disableGenericOverlay();
 		}
 		// clear info
 		this.selectionOverlay.clear();
@@ -1153,11 +1153,11 @@ public class AdvancedTouristMap extends MapActivity {
 		this.displayRoute = false;
 		this.routeMenu.setVisibility(View.GONE);
 	}
-	
+
 	private void disableWikipediaOverlay() {
 		this.advancedMapViewerApplication.getCurrentWikiArticles().clear();
 	}
-	
+
 	private void disablePoiOverlay() {
 		this.advancedMapViewerApplication.getCurrentPois().clear();
 	}
@@ -1230,17 +1230,17 @@ public class AdvancedTouristMap extends MapActivity {
 	 *            if a toast message should be displayed or not.
 	 */
 	void disableFollowGPS(boolean showToastMessage) {
-		//remove the position "circle"
+		// remove the position "circle"
 		if (this.positionCircleOverlay != null) {
 			this.mapView.getOverlays().remove(this.positionCircleOverlay);
 			// this.positionOverlay.clear();
 			this.positionCircleOverlay = null;
 		}
-		//remove the position "dot"
+		// remove the position "dot"
 		if (this.genericOverlay != null && this.positionOverlayItem != null) {
 			this.genericOverlay.removeItem(this.positionOverlayItem);
 			this.positionOverlayItem = null;
-			this.genericOverlay.requestRedraw();			
+			this.genericOverlay.requestRedraw();
 		}
 		if (this.advancedMapViewerApplication.positioningEnabled) {
 			if (this.locationListener != null) {
@@ -1323,6 +1323,9 @@ public class AdvancedTouristMap extends MapActivity {
 		if (this.previousDecisionPointButton == null) {
 			this.previousDecisionPointButton = (ImageButton) findViewById(R.id.route_menu_prev);
 		}
+		if (this.showRoutingListButton == null) {
+			this.showRoutingListButton = (ImageButton) findViewById(R.id.route_menu_list);
+		}
 		this.nextDecisionPointButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -1338,6 +1341,12 @@ public class AdvancedTouristMap extends MapActivity {
 								.getPreviousDP().getGeoPoint());
 					}
 				});
+		this.showRoutingListButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(AdvancedTouristMap.this, RouteList.class));
+			}
+		});
 		this.routeMenu.setVisibility(View.VISIBLE);
 	}
 
@@ -1523,9 +1532,9 @@ public class AdvancedTouristMap extends MapActivity {
 						getString(R.string.wikipedia_no_connection),
 						Toast.LENGTH_LONG);
 			}
-			//remove the ProgressBar
+			// remove the ProgressBar
 			AdvancedTouristMap.this.progressBar.setVisibility(View.GONE);
-			
+
 		}
 
 		@Override
@@ -1535,7 +1544,7 @@ public class AdvancedTouristMap extends MapActivity {
 
 		@Override
 		protected void onCancelled() {
-			//remove the ProgressBar
+			// remove the ProgressBar
 			AdvancedTouristMap.this.progressBar.setVisibility(View.GONE);
 		}
 
